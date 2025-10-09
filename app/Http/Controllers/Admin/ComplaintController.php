@@ -120,7 +120,14 @@ class ComplaintController extends Controller
      */
     public function show(Complaint $complaint)
     {
-        $complaint->load(['user', 'category', 'attachments', 'responses.user']);
+        $complaint->load([
+            'user',
+            'category',
+            'attachments',
+            'complaintAttachments',
+            'resolutionAttachments',
+            'responses.user'
+        ]);
 
         return view('admin.complaints.show', compact('complaint'));
     }
@@ -142,35 +149,44 @@ class ComplaintController extends Controller
     public function update(Request $request, Complaint $complaint)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
-            'location' => 'required|string|max:255',
-            'status' => ['required', Rule::in(['pending', 'in_progress', 'completed', 'rejected'])],
-            'response' => 'nullable|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'attachments.*' => 'nullable|file|max:10240',
-            'report_date' => 'required|date'
+            'status' => ['required', Rule::in(['pending', 'in_progress', 'resolved', 'rejected'])],
+            'priority' => ['required', Rule::in(['low', 'medium', 'high', 'urgent'])],
+            'admin_response' => 'nullable|string',
+            'estimated_resolution' => 'nullable|date',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'deleted_images.*' => 'nullable|exists:attachments,id',
+            'keep_images.*' => 'nullable|exists:attachments,id'
         ]);
 
-        $complaint->update($validated);
+        // Update basic complaint info
+        $complaint->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'category_id' => $validated['category_id'],
+            'status' => $validated['status'],
+            'priority' => $validated['priority'],
+            'admin_response' => $validated['admin_response'],
+            'estimated_resolution' => $validated['estimated_resolution'] ? \Carbon\Carbon::parse($validated['estimated_resolution']) : null,
+        ]);
 
-        // Handle photo update
-        if ($request->hasFile('photo')) {
-            // Delete old photo if exists
-            if ($complaint->photo) {
-                Storage::disk('public')->delete($complaint->photo);
+        // Handle deleted images
+        if ($request->has('deleted_images')) {
+            foreach ($request->deleted_images as $attachmentId) {
+                $attachment = Attachment::find($attachmentId);
+                if ($attachment && $attachment->attachable_id == $complaint->id) {
+                    Storage::disk('public')->delete($attachment->file_path);
+                    $attachment->delete();
+                }
             }
-
-            $photoPath = $request->file('photo')->store('complaints/photos', 'public');
-            $complaint->update(['photo' => $photoPath]);
         }
 
-        // Handle new attachments
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                $path = $file->store('complaints/attachments', 'public');
+        // Handle new images
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('complaints', 'public');
 
                 Attachment::create([
                     'attachable_type' => Complaint::class,
@@ -215,14 +231,43 @@ class ComplaintController extends Controller
     public function updateStatus(Request $request, Complaint $complaint)
     {
         $validated = $request->validate([
-            'status' => ['required', Rule::in(['pending', 'in_progress', 'completed', 'rejected'])],
-            'response' => 'nullable|string'
+            'status' => ['required', Rule::in(['pending', 'in_progress', 'resolved', 'rejected'])],
+            'admin_response' => 'nullable|string',
+            'resolution_photos.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        $complaint->update($validated);
+        // Update complaint status and response
+        $complaint->update([
+            'status' => $validated['status'],
+            'admin_response' => $validated['admin_response'] ?? $complaint->admin_response,
+        ]);
+
+        // Handle resolution photos if status is resolved
+        if ($validated['status'] === 'resolved' && $request->hasFile('resolution_photos')) {
+            foreach ($request->file('resolution_photos') as $file) {
+                $path = $file->store('complaints/resolutions', 'public');
+
+                Attachment::create([
+                    'attachable_type' => Complaint::class,
+                    'attachable_id' => $complaint->id,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'attachment_type' => 'resolution', // New field to distinguish resolution photos
+                ]);
+            }
+        }
+
+        $statusText = match($validated['status']) {
+            'pending' => 'Menunggu',
+            'in_progress' => 'Sedang Diproses',
+            'resolved' => 'Selesai',
+            'rejected' => 'Ditolak',
+        };
 
         return redirect()->back()
-            ->with('success', 'Status keluhan berhasil diperbarui.');
+            ->with('success', "Status keluhan berhasil diubah menjadi: {$statusText}.");
     }
 
     /**

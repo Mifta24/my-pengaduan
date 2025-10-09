@@ -69,10 +69,10 @@ class AdminController extends Controller
         $completedCount = Complaint::where('status', 'completed')->count();
         $completionRate = $totalComplaints > 0 ? round(($completedCount / $totalComplaints) * 100, 1) : 0;
 
-        // Get response time statistics
+        // Get response time statistics (SQLite compatible)
         $avgResponseTime = Complaint::whereNotNull('response')
             ->whereNotNull('updated_at')
-            ->selectRaw('AVG(DATEDIFF(updated_at, report_date)) as avg_days')
+            ->selectRaw('AVG(JULIANDAY(updated_at) - JULIANDAY(report_date)) as avg_days')
             ->value('avg_days');
 
         return view('admin.dashboard', compact(
