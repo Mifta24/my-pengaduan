@@ -5,25 +5,115 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ isset($title) ? $title . ' - ' : '' }}{{ config('app.name', 'MyPengaduan') }}</title>
+        <meta name="description" content="Sistem Pengaduan RT/RW - Platform digital untuk melaporkan keluhan dan mendapatkan respon cepat dari pengurus RT/RW">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
+    <body class="font-sans text-gray-900 antialiased bg-gray-50">
+        <div class="min-h-screen flex">
+            <!-- Left Side - Branding -->
+            <div class="hidden lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:px-8 xl:px-12 bg-gradient-to-br from-indigo-600 to-purple-700">
+                <div class="max-w-md">
+                    <div class="flex items-center space-x-3 mb-8">
+                        <div class="flex-shrink-0">
+                            <div class="h-12 w-12 bg-white rounded-lg flex items-center justify-center">
+                                <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h4M9 7h6m-6 4h6m-6 4h6" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-white">MyPengaduan</h1>
+                            <p class="text-indigo-200 text-sm">Sistem Pengaduan RT/RW</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <h2 class="text-3xl font-bold text-white leading-tight">
+                            Platform Digital untuk Pengaduan Warga
+                        </h2>
+                        <p class="text-lg text-indigo-100">
+                            Laporkan keluhan dengan mudah dan dapatkan respon cepat dari pengurus RT/RW Anda.
+                        </p>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0">
+                                    <div class="h-8 w-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                        <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <span class="text-indigo-100">Respon cepat dalam 24 jam</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0">
+                                    <div class="h-8 w-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                        <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <span class="text-indigo-100">Tracking status real-time</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0">
+                                    <div class="h-8 w-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                        <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <span class="text-indigo-100">Data aman & terprivasi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
+            <!-- Right Side - Form -->
+            <div class="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-8 xl:px-12">
+                <div class="mx-auto w-full max-w-md">
+                    <!-- Mobile Logo -->
+                    <div class="lg:hidden text-center mb-8">
+                        <div class="inline-flex items-center space-x-2">
+                            <div class="h-10 w-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h4M9 7h6m-6 4h6m-6 4h6" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold text-gray-900">MyPengaduan</h1>
+                                <p class="text-sm text-gray-500">Sistem Pengaduan RT/RW</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white py-8 px-6 shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg">
+                        {{ $slot }}
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="mt-8 text-center">
+                        <p class="text-sm text-gray-500">
+                            © {{ date('Y') }} MyPengaduan. Dikembangkan untuk RT/RW Indonesia.
+                        </p>
+                        <div class="mt-2 flex justify-center space-x-4 text-sm text-gray-400">
+                            <a href="#" class="hover:text-gray-600">Bantuan</a>
+                            <span>•</span>
+                            <a href="#" class="hover:text-gray-600">Privasi</a>
+                            <span>•</span>
+                            <a href="#" class="hover:text-gray-600">Syarat & Ketentuan</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
