@@ -16,13 +16,17 @@ class Complaint extends Model
         'category_id',
         'photo',
         'location',
+        'priority',
         'status',
         'response',
+        'admin_response',
+        'estimated_resolution',
         'report_date',
     ];
 
     protected $casts = [
         'report_date' => 'date',
+        'estimated_resolution' => 'date',
     ];
 
     public function user()
@@ -43,6 +47,18 @@ class Complaint extends Model
     public function attachments()
     {
         return $this->morphMany(Attachment::class, 'attachable');
+    }
+
+    public function complaintAttachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachable')
+                    ->where('attachment_type', 'complaint');
+    }
+
+    public function resolutionAttachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachable')
+                    ->where('attachment_type', 'resolution');
     }
 
     public function getStatusBadgeColor()
