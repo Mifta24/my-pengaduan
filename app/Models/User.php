@@ -27,6 +27,7 @@ class User extends Authenticatable
         'password',
         'role',
         'address',
+        'is_active',
     ];
 
     /**
@@ -78,6 +79,11 @@ class User extends Authenticatable
     public function responses()
     {
         return $this->hasMany(Response::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 
     /**

@@ -104,7 +104,7 @@ class UserController extends Controller
             'total_complaints' => $user->complaints->count(),
             'pending_complaints' => $user->complaints->where('status', 'pending')->count(),
             'in_progress_complaints' => $user->complaints->where('status', 'in_progress')->count(),
-            'completed_complaints' => $user->complaints->where('status', 'completed')->count(),
+            'resolved_complaints' => $user->complaints->where('status', 'resolved')->count(),
             'rejected_complaints' => $user->complaints->where('status', 'rejected')->count(),
         ];
 
@@ -117,6 +117,7 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = Role::all();
+        $user->load(['roles', 'complaints', 'comments']);
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
@@ -297,6 +298,27 @@ class UserController extends Controller
         }
 
         return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Toggle user status (active/inactive)
+     */
+    public function toggleStatus(User $user)
+    {
+        // Prevent admin from disabling their own account
+        if ($user->id === Auth::id()) {
+            return redirect()->back()
+                ->with('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
+        }
+
+        $user->update([
+            'is_active' => !$user->is_active
+        ]);
+
+        $status = $user->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        return redirect()->back()
+            ->with('success', "Pengguna {$user->name} berhasil {$status}.");
     }
 
     /**
