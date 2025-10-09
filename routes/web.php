@@ -1,15 +1,95 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
+use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+Route::get('/announcements/{announcement:slug}', [AnnouncementController::class, 'show'])->name('announcements.show');
+
+// Authenticated routes for announcements
+Route::middleware('auth')->group(function () {
+    Route::post('/announcements/{announcement}/comments', [AnnouncementController::class, 'storeComment'])->name('announcements.comments.store');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| User Dashboard Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [ComplaintController::class, 'dashboard'])->name('dashboard');
+
+    // User Complaint Routes
+    Route::resource('complaints', ComplaintController::class)->except(['destroy']);
+    Route::get('/complaints/{complaint}/track', [ComplaintController::class, 'track'])->name('keluhan.track');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Admin Dashboard
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+
+    // Complaint Management
+    Route::resource('complaints', AdminComplaintController::class);
+    Route::patch('complaints/{complaint}/status', [AdminComplaintController::class, 'updateStatus'])->name('complaints.status');
+    Route::post('complaints/{complaint}/response', [AdminComplaintController::class, 'addResponse'])->name('complaints.response');
+    Route::delete('attachments/{attachment}', [AdminComplaintController::class, 'deleteAttachment'])->name('attachments.delete');
+    Route::get('complaints/export/pdf', [AdminComplaintController::class, 'exportPdf'])->name('complaints.export.pdf');
+    Route::get('complaints/export/excel', [AdminComplaintController::class, 'exportExcel'])->name('complaints.export.excel');
+
+    // Category Management
+    Route::resource('categories', CategoryController::class);
+    Route::patch('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])->name('categories.toggle-status');
+    Route::post('categories/bulk-action', [CategoryController::class, 'bulkAction'])->name('categories.bulk-action');
+    Route::get('categories/export', [CategoryController::class, 'export'])->name('categories.export');
+
+    // User Management
+    Route::resource('users', UserController::class);
+    Route::patch('users/{user}/verify-email', [UserController::class, 'verifyEmail'])->name('users.verify-email');
+    Route::patch('users/{user}/unverify-email', [UserController::class, 'unverifyEmail'])->name('users.unverify-email');
+    Route::patch('users/{user}/change-role', [UserController::class, 'changeRole'])->name('users.change-role');
+    Route::patch('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+    Route::post('users/bulk-action', [UserController::class, 'bulkAction'])->name('users.bulk-action');
+    Route::get('users/export', [UserController::class, 'export'])->name('users.export');
+
+    // Announcement Management
+    Route::resource('announcements', AdminAnnouncementController::class);
+    Route::patch('announcements/{announcement}/toggle-status', [AdminAnnouncementController::class, 'toggleStatus'])->name('announcements.toggle-status');
+    Route::patch('announcements/{announcement}/toggle-urgent', [AdminAnnouncementController::class, 'toggleUrgent'])->name('announcements.toggle-urgent');
+    Route::post('announcements/{announcement}/publish', [AdminAnnouncementController::class, 'publish'])->name('announcements.publish');
+    Route::post('announcements/{announcement}/unpublish', [AdminAnnouncementController::class, 'unpublish'])->name('announcements.unpublish');
+    Route::post('announcements/{announcement}/duplicate', [AdminAnnouncementController::class, 'duplicate'])->name('announcements.duplicate');
+    Route::post('announcements/bulk-action', [AdminAnnouncementController::class, 'bulkAction'])->name('announcements.bulk-action');
+    Route::get('announcements/export', [AdminAnnouncementController::class, 'export'])->name('announcements.export');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Profile Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
