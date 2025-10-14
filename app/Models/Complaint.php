@@ -65,8 +65,9 @@ class Complaint extends Model
     {
         return match($this->status) {
             'pending' => 'yellow',
-            'processing' => 'blue',
-            'completed' => 'green',
+            'in_progress' => 'blue',
+            'resolved' => 'green',
+            'rejected' => 'red',
             default => 'gray'
         };
     }
