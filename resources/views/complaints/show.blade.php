@@ -58,11 +58,11 @@
                     <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium
                         @if($complaint->status === 'pending') bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20
                         @elseif($complaint->status === 'in_progress') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10
-                        @elseif($complaint->status === 'completed') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
+                        @elseif($complaint->status === 'resolved') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
                         @else bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10 @endif">
                         @if($complaint->status === 'pending') Menunggu
                         @elseif($complaint->status === 'in_progress') Diproses
-                        @elseif($complaint->status === 'completed') Selesai
+                        @elseif($complaint->status === 'resolved') Selesai
                         @else Ditolak @endif
                     </span>
                     <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium
@@ -293,13 +293,13 @@
                                 </li>
                             @endif
 
-                            @if(in_array($complaint->status, ['completed', 'rejected']))
+                            @if(in_array($complaint->status, ['resolved', 'rejected']))
                                 <li>
                                     <div class="relative">
                                         <div class="relative flex space-x-3">
                                             <div>
-                                                <span class="h-8 w-8 rounded-full {{ $complaint->status === 'completed' ? 'bg-green-500' : 'bg-red-500' }} flex items-center justify-center ring-8 ring-white">
-                                                    @if($complaint->status === 'completed')
+                                                <span class="h-8 w-8 rounded-full {{ $complaint->status === 'resolved' ? 'bg-green-500' : 'bg-red-500' }} flex items-center justify-center ring-8 ring-white">
+                                                    @if($complaint->status === 'resolved')
                                                         <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                                         </svg>
@@ -313,7 +313,7 @@
                                             <div class="min-w-0 flex-1">
                                                 <div>
                                                     <p class="text-sm font-medium text-gray-900">
-                                                        Keluhan {{ $complaint->status === 'completed' ? 'Selesai' : 'Ditolak' }}
+                                                        Keluhan {{ $complaint->status === 'resolved' ? 'Selesai' : 'Ditolak' }}
                                                     </p>
                                                     <p class="text-sm text-gray-500">
                                                         {{ $complaint->responded_at ? $complaint->responded_at->format('d M Y, H:i') : $complaint->updated_at->format('d M Y, H:i') }}

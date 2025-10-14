@@ -28,7 +28,7 @@
                 </p>
             </div>
             <div class="flex space-x-3">
-                <a href="{{ route('admin.reports') }}"
+                <a href="{{ route('admin.reports.index') }}"
                    class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                     <svg class="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
@@ -127,8 +127,8 @@
                 </p>
                 <div class="absolute inset-x-0 bottom-0 bg-gray-50 px-4 py-4 sm:px-6">
                     <div class="text-sm">
-                        <a href="{{ route('admin.reports') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
-                            Lihat laporan<span class="sr-only"> Tingkat Penyelesaian stats</span>
+                        <a href="{{ route('admin.reports.complaints', ['status' => 'resolved']) }}" class="font-medium text-indigo-600 hover:text-indigo-500">
+                            Lihat keluhan selesai<span class="sr-only"> Tingkat Penyelesaian stats</span>
                         </a>
                     </div>
                 </div>
@@ -146,7 +146,7 @@
                 <p class="ml-16 truncate text-sm font-medium text-gray-500">Rata-rata Respon</p>
             </dt>
             <dd class="ml-16 flex items-baseline pb-6 sm:pb-7">
-                <p class="text-2xl font-semibold text-gray-900">{{ round($avgResponseTime ?? 0, 1) }} hari</p>
+                <p class="text-2xl font-semibold text-gray-900">{{ $avgResponseTime }}</p>
                 <p class="ml-2 flex items-baseline text-sm font-semibold text-red-600">
                     <svg class="h-4 w-4 flex-shrink-0 self-center text-red-500" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 3a.75.75 0 01.75.75v10.638l4.96-4.96a.75.75 0 111.06 1.06l-6.25 6.25a.75.75 0 01-1.06 0l-6.25-6.25a.75.75 0 111.06-1.06L9.25 14.388V3.75A.75.75 0 0110 3z" clip-rule="evenodd" />
@@ -156,8 +156,8 @@
                 </p>
                 <div class="absolute inset-x-0 bottom-0 bg-gray-50 px-4 py-4 sm:px-6">
                     <div class="text-sm">
-                        <a href="{{ route('admin.reports') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
-                            Analisis waktu<span class="sr-only"> Rata-rata Respon stats</span>
+                        <a href="{{ route('admin.reports.complaints') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
+                            Analisis respon<span class="sr-only"> Rata-rata Respon stats</span>
                         </a>
                     </div>
                 </div>
@@ -173,7 +173,7 @@
                 <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Distribusi Status Keluhan</h3>
                 <div class="space-y-3">
                     @if(isset($complaintsByStatus))
-                        @foreach(['pending' => ['label' => 'Menunggu', 'color' => 'bg-yellow-500'], 'in_progress' => ['label' => 'Diproses', 'color' => 'bg-blue-500'], 'completed' => ['label' => 'Selesai', 'color' => 'bg-green-500'], 'rejected' => ['label' => 'Ditolak', 'color' => 'bg-red-500']] as $status => $config)
+                        @foreach(['pending' => ['label' => 'Menunggu', 'color' => 'bg-yellow-500'], 'in_progress' => ['label' => 'Diproses', 'color' => 'bg-blue-500'], 'resolved' => ['label' => 'Selesai', 'color' => 'bg-green-500'], 'rejected' => ['label' => 'Ditolak', 'color' => 'bg-red-500']] as $status => $config)
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
                                     <div class="w-3 h-3 {{ $config['color'] }} rounded-full mr-3"></div>
@@ -208,7 +208,7 @@
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         @if($complaint->status === 'pending') bg-yellow-100 text-yellow-800
                                         @elseif($complaint->status === 'in_progress') bg-blue-100 text-blue-800
-                                        @elseif($complaint->status === 'completed') bg-green-100 text-green-800
+                                        @elseif($complaint->status === 'resolved') bg-green-100 text-green-800
                                         @else bg-red-100 text-red-800 @endif">
                                         {{ ucfirst($complaint->status) }}
                                     </span>

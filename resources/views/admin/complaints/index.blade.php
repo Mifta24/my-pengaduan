@@ -61,7 +61,7 @@
                     <option value="">Semua Status</option>
                     <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Menunggu</option>
                     <option value="in_progress" {{ request('status') === 'in_progress' ? 'selected' : '' }}>Diproses</option>
-                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Selesai</option>
+                    <option value="resolved" {{ request('status') === 'resolved' ? 'selected' : '' }}>Selesai</option>
                     <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Ditolak</option>
                 </select>
             </div>
@@ -96,7 +96,62 @@
     <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
         <div class="px-4 py-5 sm:p-6">
             @if($complaints->count() > 0)
-                <div class="overflow-hidden">
+                <!-- Mobile Card View (hidden on lg+) -->
+                <div class="lg:hidden space-y-4">
+                    @foreach($complaints as $complaint)
+                        <div class="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="text-sm font-medium text-gray-900 truncate">
+                                        <a href="{{ route('admin.complaints.show', $complaint->id) }}" class="hover:text-indigo-600">
+                                            {{ $complaint->title }}
+                                        </a>
+                                    </h3>
+                                    <p class="mt-1 text-sm text-gray-500 line-clamp-2">{{ $complaint->description }}</p>
+                                    <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                                        <span class="flex items-center">
+                                            <svg class="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                            </svg>
+                                            {{ $complaint->user->name }}
+                                        </span>
+                                        @if($complaint->category)
+                                            <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                                                {{ $complaint->category->name }}
+                                            </span>
+                                        @endif
+                                        <span class="flex items-center">
+                                            <svg class="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                            </svg>
+                                            {{ $complaint->report_date->format('d/m/Y') }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="ml-4 flex flex-col items-end gap-2">
+                                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
+                                        @if($complaint->status === 'pending') bg-yellow-100 text-yellow-800
+                                        @elseif($complaint->status === 'in_progress') bg-blue-100 text-blue-800
+                                        @elseif($complaint->status === 'resolved') bg-green-100 text-green-800
+                                        @else bg-red-100 text-red-800 @endif">
+                                        {{ $complaint->status === 'pending' ? 'Menunggu' :
+                                           ($complaint->status === 'in_progress' ? 'Diproses' :
+                                           ($complaint->status === 'resolved' ? 'Selesai' : 'Ditolak')) }}
+                                    </span>
+                                    <div class="flex gap-1">
+                                        <a href="{{ route('admin.complaints.show', $complaint->id) }}"
+                                           class="text-indigo-600 hover:text-indigo-900 text-xs">Lihat</a>
+                                        <a href="{{ route('admin.complaints.edit', $complaint->id) }}"
+                                           class="text-gray-600 hover:text-gray-900 text-xs">Edit</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Desktop Table View (hidden on mobile) -->
+                <div class="hidden lg:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-300">
                         <thead>
                             <tr>
@@ -155,11 +210,11 @@
                                         <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
                                             @if($complaint->status === 'pending') bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20
                                             @elseif($complaint->status === 'in_progress') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10
-                                            @elseif($complaint->status === 'completed') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
+                                            @elseif($complaint->status === 'resolved') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
                                             @else bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10 @endif">
                                             @if($complaint->status === 'pending') Menunggu
                                             @elseif($complaint->status === 'in_progress') Diproses
-                                            @elseif($complaint->status === 'completed') Selesai
+                                            @elseif($complaint->status === 'resolved') Selesai
                                             @else Ditolak @endif
                                         </span>
                                     </td>

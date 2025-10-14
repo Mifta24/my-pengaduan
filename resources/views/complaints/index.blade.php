@@ -41,7 +41,7 @@
                     <option value="">Semua Status</option>
                     <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Menunggu</option>
                     <option value="in_progress" {{ request('status') === 'in_progress' ? 'selected' : '' }}>Diproses</option>
-                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Selesai</option>
+                    <option value="resolved" {{ request('status') === 'resolved' ? 'selected' : '' }}>Selesai</option>
                     <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Ditolak</option>
                 </select>
             </div>
@@ -94,11 +94,11 @@
                                 <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium
                                     @if($complaint->status === 'pending') bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20
                                     @elseif($complaint->status === 'in_progress') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10
-                                    @elseif($complaint->status === 'completed') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
+                                    @elseif($complaint->status === 'resolved') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
                                     @else bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10 @endif">
                                     @if($complaint->status === 'pending') Menunggu
                                     @elseif($complaint->status === 'in_progress') Diproses
-                                    @elseif($complaint->status === 'completed') Selesai
+                                    @elseif($complaint->status === 'resolved') Selesai
                                     @else Ditolak @endif
                                 </span>
                                 <div class="flex space-x-2">

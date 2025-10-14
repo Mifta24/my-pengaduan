@@ -272,11 +272,11 @@
                         <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
                             @if($complaint->status === 'pending') bg-yellow-50 text-yellow-800
                             @elseif($complaint->status === 'in_progress') bg-blue-50 text-blue-700
-                            @elseif($complaint->status === 'completed') bg-green-50 text-green-700
+                            @elseif($complaint->status === 'resolved') bg-green-50 text-green-700
                             @else bg-red-50 text-red-700 @endif">
                             @if($complaint->status === 'pending') Menunggu
                             @elseif($complaint->status === 'in_progress') Diproses
-                            @elseif($complaint->status === 'completed') Selesai
+                            @elseif($complaint->status === 'resolved') Selesai
                             @else Ditolak @endif
                         </span>
                     </div>
@@ -306,7 +306,7 @@
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-600">Lama Penanganan:</span>
                         <span class="text-sm text-gray-900">
-                            @if($complaint->status === 'completed')
+                            @if($complaint->status === 'resolved')
                                 {{ $complaint->created_at->diffInDays($complaint->updated_at) }} hari
                             @else
                                 {{ $complaint->created_at->diffInDays(now()) }} hari
@@ -347,7 +347,7 @@
                             <strong>Total Keluhan:</strong> {{ $complaint->user->complaints()->count() }}
                         </div>
                         <div class="text-sm text-gray-600">
-                            <strong>Keluhan Selesai:</strong> {{ $complaint->user->complaints()->where('status', 'completed')->count() }}
+                            <strong>Keluhan Selesai:</strong> {{ $complaint->user->complaints()->where('status', 'resolved')->count() }}
                         </div>
                     </div>
                 </div>

@@ -92,7 +92,78 @@
     <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
         <div class="px-4 py-5 sm:p-6">
             @if($users->count() > 0)
-                <div class="overflow-hidden">
+                <!-- Mobile Card View (hidden on lg+) -->
+                <div class="lg:hidden space-y-4">
+                    @foreach($users as $user)
+                        <div class="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                            <div class="flex items-start gap-3">
+                                <div class="h-10 w-10 flex-shrink-0">
+                                    <div class="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center">
+                                        <span class="text-sm font-medium text-white">
+                                            {{ substr($user->name, 0, 1) }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1 min-w-0">
+                                            <h3 class="text-sm font-medium text-gray-900 truncate">{{ $user->name }}</h3>
+                                            <p class="text-sm text-gray-500 truncate">{{ $user->email }}</p>
+                                            @if($user->phone)
+                                                <p class="text-xs text-gray-500 mt-1">{{ $user->phone }}</p>
+                                            @endif
+                                        </div>
+                                        <div class="ml-2 flex flex-col items-end gap-1">
+                                            @if($user->roles->count() > 0)
+                                                @foreach($user->roles as $role)
+                                                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
+                                                        @if($role->name === 'super_admin') bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-700/10
+                                                        @elseif($role->name === 'admin') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10
+                                                        @else bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10 @endif">
+                                                        @if($role->name === 'super_admin') Super Admin
+                                                        @elseif($role->name === 'admin') Admin
+                                                        @else User @endif
+                                                    </span>
+                                                @endforeach
+                                            @endif
+                                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
+                                                @if($user->email_verified_at) bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
+                                                @else bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20 @endif">
+                                                {{ $user->email_verified_at ? 'Terverifikasi' : 'Belum Verifikasi' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                                        <span>Bergabung {{ $user->created_at->format('d M Y') }}</span>
+                                        @if($user->complaints_count > 0)
+                                            <span>• {{ $user->complaints_count }} keluhan</span>
+                                        @endif
+                                    </div>
+                                    <div class="mt-3 flex gap-2">
+                                        <a href="{{ route('admin.users.show', $user->id) }}"
+                                           class="text-indigo-600 hover:text-indigo-900 text-xs">Lihat</a>
+                                        <a href="{{ route('admin.users.edit', $user->id) }}"
+                                           class="text-gray-600 hover:text-gray-900 text-xs">Edit</a>
+                                        @if($user->id !== auth()->id())
+                                            <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="text-red-600 hover:text-red-900 text-xs"
+                                                        onclick="return confirm('Yakin ingin menghapus pengguna ini?')">
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Desktop Table View (hidden on mobile) -->
+                <div class="hidden lg:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-300">
                         <thead>
                             <tr>

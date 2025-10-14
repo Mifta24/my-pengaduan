@@ -14,6 +14,37 @@
         </p>
     </div>
 
+    <!-- Success Messages -->
+    @if (session('status') === 'profile-updated')
+        <div class="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800">Profil berhasil diperbarui!</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if (session('status') === 'notifications-updated')
+        <div class="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800">Preferensi notifikasi berhasil diperbarui!</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="space-y-8">
         <!-- Profile Information -->
         <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
@@ -251,35 +282,35 @@
                         <legend class="text-sm font-medium leading-6 text-gray-900">Notifikasi Email</legend>
                         <div class="mt-4 space-y-4">
                             <div class="flex items-center">
-                                <input id="email_complaint_updates" name="email_complaint_updates" type="checkbox"
-                                       {{ $user->email_notifications['complaint_updates'] ?? true ? 'checked' : '' }}
+                                <input id="complaint_updates" name="complaint_updates" type="checkbox"
+                                       {{ $user->notification_preferences['complaint_updates'] ?? true ? 'checked' : '' }}
                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-                                <label for="email_complaint_updates" class="ml-3 text-sm leading-6 text-gray-900">
+                                <label for="complaint_updates" class="ml-3 text-sm leading-6 text-gray-900">
                                     Update status keluhan
                                 </label>
                             </div>
                             <div class="flex items-center">
-                                <input id="email_announcements" name="email_announcements" type="checkbox"
-                                       {{ $user->email_notifications['announcements'] ?? true ? 'checked' : '' }}
+                                <input id="system_announcements" name="system_announcements" type="checkbox"
+                                       {{ $user->notification_preferences['system_announcements'] ?? true ? 'checked' : '' }}
                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-                                <label for="email_announcements" class="ml-3 text-sm leading-6 text-gray-900">
+                                <label for="system_announcements" class="ml-3 text-sm leading-6 text-gray-900">
                                     Pengumuman penting
                                 </label>
                             </div>
                             <div class="flex items-center">
-                                <input id="email_admin_responses" name="email_admin_responses" type="checkbox"
-                                       {{ $user->email_notifications['admin_responses'] ?? true ? 'checked' : '' }}
+                                <input id="email_notifications" name="email_notifications" type="checkbox"
+                                       {{ $user->notification_preferences['email_notifications'] ?? true ? 'checked' : '' }}
                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-                                <label for="email_admin_responses" class="ml-3 text-sm leading-6 text-gray-900">
-                                    Respon dari admin
+                                <label for="email_notifications" class="ml-3 text-sm leading-6 text-gray-900">
+                                    Notifikasi via email
                                 </label>
                             </div>
                             <div class="flex items-center">
-                                <input id="email_weekly_summary" name="email_weekly_summary" type="checkbox"
-                                       {{ $user->email_notifications['weekly_summary'] ?? false ? 'checked' : '' }}
+                                <input id="marketing_emails" name="marketing_emails" type="checkbox"
+                                       {{ $user->notification_preferences['marketing_emails'] ?? false ? 'checked' : '' }}
                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-                                <label for="email_weekly_summary" class="ml-3 text-sm leading-6 text-gray-900">
-                                    Ringkasan mingguan
+                                <label for="marketing_emails" class="ml-3 text-sm leading-6 text-gray-900">
+                                    Email promosi dan tips
                                 </label>
                             </div>
                         </div>
@@ -289,10 +320,10 @@
                         <legend class="text-sm font-medium leading-6 text-gray-900">Notifikasi Browser</legend>
                         <div class="mt-4 space-y-4">
                             <div class="flex items-center">
-                                <input id="browser_notifications" name="browser_notifications" type="checkbox"
-                                       {{ $user->browser_notifications ?? false ? 'checked' : '' }}
+                                <input id="push_notifications" name="push_notifications" type="checkbox"
+                                       {{ $user->notification_preferences['push_notifications'] ?? false ? 'checked' : '' }}
                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-                                <label for="browser_notifications" class="ml-3 text-sm leading-6 text-gray-900">
+                                <label for="push_notifications" class="ml-3 text-sm leading-6 text-gray-900">
                                     Aktifkan notifikasi browser
                                 </label>
                             </div>
