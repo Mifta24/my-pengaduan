@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\HomeController;
@@ -49,7 +50,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Admin Dashboard
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/complaints', [ReportController::class, 'complaints'])->name('reports.complaints');
+    Route::get('/reports/users', [ReportController::class, 'users'])->name('reports.users');
+    Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
 
     // Complaint Management
     Route::resource('complaints', AdminComplaintController::class);
@@ -67,6 +73,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // User Management
     Route::resource('users', UserController::class);
+    Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::patch('users/{user}/verify-email', [UserController::class, 'verifyEmail'])->name('users.verify-email');
     Route::patch('users/{user}/unverify-email', [UserController::class, 'unverifyEmail'])->name('users.unverify-email');
     Route::patch('users/{user}/change-role', [UserController::class, 'changeRole'])->name('users.change-role');
@@ -94,6 +101,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/notifications', [ProfileController::class, 'updateNotifications'])->name('profile.notifications');
+    Route::get('/profile/export', [ProfileController::class, 'export'])->name('profile.export');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
