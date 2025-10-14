@@ -81,7 +81,7 @@ class ComplaintController extends Controller
             'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'location' => 'required|string|max:255',
-            'status' => ['required', Rule::in(['pending', 'in_progress', 'completed', 'rejected'])],
+            'status' => ['required', Rule::in(['pending', 'in_progress', 'resolved', 'rejected'])],
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'attachments.*' => 'nullable|file|max:10240', // 10MB max per file
             'report_date' => 'required|date'
@@ -277,7 +277,7 @@ class ComplaintController extends Controller
     {
         $validated = $request->validate([
             'response' => 'required|string',
-            'status' => ['nullable', Rule::in(['pending', 'in_progress', 'completed', 'rejected'])]
+            'status' => ['nullable', Rule::in(['pending', 'in_progress', 'resolved', 'rejected'])]
         ]);
 
         // Update complaint response

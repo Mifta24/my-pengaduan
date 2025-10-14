@@ -40,10 +40,15 @@ class ComplaintController extends Controller
             ->limit(5)
             ->get();
 
-        // Get latest announcements
+        // Get latest announcements (order by sticky, then priority, then published_at)
         $announcements = \App\Models\Announcement::where('is_active', true)
             ->where('published_at', '<=', now())
-            ->orderBy('is_urgent', 'desc')
+            ->orderBy('is_sticky', 'desc')
+            ->orderByRaw("CASE
+                WHEN priority = 'urgent' THEN 1
+                WHEN priority = 'high' THEN 2
+                WHEN priority = 'medium' THEN 3
+                ELSE 4 END")
             ->orderBy('published_at', 'desc')
             ->limit(3)
             ->get();

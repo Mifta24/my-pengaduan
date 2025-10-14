@@ -18,7 +18,7 @@ class HomeController extends Controller
         // Get complaint statistics for public display
         $stats = [
             'total_complaints' => Complaint::count(),
-            'resolved_complaints' => Complaint::where('status', 'completed')->count(),
+            'resolved_complaints' => Complaint::where('status', 'resolved')->count(),
             'pending_complaints' => Complaint::where('status', 'pending')->count(),
             'total_users' => \App\Models\User::count(),
         ];

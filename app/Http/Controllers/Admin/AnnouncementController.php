@@ -66,14 +66,16 @@ class AnnouncementController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'is_active' => 'boolean',
-            'is_urgent' => 'boolean',
+            'is_sticky' => 'boolean',
+            'priority' => 'nullable|in:urgent,high,medium,low',
             'published_at' => 'nullable|date'
         ]);
 
-        // Set default values
-        $validated['is_active'] = $validated['is_active'] ?? true;
-        $validated['is_urgent'] = $validated['is_urgent'] ?? false;
-        $validated['published_at'] = $validated['published_at'] ?? now();
+    // Set default values
+    $validated['is_active'] = $validated['is_active'] ?? true;
+    $validated['is_sticky'] = $validated['is_sticky'] ?? false;
+    $validated['priority'] = $validated['priority'] ?? 'medium';
+    $validated['published_at'] = $validated['published_at'] ?? now();
 
         Announcement::create($validated);
 
@@ -106,7 +108,8 @@ class AnnouncementController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'is_active' => 'boolean',
-            'is_urgent' => 'boolean',
+            'is_sticky' => 'boolean',
+            'priority' => 'nullable|in:urgent,high,medium,low',
             'published_at' => 'nullable|date'
         ]);
 
@@ -145,9 +148,11 @@ class AnnouncementController extends Controller
      */
     public function toggleUrgent(Announcement $announcement)
     {
-        $announcement->update(['is_urgent' => !$announcement->is_urgent]);
+        // Backward-compatible: toggle between urgent and medium priority
+        $newPriority = $announcement->priority === 'urgent' ? 'medium' : 'urgent';
+        $announcement->update(['priority' => $newPriority]);
 
-        $status = $announcement->is_urgent ? 'ditandai sebagai urgent' : 'urgent dihapus';
+        $status = $newPriority === 'urgent' ? 'ditandai sebagai urgent' : 'status urgent dihapus';
 
         return redirect()->back()
             ->with('success', "Pengumuman berhasil {$status}.");
@@ -199,7 +204,7 @@ class AnnouncementController extends Controller
     public function bulkAction(Request $request)
     {
         $validated = $request->validate([
-            'action' => 'required|in:activate,deactivate,delete,urgent,not_urgent',
+            'action' => 'required|in:activate,deactivate,delete,urgent,not_urgent,sticky,not_sticky',
             'announcement_ids' => 'required|array',
             'announcement_ids.*' => 'exists:announcements,id'
         ]);
@@ -218,13 +223,23 @@ class AnnouncementController extends Controller
                 break;
 
             case 'urgent':
-                $announcements->update(['is_urgent' => true]);
+                $announcements->update(['priority' => 'urgent']);
                 $message = 'Pengumuman yang dipilih berhasil ditandai sebagai urgent.';
                 break;
 
             case 'not_urgent':
-                $announcements->update(['is_urgent' => false]);
+                $announcements->update(['priority' => 'medium']);
                 $message = 'Pengumuman yang dipilih berhasil dihapus status urgentnya.';
+                break;
+
+            case 'sticky':
+                $announcements->update(['is_sticky' => true]);
+                $message = 'Pengumuman yang dipilih berhasil dipin (sticky).';
+                break;
+
+            case 'not_sticky':
+                $announcements->update(['is_sticky' => false]);
+                $message = 'Pin (sticky) pada pengumuman yang dipilih dihapus.';
                 break;
 
             case 'delete':
@@ -243,9 +258,14 @@ class AnnouncementController extends Controller
     {
         $announcements = Announcement::where('is_active', true)
             ->where('published_at', '<=', now())
-            ->orderBy('is_urgent', 'desc')
+            ->orderBy('is_sticky', 'desc')
+            ->orderByRaw("CASE
+                WHEN priority = 'urgent' THEN 1
+                WHEN priority = 'high' THEN 2
+                WHEN priority = 'medium' THEN 3
+                ELSE 4 END")
             ->orderBy('published_at', 'desc')
-            ->select('id', 'title', 'content', 'is_urgent', 'published_at')
+            ->select('id', 'title', 'content', 'priority', 'is_sticky', 'published_at')
             ->limit(10)
             ->get();
 
@@ -269,7 +289,7 @@ class AnnouncementController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $announcement->only(['id', 'title', 'content', 'is_urgent', 'published_at'])
+            'data' => $announcement->only(['id', 'title', 'content', 'priority', 'is_sticky', 'published_at'])
         ]);
     }
 

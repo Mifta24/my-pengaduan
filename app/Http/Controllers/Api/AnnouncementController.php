@@ -17,10 +17,9 @@ class AnnouncementController extends Controller
             $query = Announcement::where('is_active', true)
                 ->where('published_at', '<=', now());
 
-            // Filter by urgent
-            if ($request->filled('urgent')) {
-                $isUrgent = $request->boolean('urgent');
-                $query->where('is_urgent', $isUrgent);
+            // Filter by priority
+            if ($request->filled('priority')) {
+                $query->where('priority', $request->get('priority'));
             }
 
             // Search by title or content
@@ -31,7 +30,12 @@ class AnnouncementController extends Controller
                 });
             }
 
-            $announcements = $query->orderBy('is_urgent', 'desc')
+            $announcements = $query->orderBy('is_sticky', 'desc')
+                ->orderByRaw("CASE
+                    WHEN priority = 'urgent' THEN 1
+                    WHEN priority = 'high' THEN 2
+                    WHEN priority = 'medium' THEN 3
+                    ELSE 4 END")
                 ->orderBy('published_at', 'desc')
                 ->paginate($request->get('per_page', 10));
 
@@ -73,7 +77,7 @@ class AnnouncementController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $announcement->only([
-                    'id', 'title', 'content', 'is_urgent', 'published_at', 'created_at'
+                    'id', 'title', 'content', 'priority', 'is_sticky', 'published_at', 'created_at'
                 ])
             ]);
 
@@ -92,7 +96,7 @@ class AnnouncementController extends Controller
     {
         try {
             $announcements = Announcement::where('is_active', true)
-                ->where('is_urgent', true)
+                ->where('priority', 'urgent')
                 ->where('published_at', '<=', now())
                 ->orderBy('published_at', 'desc')
                 ->limit(5)
@@ -120,10 +124,15 @@ class AnnouncementController extends Controller
         try {
             $announcements = Announcement::where('is_active', true)
                 ->where('published_at', '<=', now())
-                ->orderBy('is_urgent', 'desc')
+                ->orderBy('is_sticky', 'desc')
+                ->orderByRaw("CASE
+                    WHEN priority = 'urgent' THEN 1
+                    WHEN priority = 'high' THEN 2
+                    WHEN priority = 'medium' THEN 3
+                    ELSE 4 END")
                 ->orderBy('published_at', 'desc')
                 ->limit(3)
-                ->select('id', 'title', 'content', 'is_urgent', 'published_at')
+                ->select('id', 'title', 'content', 'priority', 'is_sticky', 'published_at')
                 ->get();
 
             return response()->json([

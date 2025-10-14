@@ -66,14 +66,11 @@ class AdminController extends Controller
             ->get();
 
         // Get status completion rate
-        $completedCount = Complaint::where('status', 'completed')->count();
-        $completionRate = $totalComplaints > 0 ? round(($completedCount / $totalComplaints) * 100, 1) : 0;
+        $resolvedCount = Complaint::where('status', 'resolved')->count();
+        $completionRate = $totalComplaints > 0 ? round(($resolvedCount / $totalComplaints) * 100, 1) : 0;
 
         // Get response time statistics (SQLite compatible)
-        $avgResponseTime = Complaint::whereNotNull('response')
-            ->whereNotNull('updated_at')
-            ->selectRaw('AVG(JULIANDAY(updated_at) - JULIANDAY(report_date)) as avg_days')
-            ->value('avg_days');
+        $avgResponseTime = $this->calculateAverageResponseTime();
 
         return view('admin.dashboard', compact(
             'totalComplaints',
@@ -152,7 +149,7 @@ class AdminController extends Controller
         // Calculate statistics
         $stats = [
             'total' => $complaints->count(),
-            'completed' => $complaints->where('status', 'completed')->count(),
+            'resolved' => $complaints->where('status', 'resolved')->count(),
             'in_progress' => $complaints->where('status', 'in_progress')->count(),
             'pending' => $complaints->where('status', 'pending')->count(),
             'by_category' => $complaints->groupBy('category.name')->map->count(),
@@ -181,5 +178,38 @@ class AdminController extends Controller
         // This will be implemented when we create the Excel functionality
         // For now, return to view
         return view('admin.reports.excel', $data);
+    }
+
+    /**
+     * Calculate average response time with consistent method
+     */
+    private function calculateAverageResponseTime($query = null)
+    {
+        if ($query === null) {
+            $query = Complaint::query();
+        }
+
+        $avgTimeInDays = $query->whereNotNull('updated_at')
+            ->where('status', '!=', 'pending')
+            ->get()
+            ->avg(function ($complaint) {
+                return $complaint->created_at->diffInDays($complaint->updated_at);
+            });
+
+        $avgTimeInDays = $avgTimeInDays ?? 0;
+
+        // Convert to hours if less than 1 day
+        if ($avgTimeInDays < 1 && $avgTimeInDays > 0) {
+            $avgTimeInHours = $query->whereNotNull('updated_at')
+                ->where('status', '!=', 'pending')
+                ->get()
+                ->avg(function ($complaint) {
+                    return $complaint->created_at->diffInHours($complaint->updated_at);
+                });
+
+            return round($avgTimeInHours ?? 0, 1) . ' jam';
+        }
+
+        return round($avgTimeInDays, 1) . ' hari';
     }
 }

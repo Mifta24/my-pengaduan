@@ -85,7 +85,7 @@ class CategoryController extends Controller
             'total' => $category->complaints->count(),
             'pending' => $category->complaints->where('status', 'pending')->count(),
             'in_progress' => $category->complaints->where('status', 'in_progress')->count(),
-            'completed' => $category->complaints->where('status', 'completed')->count(),
+            'resolved' => $category->complaints->where('status', 'resolved')->count(),
             'rejected' => $category->complaints->where('status', 'rejected')->count(),
         ];
 
