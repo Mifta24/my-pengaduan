@@ -28,7 +28,7 @@ return new class extends Migration
         });
 
         // Update existing data
-        DB::statement('UPDATE announcements SET slug = LOWER(REPLACE(title, " ", "-")) WHERE slug IS NULL');
+        DB::statement("UPDATE announcements SET slug = LOWER(REPLACE(title, ' ', '-')) WHERE slug IS NULL");
         DB::statement('UPDATE announcements SET published_at = created_at WHERE published_at IS NULL');
 
         Schema::table('announcements', function (Blueprint $table) {
