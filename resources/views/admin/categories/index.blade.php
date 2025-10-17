@@ -97,9 +97,9 @@
                                 @endif
                             </div>
                             <div class="ml-3">
-                                <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
-                                    @if($category->is_active) bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
-                                    @else bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10 @endif">
+                                <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset {{ $category->is_active
+                                    ? 'bg-green-50 text-green-700 ring-green-600/20'
+                                    : 'bg-red-50 text-red-700 ring-red-600/10' }}">
                                     {{ $category->is_active ? 'Aktif' : 'Nonaktif' }}
                                 </span>
                             </div>

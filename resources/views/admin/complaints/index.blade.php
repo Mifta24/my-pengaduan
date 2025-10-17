@@ -129,14 +129,17 @@
                                     </div>
                                 </div>
                                 <div class="ml-4 flex flex-col items-end gap-2">
-                                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
-                                        @if($complaint->status === 'pending') bg-yellow-100 text-yellow-800
-                                        @elseif($complaint->status === 'in_progress') bg-blue-100 text-blue-800
-                                        @elseif($complaint->status === 'resolved') bg-green-100 text-green-800
-                                        @else bg-red-100 text-red-800 @endif">
-                                        {{ $complaint->status === 'pending' ? 'Menunggu' :
-                                           ($complaint->status === 'in_progress' ? 'Diproses' :
-                                           ($complaint->status === 'resolved' ? 'Selesai' : 'Ditolak')) }}
+                                    @php
+                                    $statusClasses = [
+                                        'pending' => 'bg-yellow-100 text-yellow-800',
+                                        'in_progress' => 'bg-blue-100 text-blue-800',
+                                        'resolved' => 'bg-green-100 text-green-800',
+                                        'rejected' => 'bg-red-100 text-red-800',
+                                    ];
+                                    $statusLabels = ['pending' => 'Menunggu', 'in_progress' => 'Diproses', 'resolved' => 'Selesai', 'rejected' => 'Ditolak'];
+                                    @endphp
+                                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium {{ $statusClasses[$complaint->status] ?? 'bg-gray-100 text-gray-800' }}">
+                                        {{ $statusLabels[$complaint->status] ?? 'Unknown' }}
                                     </span>
                                     <div class="flex gap-1">
                                         <a href="{{ route('admin.complaints.show', $complaint->id) }}"
@@ -207,15 +210,17 @@
                                         @endif
                                     </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                        <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
-                                            @if($complaint->status === 'pending') bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20
-                                            @elseif($complaint->status === 'in_progress') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10
-                                            @elseif($complaint->status === 'resolved') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
-                                            @else bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10 @endif">
-                                            @if($complaint->status === 'pending') Menunggu
-                                            @elseif($complaint->status === 'in_progress') Diproses
-                                            @elseif($complaint->status === 'resolved') Selesai
-                                            @else Ditolak @endif
+                                        @php
+                                        $statusClasses = [
+                                            'pending' => 'bg-yellow-50 text-yellow-800 ring-yellow-600/20',
+                                            'in_progress' => 'bg-blue-50 text-blue-700 ring-blue-700/10',
+                                            'resolved' => 'bg-green-50 text-green-700 ring-green-600/20',
+                                            'rejected' => 'bg-red-50 text-red-700 ring-red-600/10',
+                                        ];
+                                        $statusLabels = ['pending' => 'Menunggu', 'in_progress' => 'Diproses', 'resolved' => 'Selesai', 'rejected' => 'Ditolak'];
+                                        @endphp
+                                        <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset {{ $statusClasses[$complaint->status] ?? 'bg-gray-50 text-gray-700 ring-gray-600/20' }}">
+                                            {{ $statusLabels[$complaint->status] ?? 'Unknown' }}
                                         </span>
                                     </td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

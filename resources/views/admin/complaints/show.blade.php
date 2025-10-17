@@ -269,28 +269,32 @@
                 <div class="px-6 py-4 space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-600">Status Saat Ini:</span>
-                        <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
-                            @if($complaint->status === 'pending') bg-yellow-50 text-yellow-800
-                            @elseif($complaint->status === 'in_progress') bg-blue-50 text-blue-700
-                            @elseif($complaint->status === 'resolved') bg-green-50 text-green-700
-                            @else bg-red-50 text-red-700 @endif">
-                            @if($complaint->status === 'pending') Menunggu
-                            @elseif($complaint->status === 'in_progress') Diproses
-                            @elseif($complaint->status === 'resolved') Selesai
-                            @else Ditolak @endif
+                        @php
+                        $statusClasses = [
+                            'pending' => 'bg-yellow-50 text-yellow-800',
+                            'in_progress' => 'bg-blue-50 text-blue-700',
+                            'resolved' => 'bg-green-50 text-green-700',
+                            'rejected' => 'bg-red-50 text-red-700',
+                        ];
+                        $statusLabels = ['pending' => 'Menunggu', 'in_progress' => 'Diproses', 'resolved' => 'Selesai', 'rejected' => 'Ditolak'];
+                        @endphp
+                        <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium {{ $statusClasses[$complaint->status] ?? 'bg-gray-50 text-gray-700' }}">
+                            {{ $statusLabels[$complaint->status] ?? 'Unknown' }}
                         </span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-600">Prioritas:</span>
-                        <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
-                            @if($complaint->priority === 'low') bg-gray-50 text-gray-700
-                            @elseif($complaint->priority === 'medium') bg-yellow-50 text-yellow-700
-                            @elseif($complaint->priority === 'high') bg-orange-50 text-orange-700
-                            @else bg-red-50 text-red-700 @endif">
-                            @if($complaint->priority === 'low') Rendah
-                            @elseif($complaint->priority === 'medium') Sedang
-                            @elseif($complaint->priority === 'high') Tinggi
-                            @else Mendesak @endif
+                        @php
+                        $priorityClasses = [
+                            'low' => 'bg-gray-50 text-gray-700',
+                            'medium' => 'bg-yellow-50 text-yellow-700',
+                            'high' => 'bg-orange-50 text-orange-700',
+                            'urgent' => 'bg-red-50 text-red-700',
+                        ];
+                        $priorityLabels = ['low' => 'Rendah', 'medium' => 'Sedang', 'high' => 'Tinggi', 'urgent' => 'Mendesak'];
+                        @endphp
+                        <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium {{ $priorityClasses[$complaint->priority] ?? 'bg-gray-50 text-gray-700' }}">
+                            {{ $priorityLabels[$complaint->priority] ?? 'Unknown' }}
                         </span>
                     </div>
                     <div class="flex items-center justify-between">
@@ -470,7 +474,7 @@
                     </div>
 
                     <!-- Preview Resolution Photos -->
-                    <div id="resolutionPreview" class="mt-4 grid grid-cols-3 gap-4 hidden"></div>
+                    <div id="resolutionPreview" class="mt-4 hidden"></div>
                 </div>
 
                 <!-- Action Buttons -->
@@ -591,10 +595,12 @@
 
         if (resolutionFiles.length === 0) {
             container.classList.add('hidden');
+            container.classList.remove('grid', 'grid-cols-3', 'gap-4');
             return;
         }
 
         container.classList.remove('hidden');
+        container.classList.add('grid', 'grid-cols-3', 'gap-4');
 
         resolutionFiles.forEach((file, index) => {
             const reader = new FileReader();
