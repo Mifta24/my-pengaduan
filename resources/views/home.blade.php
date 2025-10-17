@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Beranda - Sistem Pengaduan RT/RW')
+@section('title', 'Beranda - Sistem Pengaduan Lurah/RW')
 
 @section('content')
 <!-- Hero Section -->
@@ -8,11 +8,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div class="text-center">
             <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
-                Sistem Pengaduan RT/RW
+                Sistem Pengaduan Lurah/RW
             </h1>
             <p class="text-xl md:text-2xl text-indigo-100 mb-8 max-w-3xl mx-auto">
                 Sampaikan keluhan dan aspirasi Anda dengan mudah dan cepat.
-                Kami berkomitmen untuk meningkatkan kualitas pelayanan di lingkungan RT/RW.
+                Kami berkomitmen untuk meningkatkan kualitas pelayanan di lingkungan Lurah/RW.
             </p>
             @auth
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -55,7 +55,7 @@
                 Fitur Unggulan
             </h2>
             <p class="mt-4 text-lg text-gray-600">
-                Sistem yang dirancang untuk memudahkan komunikasi antara warga dan pengurus RT/RW
+                Sistem yang dirancang untuk memudahkan komunikasi antara warga dan pengurus Lurah/RW
             </p>
         </div>
 
@@ -109,7 +109,7 @@
                             </svg>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Komunikasi Transparan</h3>
-                        <p class="text-gray-600">Komunikasi dua arah yang transparan antara warga dan pengurus RT/RW.</p>
+                        <p class="text-gray-600">Komunikasi dua arah yang transparan antara warga dan pengurus Lurah/RW.</p>
                     </div>
                 </div>
 
@@ -151,7 +151,7 @@
                 Statistik Sistem
             </h2>
             <p class="mt-4 text-lg text-gray-600">
-                Data real-time aktivitas penggunaan sistem pengaduan RT/RW
+                Data real-time aktivitas penggunaan sistem pengaduan Lurah/RW
             </p>
         </div>
 
@@ -185,7 +185,7 @@
                 Pengumuman Terbaru
             </h2>
             <p class="mt-4 text-lg text-gray-600">
-                Informasi terkini dari pengurus RT/RW
+                Informasi terkini dari pengurus Lurah/RW
             </p>
         </div>
 

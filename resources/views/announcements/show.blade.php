@@ -128,7 +128,7 @@
                                 @foreach($announcement->target_audience as $target)
                                     <span class="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
                                         @if($target === 'all') 👥 Semua Warga
-                                        @elseif($target === 'rt') 🏘️ Pengurus RT
+                                        @elseif($target === 'Lurah') 🏘️ Pengurus Lurah
                                         @elseif($target === 'rw') 🏛️ Pengurus RW
                                         @else {{ ucfirst($target) }} @endif
                                     </span>
@@ -270,7 +270,7 @@
                                         <div class="min-w-0 flex-1">
                                             <div class="flex items-center space-x-2">
                                                 <h4 class="text-sm font-semibold text-gray-900">{{ $comment->user->name }}</h4>
-                                                @if($comment->user->hasRole(['admin', 'rt', 'rw']))
+                                                @if($comment->user->hasRole(['admin', 'Lurah', 'rw']))
                                                     <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
                                                         {{ $comment->user->getRoleNames()->first() }}
                                                     </span>

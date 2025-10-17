@@ -10,7 +10,7 @@
             Pengumuman
         </h1>
         <p class="mt-1 text-sm text-gray-500">
-            Pengumuman terbaru dari pengurus RT/RW
+            Pengumuman terbaru dari pengurus Lurah/RW
         </p>
     </div>
 
@@ -147,7 +147,7 @@
                                     @foreach($announcement->target_audience as $target)
                                         <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
                                             @if($target === 'all') Semua Warga
-                                            @elseif($target === 'rt') Pengurus RT
+                                            @elseif($target === 'Lurah') Pengurus Lurah
                                             @elseif($target === 'rw') Pengurus RW
                                             @else {{ ucfirst($target) }} @endif
                                         </span>

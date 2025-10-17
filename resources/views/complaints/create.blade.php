@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Ajukan Keluhan - Sistem Pengaduan RT/RW')
+@section('title', 'Ajukan Keluhan - Sistem Pengaduan Lurah/RW')
 
 @section('content')
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -12,7 +12,7 @@
                     Ajukan Keluhan
                 </h1>
                 <p class="mt-1 text-sm text-gray-500">
-                    Sampaikan keluhan atau aspirasi Anda kepada pengurus RT/RW.
+                    Sampaikan keluhan atau aspirasi Anda kepada pengurus Lurah/RW.
                 </p>
             </div>
             <div>
@@ -94,7 +94,7 @@
                 <div class="mt-2">
                     <input type="text" name="location" id="location" value="{{ old('location') }}"
                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 @error('location') ring-red-500 @enderror"
-                           placeholder="Contoh: Jalan Mawar No. 15, RT 001/RW 002">
+                           placeholder="Contoh: Jalan Mawar No. 15, Lurah 001/RW 002">
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
                     Sebutkan lokasi spesifik dimana masalah ini terjadi (opsional).
