@@ -1,15 +1,15 @@
 # 🧠 Context & Rules — Sistem Pengaduan Warga (Web Admin + User)
 
 ## 🎯 Tujuan Sistem
-Sistem ini adalah platform berbasis **Laravel** untuk mengelola pengaduan masyarakat di lingkungan RT/RW.  
-Web ini digunakan oleh **admin (RT/RW)** dan **user warga** untuk mengelola serta memantau laporan pengaduan secara transparan dan efisien.  
+Sistem ini adalah platform berbasis **Laravel** untuk mengelola pengaduan masyarakat di lingkungan Lurah/RW.  
+Web ini digunakan oleh **admin (Lurah/RW)** dan **user warga** untuk mengelola serta memantau laporan pengaduan secara transparan dan efisien.  
 Sistem terintegrasi dengan **API** untuk aplikasi mobile (Flutter) dan **database Supabase** sebagai penyimpanan utama.
 
 ---
 
 ## 👥 Role dan Hak Akses
 
-### 1. 🧑‍💼 Admin (RT / RW)
+### 1. 🧑‍💼 Admin (Lurah / RW)
 **Peran utama:** Mengelola seluruh data pengaduan, warga, dan pengumuman.
 
 **Hak akses:**
@@ -77,7 +77,7 @@ Sistem terintegrasi dengan **API** untuk aplikasi mobile (Flutter) dan **databas
    - Lihat daftar laporan sendiri + statusnya
 3. **Detail Laporan**
    - Lihat catatan tindak lanjut dari admin
-4. **Pengumuman RT/RW**
+4. **Pengumuman Lurah/RW**
    - Lihat daftar pengumuman publik
 5. **Profil**
    - Edit data diri dan password
@@ -110,5 +110,5 @@ Saat menggunakan AI untuk generate code, tambahkan konteks berikut:
 ## 📚 Tujuan Akhir
 - Meningkatkan transparansi dan efisiensi dalam penanganan laporan warga.  
 - Mempermudah warga melapor dan memantau hasil pengaduan.  
-- Memberikan alat bantu modern bagi RT/RW dalam mengelola administrasi lingkungan.
+- Memberikan alat bantu modern bagi Lurah/RW dalam mengelola administrasi lingkungan.
 

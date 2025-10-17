@@ -1,4 +1,4 @@
-# Website Pengaduan Warga Digital (ruang lingkup rt) 
+# Website Pengaduan Warga Digital (ruang lingkup Lurah) 
 
 ## 🧩 **Tahap 1 — Rencana Web Admin Laravel**
 
@@ -18,8 +18,8 @@ Membuat web admin untuk:
 
 ### 🧍‍♂️ **Autentikasi & Role**
 
-* **Login Admin / Ketua RT**
-* Role-based Access (Admin RW, Ketua RT, Staff RT)
+* **Login Admin / Ketua Lurah**
+* Role-based Access (Admin RW, Ketua Lurah, Staff Lurah)
 * Middleware `auth` & `role` (bisa pakai Laravel Spatie Permission)
 
 ---
@@ -72,7 +72,7 @@ CRUD lengkap untuk data pengaduan:
 ### 🔔 **Notifikasi (Opsional)**
 
 * Admin bisa kirim notifikasi ke warga (via FCM atau Supabase Realtime)
-* Contoh: *"Laporan Anda telah ditindaklanjuti oleh Ketua RT"*
+* Contoh: *"Laporan Anda telah ditindaklanjuti oleh Ketua Lurah"*
 
 ---
 
@@ -88,7 +88,7 @@ Berikut rancangan tabel inti:
 | name       | varchar                       | Nama pengguna |
 | email      | varchar                       | Email unik    |
 | password   | varchar                       | Hash password |
-| role       | enum('warga','rt','admin_rw') | Role pengguna |
+| role       | enum('warga','Lurah','admin_rw') | Role pengguna |
 | alamat     | text                          | Alamat warga  |
 | created_at | timestamp                     |               |
 | updated_at | timestamp                     |               |
