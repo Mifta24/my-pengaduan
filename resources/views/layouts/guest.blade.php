@@ -6,7 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ isset($title) ? $title . ' - ' : '' }}{{ config('app.name', 'MyPengaduan') }}</title>
-        <meta name="description" content="Sistem Pengaduan RT/RW - Platform digital untuk melaporkan keluhan dan mendapatkan respon cepat dari pengurus RT/RW">
+        <meta name="description" content="Sistem Pengaduan Lurah/RW - Platform digital untuk melaporkan keluhan dan mendapatkan respon cepat dari pengurus Lurah/RW">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -30,7 +30,7 @@
                         </div>
                         <div>
                             <h1 class="text-2xl font-bold text-white">MyPengaduan</h1>
-                            <p class="text-indigo-200 text-sm">Sistem Pengaduan RT/RW</p>
+                            <p class="text-indigo-200 text-sm">Sistem Pengaduan Lurah/RW</p>
                         </div>
                     </div>
 
@@ -39,7 +39,7 @@
                             Platform Digital untuk Pengaduan Warga
                         </h2>
                         <p class="text-lg text-indigo-100">
-                            Laporkan keluhan dengan mudah dan dapatkan respon cepat dari pengurus RT/RW Anda.
+                            Laporkan keluhan dengan mudah dan dapatkan respon cepat dari pengurus Lurah/RW Anda.
                         </p>
 
                         <div class="space-y-4">
@@ -91,7 +91,7 @@
                             </div>
                             <div>
                                 <h1 class="text-xl font-bold text-gray-900">MyPengaduan</h1>
-                                <p class="text-sm text-gray-500">Sistem Pengaduan RT/RW</p>
+                                <p class="text-sm text-gray-500">Sistem Pengaduan Lurah/RW</p>
                             </div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                     <!-- Footer -->
                     <div class="mt-8 text-center">
                         <p class="text-sm text-gray-500">
-                            © {{ date('Y') }} MyPengaduan. Dikembangkan untuk RT/RW Indonesia.
+                            © {{ date('Y') }} MyPengaduan. Dikembangkan untuk Lurah/RW Indonesia.
                         </p>
                         <div class="mt-2 flex justify-center space-x-4 text-sm text-gray-400">
                             <a href="#" class="hover:text-gray-600">Bantuan</a>
@@ -116,5 +116,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Scripts Stack -->
+        @stack('scripts')
     </body>
 </html>
