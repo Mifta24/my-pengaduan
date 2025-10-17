@@ -59,7 +59,6 @@
                 <select name="role"
                         class="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                     <option value="">Semua Peran</option>
-                    <option value="super_admin" {{ request('role') === 'super_admin' ? 'selected' : '' }}>Super Admin</option>
                     <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                     <option value="user" {{ request('role') === 'user' ? 'selected' : '' }}>User</option>
                 </select>
