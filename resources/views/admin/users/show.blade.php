@@ -302,11 +302,15 @@
                                         <p class="text-gray-900">{{ Str::limit($comment->content, 100) }}</p>
                                     </div>
                                     <div class="mt-1 text-sm text-gray-500">
-                                        <span>Pada keluhan:
-                                            <a href="{{ route('admin.complaints.show', $comment->complaint) }}" class="font-medium text-gray-900 hover:text-indigo-600">
-                                                {{ Str::limit($comment->complaint->title, 50) }}
-                                            </a>
-                                        </span>
+                                        @if($comment->complaint)
+                                            <span>Pada keluhan:
+                                                <a href="{{ route('admin.complaints.show', $comment->complaint->id) }}" class="font-medium text-gray-900 hover:text-indigo-600">
+                                                    {{ Str::limit($comment->complaint->title, 50) }}
+                                                </a>
+                                            </span>
+                                        @else
+                                            <span>Keluhan telah dihapus</span>
+                                        @endif
                                         <span> • {{ $comment->created_at->diffForHumans() }}</span>
                                     </div>
                                 </div>
