@@ -188,21 +188,22 @@
                                             {{ $announcement->title }}
                                         </a>
                                     </h3>
-                                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
-                                        @if($announcement->is_active) bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
-                                        @else bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10 @endif">
-                                        @if($announcement->is_active) Aktif
-                                        @else Tidak Aktif @endif
+                                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset {{ $announcement->is_active
+                                        ? 'bg-green-50 text-green-700 ring-green-600/20'
+                                        : 'bg-red-50 text-red-700 ring-red-600/10' }}">
+                                        {{ $announcement->is_active ? 'Aktif' : 'Tidak Aktif' }}
                                     </span>
-                                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
-                                        @if($announcement->priority === 'low') bg-gray-50 text-gray-700 ring-1 ring-inset ring-gray-600/20
-                                        @elseif($announcement->priority === 'medium') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20
-                                        @elseif($announcement->priority === 'high') bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-600/20
-                                        @else bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10 @endif">
-                                        @if($announcement->priority === 'low') Rendah
-                                        @elseif($announcement->priority === 'medium') Sedang
-                                        @elseif($announcement->priority === 'high') Tinggi
-                                        @else Mendesak @endif
+                                    @php
+                                    $priorityClasses = [
+                                        'low' => 'bg-gray-50 text-gray-700 ring-gray-600/20',
+                                        'medium' => 'bg-blue-50 text-blue-700 ring-blue-600/20',
+                                        'high' => 'bg-orange-50 text-orange-700 ring-orange-600/20',
+                                        'urgent' => 'bg-red-50 text-red-700 ring-red-600/10',
+                                    ];
+                                    $priorityLabels = ['low' => 'Rendah', 'medium' => 'Sedang', 'high' => 'Tinggi', 'urgent' => 'Mendesak'];
+                                    @endphp
+                                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset {{ $priorityClasses[$announcement->priority] ?? $priorityClasses['low'] }}">
+                                        {{ $priorityLabels[$announcement->priority] ?? 'Rendah' }}
                                     </span>
                                 </div>
 

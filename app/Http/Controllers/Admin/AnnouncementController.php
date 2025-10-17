@@ -78,19 +78,45 @@ class AnnouncementController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:announcements,slug',
+            'summary' => 'nullable|string',
             'content' => 'required|string',
             'is_active' => 'boolean',
             'is_sticky' => 'boolean',
+            'allow_comments' => 'boolean',
             'priority' => 'nullable|in:urgent,high,medium,low',
-            'published_at' => 'nullable|date'
+            'target_audience' => 'nullable|array',
+            'published_at' => 'nullable|date',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx'
         ]);
 
+        // Generate slug if not provided
+        if (empty($validated['slug'])) {
+            $validated['slug'] = \Illuminate\Support\Str::slug($validated['title']);
+        }
+
         // Set default values
-        $validated['is_active'] = $validated['is_active'] ?? true;
-        $validated['is_sticky'] = $validated['is_sticky'] ?? false;
+        $validated['is_active'] = $request->has('is_active') ? true : false;
+        $validated['is_sticky'] = $request->has('is_sticky') ? true : false;
+        $validated['allow_comments'] = $request->has('allow_comments') ? true : false;
         $validated['priority'] = $validated['priority'] ?? 'medium';
         $validated['published_at'] = $validated['published_at'] ?? now();
-        $validated['author_id'] = auth()->id(); // Add author_id
+        $validated['author_id'] = Auth::id();
+
+        // Handle file attachments
+        if ($request->hasFile('attachments')) {
+            $attachments = [];
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('announcements', 'public');
+                $attachments[] = [
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                ];
+            }
+            $validated['attachments'] = $attachments;
+        }
 
         Announcement::create($validated);
 
@@ -129,7 +155,9 @@ class AnnouncementController extends Controller
             'allow_comments' => 'nullable|boolean',
             'priority' => 'nullable|in:urgent,high,medium,low',
             'target_audience' => 'nullable|array',
-            'published_at' => 'nullable|date'
+            'published_at' => 'nullable|date',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx'
         ]);
 
         // Handle checkboxes
@@ -138,18 +166,36 @@ class AnnouncementController extends Controller
         $validated['allow_comments'] = $request->has('allow_comments') ? true : false;
 
         // Handle attachments removal
+        $existingAttachments = $announcement->attachments ?? [];
         if ($request->has('remove_attachments')) {
-            $attachments = $announcement->attachments ?? [];
             foreach ($request->remove_attachments as $index) {
-                if (isset($attachments[$index])) {
+                if (isset($existingAttachments[$index])) {
                     // Delete file from storage if exists
-                    if (is_array($attachments[$index]) && isset($attachments[$index]['path'])) {
-                        Storage::disk('public')->delete($attachments[$index]['path']);
+                    if (is_array($existingAttachments[$index]) && isset($existingAttachments[$index]['path'])) {
+                        Storage::disk('public')->delete($existingAttachments[$index]['path']);
                     }
-                    unset($attachments[$index]);
+                    unset($existingAttachments[$index]);
                 }
             }
-            $validated['attachments'] = array_values($attachments); // Re-index array
+            $existingAttachments = array_values($existingAttachments); // Re-index array
+        }
+
+        // Handle new file attachments
+        if ($request->hasFile('attachments')) {
+            $newAttachments = [];
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('announcements', 'public');
+                $newAttachments[] = [
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                ];
+            }
+            // Merge existing and new attachments
+            $validated['attachments'] = array_merge($existingAttachments, $newAttachments);
+        } else {
+            // Keep existing attachments if no new files uploaded
+            $validated['attachments'] = $existingAttachments;
         }
 
         $announcement->update($validated);

@@ -128,8 +128,7 @@
                                 @foreach($announcement->target_audience as $target)
                                     <span class="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
                                         @if($target === 'all') 👥 Semua Warga
-                                        @elseif($target === 'Lurah') 🏘️ Pengurus Lurah
-                                        @elseif($target === 'rw') 🏛️ Pengurus RW
+                                        @elseif($target === 'rt') 🏛️ Pengurus RT
                                         @else {{ ucfirst($target) }} @endif
                                     </span>
                                 @endforeach
@@ -169,45 +168,109 @@
                 {!! nl2br(e($announcement->content)) !!}
             </div>
 
-            <!-- Attachments -->
+            <!-- Attachments & Photos -->
             @if($announcement->attachments && count($announcement->attachments) > 0)
                 <div class="mt-8 pt-8 border-t border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Lampiran</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        @foreach($announcement->attachments as $attachment)
-                            <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors duration-150">
-                                <div class="flex items-start space-x-3">
-                                    <div class="flex-shrink-0">
-                                        @if(Str::contains($attachment['type'], 'image'))
-                                            <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                        @elseif(Str::contains($attachment['type'], 'pdf'))
-                                            <svg class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                            </svg>
-                                        @else
-                                            <svg class="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                        @endif
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">📎 Lampiran & Foto</h3>
+
+                    @php
+                        $images = [];
+                        $files = [];
+                        foreach($announcement->attachments as $attachment) {
+                            $extension = pathinfo($attachment['original_name'] ?? $attachment['name'] ?? '', PATHINFO_EXTENSION);
+                            if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                                $images[] = $attachment;
+                            } else {
+                                $files[] = $attachment;
+                            }
+                        }
+                    @endphp
+
+                    <!-- Photo Gallery -->
+                    @if(count($images) > 0)
+                        <div class="mb-8">
+                            <h4 class="text-base font-medium text-gray-900 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Foto ({{ count($images) }})
+                            </h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                @foreach($images as $index => $image)
+                                    <div class="relative group cursor-pointer overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300"
+                                         onclick="openImageModal('{{ asset('storage/' . $image['path']) }}', '{{ $image['original_name'] ?? $image['name'] ?? 'Foto ' . ($index + 1) }}')">
+                                        <div class="aspect-w-16 aspect-h-12 bg-gray-200">
+                                            <img src="{{ asset('storage/' . $image['path']) }}"
+                                                 alt="{{ $image['original_name'] ?? $image['name'] ?? 'Foto' }}"
+                                                 class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
+                                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23ddd\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'sans-serif\' font-size=\'14\' fill=\'%23999\'%3EGambar tidak tersedia%3C/text%3E%3C/svg%3E';">
+                                        </div>
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                        <div class="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                            <p class="text-sm font-medium truncate">{{ $image['original_name'] ?? $image['name'] ?? 'Foto ' . ($index + 1) }}</p>
+                                            <p class="text-xs text-gray-200 mt-1">Klik untuk memperbesar</p>
+                                        </div>
+                                        <div class="absolute top-2 right-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            🔍 Lihat
+                                        </div>
                                     </div>
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-gray-900 truncate">{{ $attachment['name'] }}</p>
-                                        <p class="text-sm text-gray-500">{{ $attachment['size'] ?? 'N/A' }}</p>
-                                    </div>
-                                    <div class="flex-shrink-0">
-                                        <a href="{{ $attachment['url'] }}" target="_blank"
-                                           class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500">
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Other Files/Documents -->
+                    @if(count($files) > 0)
+                        <div>
+                            <h4 class="text-base font-medium text-gray-900 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Dokumen ({{ count($files) }})
+                            </h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @foreach($files as $file)
+                                    @php
+                                        $extension = pathinfo($file['original_name'] ?? $file['name'] ?? '', PATHINFO_EXTENSION);
+                                    @endphp
+                                    <a href="{{ asset('storage/' . $file['path']) }}"
+                                       target="_blank"
+                                       download
+                                       class="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-indigo-300 hover:shadow-md transition-all duration-200 group">
+                                        <div class="flex-shrink-0">
+                                            @if(strtolower($extension) === 'pdf')
+                                                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                                    <svg class="h-7 w-7 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                            @else
+                                                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                                                    <svg class="h-7 w-7 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="ml-4 flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600">
+                                                {{ $file['original_name'] ?? $file['name'] ?? 'File' }}
+                                            </p>
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                {{ strtoupper($extension) }} •
+                                                {{ isset($file['size']) ? number_format($file['size'] / 1024, 1) . ' KB' : 'N/A' }}
+                                            </p>
+                                        </div>
+                                        <div class="ml-3">
+                                            <svg class="h-5 w-5 text-gray-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
-                                        </a>
-                                    </div>
-                                </div>
+                                        </div>
+                                    </a>
+                                @endforeach
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @endif
                 </div>
             @endif
 
@@ -336,6 +399,19 @@
     </div>
 </div>
 
+<!-- Image Modal -->
+<div id="imageModal" style="display: none;" class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
+    <div class="relative max-w-7xl max-h-full">
+        <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl font-bold z-10">
+            &times;
+        </button>
+        <img id="modalImage" src="" alt="" class="max-w-full max-h-[90vh] object-contain">
+        <div class="text-center mt-4">
+            <p id="modalImageName" class="text-white text-lg"></p>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
     function shareAnnouncement(title, url) {
@@ -362,6 +438,37 @@
             });
         }
     }
+
+    function openImageModal(src, name) {
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalImageName = document.getElementById('modalImageName');
+
+        modalImage.src = src;
+        modalImageName.textContent = name;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside the image
+    document.getElementById('imageModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeImageModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeImageModal();
+        }
+    });
 </script>
 @endpush
 @endsection

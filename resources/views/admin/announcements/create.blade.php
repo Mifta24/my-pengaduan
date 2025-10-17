@@ -326,7 +326,7 @@
                             </div>
 
                             <!-- Preview Attachments -->
-                            <div id="attachments-preview" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 hidden"></div>
+                            <div id="attachments-preview" class="mt-4 hidden"></div>
 
                             <p class="mt-2 text-sm text-gray-500">Upload dokumen pendukung atau gambar untuk pengumuman</p>
                             @error('attachments')
@@ -416,23 +416,41 @@
                 const maxSize = 10 * 1024 * 1024; // 10MB
                 const container = document.getElementById('attachments-preview');
 
-                container.innerHTML = '';
-                attachmentFiles = [];
-
-                if (files.length > maxFiles) {
-                    alert(`Maksimal ${maxFiles} file dapat diupload`);
-                    input.value = '';
-                    return;
-                }
-
-                files.forEach((file, index) => {
+                // Don't clear existing files, add to them
+                files.forEach(file => {
                     if (file.size > maxSize) {
                         alert(`File ${file.name} terlalu besar. Maksimal 10MB per file.`);
                         return;
                     }
-
                     attachmentFiles.push(file);
+                });
 
+                if (attachmentFiles.length > maxFiles) {
+                    alert(`Maksimal ${maxFiles} file dapat diupload`);
+                    attachmentFiles = attachmentFiles.slice(0, maxFiles);
+                }
+
+                // Update the file input with current files
+                updateAttachmentFileInput();
+
+                // Re-render preview
+                renderAttachmentPreview();
+            }
+
+            function renderAttachmentPreview() {
+                const container = document.getElementById('attachments-preview');
+                container.innerHTML = '';
+
+                if (attachmentFiles.length === 0) {
+                    container.classList.add('hidden');
+                    container.classList.remove('grid', 'grid-cols-2', 'sm:grid-cols-3', 'md:grid-cols-4', 'gap-4');
+                    return;
+                }
+
+                container.classList.remove('hidden');
+                container.classList.add('grid', 'grid-cols-2', 'sm:grid-cols-3', 'md:grid-cols-4', 'gap-4');
+
+                attachmentFiles.forEach((file, index) => {
                     const div = document.createElement('div');
                     div.className = 'relative group';
 
@@ -475,12 +493,6 @@
 
                     container.appendChild(div);
                 });
-
-                if (attachmentFiles.length > 0) {
-                    container.classList.remove('hidden');
-                } else {
-                    container.classList.add('hidden');
-                }
             }
 
             function getFileIcon(fileType) {
@@ -502,10 +514,7 @@
             function removeAttachment(index) {
                 attachmentFiles.splice(index, 1);
                 updateAttachmentFileInput();
-
-                // Re-render preview
-                const input = document.getElementById('attachments');
-                previewAttachments(input);
+                renderAttachmentPreview();
             }
 
             function updateAttachmentFileInput() {

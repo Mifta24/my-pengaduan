@@ -225,54 +225,93 @@
                 </div>
             </div>
 
-            <!-- Attachments -->
+            <!-- Attachments / Photos -->
             @if($announcement->attachments && count($announcement->attachments) > 0)
                 <div class="mt-6 bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
                     <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Lampiran</h3>
+                        <h3 class="text-lg font-medium text-gray-900">Lampiran & Foto</h3>
                     </div>
                     <div class="px-6 py-4">
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            @foreach($announcement->attachments as $attachment)
-                                <div class="flex items-center p-3 border border-gray-200 rounded-lg">
-                                    <div class="flex-shrink-0">
-                                        @php
-                                            $extension = pathinfo($attachment['original_name'], PATHINFO_EXTENSION);
-                                        @endphp
-                                        @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']))
-                                            <svg class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                        @elseif(strtolower($extension) === 'pdf')
-                                            <svg class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                            </svg>
-                                        @else
-                                            <svg class="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                        @endif
-                                    </div>
-                                    <div class="ml-3 flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-gray-900 truncate">
-                                            {{ $attachment['original_name'] }}
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            {{ isset($attachment['size']) ? number_format($attachment['size'] / 1024, 1) . ' KB' : 'Unknown size' }}
-                                        </p>
-                                    </div>
-                                    <div class="ml-3">
-                                        <a href="{{ Storage::url($attachment['path']) }}"
-                                           target="_blank"
-                                           class="inline-flex items-center p-1 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200">
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                        </a>
-                                    </div>
+                        @php
+                            $images = [];
+                            $files = [];
+                            foreach($announcement->attachments as $attachment) {
+                                $extension = pathinfo($attachment['original_name'] ?? $attachment['name'] ?? '', PATHINFO_EXTENSION);
+                                if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                                    $images[] = $attachment;
+                                } else {
+                                    $files[] = $attachment;
+                                }
+                            }
+                        @endphp
+
+                        <!-- Images Gallery -->
+                        @if(count($images) > 0)
+                            <div class="mb-6">
+                                <h4 class="text-sm font-medium text-gray-700 mb-3">Foto ({{ count($images) }})</h4>
+                                <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                                    @foreach($images as $index => $image)
+                                        <div class="relative group cursor-pointer" onclick="openImageModal('{{ asset('storage/' . $image['path']) }}')">
+                                            <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200">
+                                                <img src="{{ asset('storage/' . $image['path']) }}"
+                                                     alt="{{ $image['original_name'] ?? $image['name'] ?? 'Foto' }}"
+                                                     class="h-48 w-full object-cover group-hover:opacity-75 transition-opacity"
+                                                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23ddd\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'sans-serif\' font-size=\'14\' fill=\'%23999\'%3EGambar tidak tersedia%3C/text%3E%3C/svg%3E';">
+                                            </div>
+                                            <div class="absolute inset-0 rounded-lg ring-1 ring-inset ring-gray-900/10 pointer-events-none"></div>
+                                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <p class="text-xs text-white truncate">{{ $image['original_name'] ?? $image['name'] ?? 'Foto ' . ($index + 1) }}</p>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
-                        </div>
+                            </div>
+                        @endif
+
+                        <!-- Other Files -->
+                        @if(count($files) > 0)
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-700 mb-3">Dokumen ({{ count($files) }})</h4>
+                                <div class="space-y-2">
+                                    @foreach($files as $file)
+                                        @php
+                                            $extension = pathinfo($file['original_name'] ?? $file['name'] ?? '', PATHINFO_EXTENSION);
+                                        @endphp
+                                        <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                            <div class="flex-shrink-0">
+                                                @if(strtolower($extension) === 'pdf')
+                                                    <svg class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                    </svg>
+                                                @else
+                                                    <svg class="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                @endif
+                                            </div>
+                                            <div class="ml-3 flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 truncate">
+                                                    {{ $file['original_name'] ?? $file['name'] ?? 'File' }}
+                                                </p>
+                                                <p class="text-sm text-gray-500">
+                                                    {{ isset($file['size']) ? number_format($file['size'] / 1024, 1) . ' KB' : '' }}
+                                                </p>
+                                            </div>
+                                            <div class="ml-3">
+                                                <a href="{{ asset('storage/' . $file['path']) }}"
+                                                   target="_blank"
+                                                   download
+                                                   class="inline-flex items-center p-2 border border-transparent text-sm font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200">
+                                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             @endif
@@ -306,10 +345,15 @@
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Prioritas</dt>
                         <dd class="mt-1">
-                            <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium
-                                @if($announcement->priority === 'high') bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10
-                                @elseif($announcement->priority === 'medium') bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20
-                                @else bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10 @endif">
+                            @php
+                            $priorityClasses = [
+                                'low' => 'bg-gray-50 text-gray-600 ring-gray-500/10',
+                                'medium' => 'bg-yellow-50 text-yellow-800 ring-yellow-600/20',
+                                'high' => 'bg-red-50 text-red-700 ring-red-600/10',
+                                'urgent' => 'bg-red-50 text-red-700 ring-red-600/10',
+                            ];
+                            @endphp
+                            <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset {{ $priorityClasses[$announcement->priority] ?? $priorityClasses['low'] }}">
                                 {{ ucfirst($announcement->priority) }}
                             </span>
                         </dd>
@@ -380,4 +424,50 @@
         </div>
     </div>
 </div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center pb-3">
+            <h3 class="text-lg font-bold text-gray-900">Preview Foto</h3>
+            <button onclick="closeImageModal()" class="text-black close-modal cursor-pointer">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="text-center">
+            <img id="modalImage" src="" alt="Preview foto" class="max-w-full h-auto rounded-lg">
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    function openImageModal(imageSrc) {
+        document.getElementById('modalImage').src = imageSrc;
+        document.getElementById('imageModal').classList.remove('hidden');
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.add('hidden');
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('imageModal');
+        if (event.target === modal) {
+            closeImageModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeImageModal();
+        }
+    });
+</script>
+@endpush
+
 @endsection
