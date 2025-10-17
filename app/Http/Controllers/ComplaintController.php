@@ -133,7 +133,7 @@ class ComplaintController extends Controller
             // Handle image uploads
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
-                    $imagePath = $image->store('complaints/images', 'public');
+                    $imagePath = $image->store('complaints', 'public');
 
                     Attachment::create([
                         'attachable_type' => Complaint::class,
@@ -142,6 +142,7 @@ class ComplaintController extends Controller
                         'file_path' => $imagePath,
                         'file_size' => $image->getSize(),
                         'mime_type' => $image->getMimeType(),
+                        'attachment_type' => 'complaint', // Set attachment type
                     ]);
                 }
             }
@@ -254,7 +255,7 @@ class ComplaintController extends Controller
             // Handle new image uploads
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
-                    $imagePath = $image->store('complaints/images', 'public');
+                    $imagePath = $image->store('complaints', 'public');
 
                     Attachment::create([
                         'attachable_type' => Complaint::class,
@@ -263,6 +264,7 @@ class ComplaintController extends Controller
                         'file_path' => $imagePath,
                         'file_size' => $image->getSize(),
                         'mime_type' => $image->getMimeType(),
+                        'attachment_type' => 'complaint', // Set attachment type
                     ]);
                 }
             }

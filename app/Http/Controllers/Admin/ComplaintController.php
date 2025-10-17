@@ -33,8 +33,8 @@ class ComplaintController extends Controller
         }
 
         // Filter by category
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
         }
 
         // Search by title or description
@@ -98,7 +98,7 @@ class ComplaintController extends Controller
         // Handle additional attachments
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                $path = $file->store('complaints/attachments', 'public');
+                $path = $file->store('complaints', 'public');
 
                 Attachment::create([
                     'attachable_type' => Complaint::class,
@@ -107,6 +107,7 @@ class ComplaintController extends Controller
                     'file_path' => $path,
                     'file_size' => $file->getSize(),
                     'mime_type' => $file->getMimeType(),
+                    'attachment_type' => 'complaint', // Set attachment type
                 ]);
             }
         }
@@ -130,6 +131,21 @@ class ComplaintController extends Controller
         ]);
 
         return view('admin.complaints.show', compact('complaint'));
+    }
+
+    /**
+     * Print complaint detail
+     */
+    public function print(Complaint $complaint)
+    {
+        $complaint->load([
+            'user',
+            'category',
+            'complaintAttachments',
+            'resolutionAttachments'
+        ]);
+
+        return view('admin.complaints.print', compact('complaint'));
     }
 
     /**
@@ -195,6 +211,7 @@ class ComplaintController extends Controller
                     'file_path' => $path,
                     'file_size' => $file->getSize(),
                     'mime_type' => $file->getMimeType(),
+                    'attachment_type' => 'complaint', // Set attachment type
                 ]);
             }
         }

@@ -322,6 +322,34 @@ class UserController extends Controller
     }
 
     /**
+     * Verify user (NIK & KTP verification)
+     */
+    public function verifyUser(User $user)
+    {
+        $user->update([
+            'is_verified' => true,
+            'verified_at' => now(),
+        ]);
+
+        return redirect()->back()
+            ->with('success', "Pengguna {$user->name} berhasil diverifikasi sebagai warga Lurah/RW.");
+    }
+
+    /**
+     * Reject user verification
+     */
+    public function rejectVerification(User $user)
+    {
+        $user->update([
+            'is_verified' => false,
+            'verified_at' => null,
+        ]);
+
+        return redirect()->back()
+            ->with('success', "Verifikasi pengguna {$user->name} berhasil ditolak.");
+    }
+
+    /**
      * Export users data
      */
     public function export(Request $request)

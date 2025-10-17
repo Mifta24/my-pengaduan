@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class AnnouncementController extends Controller
 {
@@ -36,6 +37,11 @@ class AnnouncementController extends Controller
             });
         }
 
+        // Filter by priority
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+
         // Filter by date range
         if ($request->filled('start_date')) {
             $query->whereDate('created_at', '>=', $request->start_date);
@@ -46,7 +52,15 @@ class AnnouncementController extends Controller
 
         $announcements = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        return view('admin.announcements.index', compact('announcements'));
+        // Calculate stats
+        $stats = [
+            'total' => Announcement::count(),
+            'published' => Announcement::where('is_active', true)->count(),
+            'draft' => Announcement::where('is_active', false)->where('published_at', null)->count(),
+            'unpublished' => Announcement::where('is_active', false)->count(),
+        ];
+
+        return view('admin.announcements.index', compact('announcements', 'stats'));
     }
 
     /**
@@ -71,11 +85,12 @@ class AnnouncementController extends Controller
             'published_at' => 'nullable|date'
         ]);
 
-    // Set default values
-    $validated['is_active'] = $validated['is_active'] ?? true;
-    $validated['is_sticky'] = $validated['is_sticky'] ?? false;
-    $validated['priority'] = $validated['priority'] ?? 'medium';
-    $validated['published_at'] = $validated['published_at'] ?? now();
+        // Set default values
+        $validated['is_active'] = $validated['is_active'] ?? true;
+        $validated['is_sticky'] = $validated['is_sticky'] ?? false;
+        $validated['priority'] = $validated['priority'] ?? 'medium';
+        $validated['published_at'] = $validated['published_at'] ?? now();
+        $validated['author_id'] = auth()->id(); // Add author_id
 
         Announcement::create($validated);
 
@@ -106,12 +121,36 @@ class AnnouncementController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:announcements,slug,' . $announcement->id,
+            'summary' => 'nullable|string',
             'content' => 'required|string',
-            'is_active' => 'boolean',
-            'is_sticky' => 'boolean',
+            'is_active' => 'nullable|boolean',
+            'is_sticky' => 'nullable|boolean',
+            'allow_comments' => 'nullable|boolean',
             'priority' => 'nullable|in:urgent,high,medium,low',
+            'target_audience' => 'nullable|array',
             'published_at' => 'nullable|date'
         ]);
+
+        // Handle checkboxes
+        $validated['is_active'] = $request->has('is_active') ? (bool)$request->is_active : false;
+        $validated['is_sticky'] = $request->has('is_sticky') ? true : false;
+        $validated['allow_comments'] = $request->has('allow_comments') ? true : false;
+
+        // Handle attachments removal
+        if ($request->has('remove_attachments')) {
+            $attachments = $announcement->attachments ?? [];
+            foreach ($request->remove_attachments as $index) {
+                if (isset($attachments[$index])) {
+                    // Delete file from storage if exists
+                    if (is_array($attachments[$index]) && isset($attachments[$index]['path'])) {
+                        Storage::disk('public')->delete($attachments[$index]['path']);
+                    }
+                    unset($attachments[$index]);
+                }
+            }
+            $validated['attachments'] = array_values($attachments); // Re-index array
+        }
 
         $announcement->update($validated);
 
@@ -135,7 +174,15 @@ class AnnouncementController extends Controller
      */
     public function toggleStatus(Announcement $announcement)
     {
-        $announcement->update(['is_active' => !$announcement->is_active]);
+        $newStatus = !$announcement->is_active;
+
+        // If activating and published_at is null, set it to now
+        $updateData = ['is_active' => $newStatus];
+        if ($newStatus && is_null($announcement->published_at)) {
+            $updateData['published_at'] = now();
+        }
+
+        $announcement->update($updateData);
 
         $status = $announcement->is_active ? 'diaktifkan' : 'dinonaktifkan';
 
@@ -190,8 +237,21 @@ class AnnouncementController extends Controller
     {
         $newAnnouncement = $announcement->replicate();
         $newAnnouncement->title = $announcement->title . ' (Copy)';
+
+        // Generate unique slug
+        $baseSlug = $announcement->slug . '-copy';
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (Announcement::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+
+        $newAnnouncement->slug = $slug;
         $newAnnouncement->is_active = false;
         $newAnnouncement->published_at = null;
+        $newAnnouncement->views_count = 0;
         $newAnnouncement->save();
 
         return redirect()->route('admin.announcements.edit', $newAnnouncement)
@@ -213,6 +273,12 @@ class AnnouncementController extends Controller
 
         switch ($validated['action']) {
             case 'activate':
+                // Set published_at if null when activating
+                $announcementIds = $validated['announcement_ids'];
+                Announcement::whereIn('id', $announcementIds)
+                    ->whereNull('published_at')
+                    ->update(['published_at' => now()]);
+
                 $announcements->update(['is_active' => true]);
                 $message = 'Pengumuman yang dipilih berhasil diaktifkan.';
                 break;
