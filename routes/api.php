@@ -112,7 +112,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 
 Route::get('/', function () {
     return response()->json([
-        'message' => 'RT/RW Complaint Management System API',
+        'message' => 'Lurah/RW Complaint Management System API',
         'version' => '1.0.0',
         'documentation' => url('/api/docs'),
         'endpoints' => [

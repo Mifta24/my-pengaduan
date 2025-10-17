@@ -59,6 +59,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Complaint Management
     Route::resource('complaints', AdminComplaintController::class);
+    Route::get('complaints/{complaint}/print', [AdminComplaintController::class, 'print'])->name('complaints.print');
     Route::patch('complaints/{complaint}/status', [AdminComplaintController::class, 'updateStatus'])->name('complaints.status');
     Route::post('complaints/{complaint}/response', [AdminComplaintController::class, 'addResponse'])->name('complaints.response');
     Route::delete('attachments/{attachment}', [AdminComplaintController::class, 'deleteAttachment'])->name('attachments.delete');
@@ -76,6 +77,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::patch('users/{user}/verify-email', [UserController::class, 'verifyEmail'])->name('users.verify-email');
     Route::patch('users/{user}/unverify-email', [UserController::class, 'unverifyEmail'])->name('users.unverify-email');
+    Route::patch('users/{user}/verify-user', [UserController::class, 'verifyUser'])->name('users.verify-user');
+    Route::patch('users/{user}/reject-verification', [UserController::class, 'rejectVerification'])->name('users.reject-verification');
     Route::patch('users/{user}/change-role', [UserController::class, 'changeRole'])->name('users.change-role');
     Route::patch('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
     Route::post('users/bulk-action', [UserController::class, 'bulkAction'])->name('users.bulk-action');
