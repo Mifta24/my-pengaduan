@@ -27,6 +27,13 @@ class User extends Authenticatable
         'password',
         'role',
         'address',
+        'nik',
+        'ktp_path',
+        'phone',
+        'rt_number',
+        'rw_number',
+        'is_verified',
+        'verified_at',
         'is_active',
         'notification_preferences',
     ];
@@ -50,6 +57,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'verified_at' => 'datetime',
             'password' => 'hashed',
             'notification_preferences' => 'array',
         ];
