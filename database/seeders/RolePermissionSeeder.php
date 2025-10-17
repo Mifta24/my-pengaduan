@@ -50,12 +50,12 @@ class RolePermissionSeeder extends Seeder
 
         // Create admin user
         $admin = User::firstOrCreate(
-            ['email' => 'admin@rt.com'],
+            ['email' => 'admin@Lurah.com'],
             [
-                'name' => 'Admin RT',
+                'name' => 'Admin Lurah',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
-                'address' => 'Kantor RT 01/RW 01'
+                'address' => 'Kantor Lurah 01/RW 01'
             ]
         );
 
@@ -68,7 +68,7 @@ class RolePermissionSeeder extends Seeder
                 'name' => 'Warga Test',
                 'password' => Hash::make('password'),
                 'role' => 'user',
-                'address' => 'Jl. Test No. 123, RT 01/RW 01'
+                'address' => 'Jl. Test No. 123, Lurah 01/RW 01'
             ]
         );
 

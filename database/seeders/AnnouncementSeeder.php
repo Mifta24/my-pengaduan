@@ -16,7 +16,7 @@ class AnnouncementSeeder extends Seeder
     public function run(): void
     {
         // Get admin users to be authors
-        $adminUsers = User::role(['admin', 'rt', 'rw'])->get();
+        $adminUsers = User::role(['admin', 'Lurah', 'rw'])->get();
 
         if ($adminUsers->isEmpty()) {
             $adminUser = User::first(); // Fallback to first user
@@ -26,21 +26,21 @@ class AnnouncementSeeder extends Seeder
 
         $announcements = [
             [
-                'title' => 'Pengumuman Penting: Rapat RT Bulanan',
-                'slug' => 'pengumuman-penting-rapat-rt-bulanan',
-                'summary' => 'Rapat rutin bulanan RT akan diadakan minggu depan untuk membahas berbagai hal penting.',
+                'title' => 'Pengumuman Penting: Rapat Lurah Bulanan',
+                'slug' => 'pengumuman-penting-rapat-Lurah-bulanan',
+                'summary' => 'Rapat rutin bulanan Lurah akan diadakan minggu depan untuk membahas berbagai hal penting.',
                 'content' => 'Assalamualaikum Wr. Wb.
 
 Dengan hormat,
 
-Kami mengundang seluruh warga RT 001/RW 003 untuk menghadiri rapat bulanan yang akan dilaksanakan pada:
+Kami mengundang seluruh warga Lurah 001/RW 003 untuk menghadiri rapat bulanan yang akan dilaksanakan pada:
 
 **Hari/Tanggal:** Sabtu, 15 Oktober 2025
 **Waktu:** 19.30 - 21.00 WIB
-**Tempat:** Balai RT 001/RW 003
+**Tempat:** Balai Lurah 001/RW 003
 
 **Agenda Rapat:**
-1. Laporan keuangan RT bulan September 2025
+1. Laporan keuangan Lurah bulan September 2025
 2. Program kerja bakti lingkungan
 3. Pembahasan iuran bulanan
 4. Persiapan peringatan 17 Agustus tahun depan
@@ -52,7 +52,7 @@ Demikian pengumuman ini kami sampaikan. Terima kasih.
 
 Wassalamualaikum Wr. Wb.
 
-**Pengurus RT 001/RW 003**',
+**Pengurus Lurah 001/RW 003**',
                 'priority' => 'high',
                 'target_audience' => ['all'],
                 'is_active' => true,
@@ -66,7 +66,7 @@ Wassalamualaikum Wr. Wb.
                 'title' => 'Info: Jadwal Pengambilan Sampah Terbaru',
                 'slug' => 'info-jadwal-pengambilan-sampah-terbaru',
                 'summary' => 'Perubahan jadwal pengambilan sampah mulai berlaku minggu ini.',
-                'content' => 'Kepada Yth. Warga RT 001/RW 003
+                'content' => 'Kepada Yth. Warga Lurah 001/RW 003
 
 Bersama ini kami informasikan bahwa mulai tanggal 10 Oktober 2025, jadwal pengambilan sampah mengalami perubahan sebagai berikut:
 
@@ -95,15 +95,15 @@ Terima kasih.',
             [
                 'title' => 'Gotong Royong Bersih-Bersih Lingkungan',
                 'slug' => 'gotong-royong-bersih-bersih-lingkungan',
-                'summary' => 'Mari bergotong royong membersihkan lingkungan RT kita tercinta.',
+                'summary' => 'Mari bergotong royong membersihkan lingkungan Lurah kita tercinta.',
                 'content' => 'Assalamualaikum Wr. Wb.
 
-Dalam rangka menjaga kebersihan dan kenyamanan lingkungan RT 001/RW 003, kami mengajak seluruh warga untuk berpartisipasi dalam kegiatan gotong royong:
+Dalam rangka menjaga kebersihan dan kenyamanan lingkungan Lurah 001/RW 003, kami mengajak seluruh warga untuk berpartisipasi dalam kegiatan gotong royong:
 
 **Waktu Pelaksanaan:**
 - **Hari:** Minggu, 20 Oktober 2025
 - **Jam:** 06.00 - 10.00 WIB
-- **Titik Kumpul:** Depan Pos RT
+- **Titik Kumpul:** Depan Pos Lurah
 
 **Kegiatan yang Akan Dilakukan:**
 1. Pembersihan selokan dan saluran air
@@ -155,13 +155,13 @@ Berdasarkan informasi dari BMKG, wilayah kita diprediksi akan mengalami cuaca ek
 7. 🚗 Hati-hati saat berkendara
 
 **Kontak Darurat:**
-- Pos RT: 0812-3456-7890
+- Pos Lurah: 0812-3456-7890
 - Damkar: 113
 - PMI: 0274-387878
 
 Tetap waspada dan saling menjaga. Semoga kita semua dalam lindungan Allah SWT.
 
-**Tim Siaga Bencana RT 001/RW 003**',
+**Tim Siaga Bencana Lurah 001/RW 003**',
                 'priority' => 'urgent',
                 'target_audience' => ['all'],
                 'is_active' => true,
@@ -175,14 +175,14 @@ Tetap waspada dan saling menjaga. Semoga kita semua dalam lindungan Allah SWT.
                 'title' => 'Pembukaan Pendaftaran Posyandu Balita',
                 'slug' => 'pembukaan-pendaftaran-posyandu-balita',
                 'summary' => 'Posyandu bulan November 2025 sudah dibuka. Daftarkan balita Anda segera.',
-                'content' => 'Kepada Orang Tua Balita di RT 001/RW 003
+                'content' => 'Kepada Orang Tua Balita di Lurah 001/RW 003
 
 Kami informasikan bahwa pendaftaran Posyandu bulan November 2025 telah dibuka dengan jadwal:
 
 **Jadwal Posyandu:**
 - **Tanggal:** 25 November 2025
 - **Waktu:** 08.00 - 12.00 WIB
-- **Tempat:** Balai RT 001/RW 003
+- **Tempat:** Balai Lurah 001/RW 003
 
 **Layanan yang Tersedia:**
 ✅ Penimbangan dan pengukuran tinggi badan
@@ -198,11 +198,11 @@ Kami informasikan bahwa pendaftaran Posyandu bulan November 2025 telah dibuka de
 - Bawa buku imunisasi anak
 
 **Kuota Terbatas:** 50 balita
-**Pendaftaran:** Hubungi Ibu Sari (RT) - 0812-1234-5678
+**Pendaftaran:** Hubungi Ibu Sari (Lurah) - 0812-1234-5678
 
 Jangan lewatkan kesempatan ini untuk memantau tumbuh kembang buah hati Anda!
 
-**Kader Posyandu RT 001/RW 003**',
+**Kader Posyandu Lurah 001/RW 003**',
                 'priority' => 'medium',
                 'target_audience' => ['all'],
                 'is_active' => true,

@@ -18,7 +18,7 @@ class RoleAndUserSeeder extends Seeder
     {
         // Create roles
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $rtRole = Role::firstOrCreate(['name' => 'rt']);
+        $rtRole = Role::firstOrCreate(['name' => 'Lurah']);
         $rwRole = Role::firstOrCreate(['name' => 'rw']);
         $userRole = Role::firstOrCreate(['name' => 'user']);
 
@@ -51,24 +51,24 @@ class RoleAndUserSeeder extends Seeder
                 'name' => 'Administrator',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
-                'rt' => '001',
+                'Lurah' => '001',
                 'rw' => '003'
             ]
         );
         $admin->assignRole('admin');
 
-        // Create RT user
-        $rt = User::firstOrCreate(
-            ['email' => 'rt@mypengaduan.com'],
+        // Create Lurah user
+        $Lurah = User::firstOrCreate(
+            ['email' => 'Lurah@mypengaduan.com'],
             [
-                'name' => 'Ketua RT 001',
+                'name' => 'Ketua Lurah 001',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
-                'rt' => '001',
+                'Lurah' => '001',
                 'rw' => '003'
             ]
         );
-        $rt->assignRole('rt');
+        $Lurah->assignRole('Lurah');
 
         // Create RW user
         $rw = User::firstOrCreate(
@@ -77,7 +77,7 @@ class RoleAndUserSeeder extends Seeder
                 'name' => 'Ketua RW 003',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
-                'rt' => '001',
+                'Lurah' => '001',
                 'rw' => '003'
             ]
         );
@@ -88,19 +88,19 @@ class RoleAndUserSeeder extends Seeder
             [
                 'name' => 'Budi Santoso',
                 'email' => 'budi@example.com',
-                'rt' => '001',
+                'Lurah' => '001',
                 'rw' => '003'
             ],
             [
                 'name' => 'Siti Nurhaliza',
                 'email' => 'siti@example.com',
-                'rt' => '001',
+                'Lurah' => '001',
                 'rw' => '003'
             ],
             [
                 'name' => 'Ahmad Fauzi',
                 'email' => 'ahmad@example.com',
-                'rt' => '001',
+                'Lurah' => '001',
                 'rw' => '003'
             ]
         ];
