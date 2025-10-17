@@ -11,7 +11,7 @@
                 Kelola Pengumuman
             </h1>
             <p class="mt-1 text-sm text-gray-500">
-                Kelola pengumuman untuk warga RT/RW
+                Kelola pengumuman untuk warga Lurah/RW
             </p>
         </div>
         <div class="mt-4 flex md:ml-4 md:mt-0">
@@ -189,11 +189,9 @@
                                         </a>
                                     </h3>
                                     <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
-                                        @if($announcement->status === 'published') bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
-                                        @elseif($announcement->status === 'draft') bg-yellow-50 text-yellow-700 ring-1 ring-inset ring-yellow-600/20
+                                        @if($announcement->is_active) bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20
                                         @else bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10 @endif">
-                                        @if($announcement->status === 'published') Aktif
-                                        @elseif($announcement->status === 'draft') Draft
+                                        @if($announcement->is_active) Aktif
                                         @else Tidak Aktif @endif
                                     </span>
                                     <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
@@ -247,10 +245,9 @@
 
                             <div class="ml-6 flex items-center space-x-2">
                                 <!-- Quick Actions -->
-                                @if($announcement->status !== 'published')
-                                    <form method="POST" action="{{ route('admin.announcements.publish', $announcement->id) }}" class="inline">
+                                @if(!$announcement->is_active)
+                                    <form method="POST" action="{{ route('admin.announcements.publish', $announcement->slug) }}" class="inline">
                                         @csrf
-                                        @method('PATCH')
                                         <button type="submit"
                                                 class="inline-flex items-center rounded-md bg-green-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-green-500"
                                                 title="Publikasikan">
@@ -261,9 +258,8 @@
                                         </button>
                                     </form>
                                 @else
-                                    <form method="POST" action="{{ route('admin.announcements.unpublish', $announcement->id) }}" class="inline">
+                                    <form method="POST" action="{{ route('admin.announcements.unpublish', $announcement->slug) }}" class="inline">
                                         @csrf
-                                        @method('PATCH')
                                         <button type="submit"
                                                 class="inline-flex items-center rounded-md bg-gray-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-gray-500"
                                                 title="Sembunyikan">
@@ -274,7 +270,7 @@
                                     </form>
                                 @endif
 
-                                <a href="{{ route('admin.announcements.edit', $announcement->id) }}"
+                                <a href="{{ route('admin.announcements.edit', $announcement->slug) }}"
                                    class="inline-flex items-center rounded-md bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500"
                                    title="Edit">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -297,11 +293,13 @@
                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             Lihat Detail
                                         </a>
-                                        <a href="{{ route('admin.announcements.duplicate', $announcement->id) }}"
-                                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            Duplikasi
-                                        </a>
-                                        <form method="POST" action="{{ route('admin.announcements.destroy', $announcement->id) }}"
+                                        <form method="POST" action="{{ route('admin.announcements.duplicate', $announcement->slug) }}" class="block">
+                                            @csrf
+                                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                Duplikasi
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.announcements.destroy', $announcement->slug) }}"
                                               onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengumuman ini?')">
                                             @csrf
                                             @method('DELETE')

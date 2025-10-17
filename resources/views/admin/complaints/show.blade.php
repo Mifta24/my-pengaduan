@@ -306,11 +306,22 @@
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-gray-600">Lama Penanganan:</span>
                         <span class="text-sm text-gray-900">
-                            @if($complaint->status === 'resolved')
-                                {{ $complaint->created_at->diffInDays($complaint->updated_at) }} hari
-                            @else
-                                {{ $complaint->created_at->diffInDays(now()) }} hari
-                            @endif
+                            @php
+                                $endDate = $complaint->status === 'resolved' ? $complaint->updated_at : now();
+                                $diff = $complaint->created_at->diff($endDate);
+
+                                if ($diff->days > 0) {
+                                    echo $diff->days . ' hari';
+                                    if ($diff->h > 0) echo ' ' . $diff->h . ' jam';
+                                } elseif ($diff->h > 0) {
+                                    echo $diff->h . ' jam';
+                                    if ($diff->i > 0) echo ' ' . $diff->i . ' menit';
+                                } elseif ($diff->i > 0) {
+                                    echo $diff->i . ' menit';
+                                } else {
+                                    echo 'Baru saja';
+                                }
+                            @endphp
                         </span>
                     </div>
                 </div>
@@ -369,13 +380,14 @@
                         Edit Keluhan
                     </a>
 
-                    <button type="button" onclick="window.print()"
-                            class="w-full inline-flex justify-center items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">
+                    <a href="{{ route('admin.complaints.print', $complaint) }}"
+                       target="_blank"
+                       class="w-full inline-flex justify-center items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">
                         <svg class="-ml-0.5 mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-16.326 0C1.768 7.441 1 8.375 1 9.456v6.294A2.25 2.25 0 003.25 18h1.091m16.091 0V16.5l.5-3h-17l.5 3v1.5m15.591 0h-15.591" />
                         </svg>
                         Print Detail
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -458,7 +470,7 @@
                     </div>
 
                     <!-- Preview Resolution Photos -->
-                    <div id="resolutionPreview" class="mt-4 grid grid-cols-3 gap-4" style="display: none;"></div>
+                    <div id="resolutionPreview" class="mt-4 grid grid-cols-3 gap-4 hidden"></div>
                 </div>
 
                 <!-- Action Buttons -->

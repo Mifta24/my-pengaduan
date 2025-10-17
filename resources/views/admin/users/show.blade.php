@@ -357,6 +357,128 @@
                         </div>
                     @endif
 
+                    @if($user->rt_number || $user->rw_number)
+                        <div class="grid grid-cols-2 gap-4">
+                            @if($user->rt_number)
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Lurah</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ $user->rt_number }}</dd>
+                                </div>
+                            @endif
+                            @if($user->rw_number)
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">RW</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ $user->rw_number }}</dd>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
+                    @if($user->nik)
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">NIK</dt>
+                            <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $user->nik }}</dd>
+                        </div>
+                    @endif
+
+                    @if($user->ktp_path)
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500 mb-2">Foto KTP</dt>
+                            <dd class="mt-1">
+                                <div class="border-2 border-gray-200 rounded-lg overflow-hidden">
+                                    <img src="{{ Storage::url($user->ktp_path) }}"
+                                         alt="KTP {{ $user->name }}"
+                                         class="w-full h-auto cursor-pointer hover:opacity-90 transition"
+                                         onclick="openKTPModal()">
+                                </div>
+                                <button type="button"
+                                        onclick="openKTPModal()"
+                                        class="mt-2 text-sm text-indigo-600 hover:text-indigo-500 flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                                    </svg>
+                                    Lihat ukuran penuh
+                                </button>
+                            </dd>
+                        </div>
+
+                        <!-- Verification Status -->
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Status Verifikasi KTP</dt>
+                            <dd class="mt-1">
+                                @if($user->is_verified)
+                                    <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                        <svg class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Terverifikasi
+                                    </span>
+                                    @if($user->verified_at)
+                                        <p class="mt-1 text-xs text-gray-500">{{ $user->verified_at->format('d M Y, H:i') }}</p>
+                                    @endif
+                                @else
+                                    <span class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
+                                        <svg class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Menunggu Verifikasi
+                                    </span>
+                                @endif
+                            </dd>
+                        </div>
+
+                        <!-- Verification Actions -->
+                        @if(!$user->is_verified)
+                            <div class="pt-2 border-t border-gray-200">
+                                <dt class="text-sm font-medium text-gray-500 mb-3">Aksi Verifikasi</dt>
+                                <dd class="space-y-2">
+                                    <form action="{{ route('admin.users.verify-user', $user) }}" method="POST" class="inline-block w-full">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit"
+                                                class="w-full inline-flex justify-center items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+                                                onclick="return confirm('Apakah Anda yakin ingin memverifikasi pengguna ini?')">
+                                            <svg class="mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Verifikasi Pengguna
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.users.reject-verification', $user) }}" method="POST" class="inline-block w-full">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit"
+                                                class="w-full inline-flex justify-center items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                                                onclick="return confirm('Apakah Anda yakin ingin menolak verifikasi pengguna ini?')">
+                                            <svg class="mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Tolak Verifikasi
+                                        </button>
+                                    </form>
+                                </dd>
+                            </div>
+                        @else
+                            <div class="pt-2 border-t border-gray-200">
+                                <dt class="text-sm font-medium text-gray-500 mb-3">Aksi Verifikasi</dt>
+                                <dd>
+                                    <form action="{{ route('admin.users.reject-verification', $user) }}" method="POST" class="inline-block w-full">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit"
+                                                class="w-full inline-flex justify-center items-center rounded-md bg-yellow-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
+                                                onclick="return confirm('Apakah Anda yakin ingin membatalkan verifikasi pengguna ini?')">
+                                            <svg class="mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                            </svg>
+                                            Batalkan Verifikasi
+                                        </button>
+                                    </form>
+                                </dd>
+                            </div>
+                        @endif
+                    @endif
+
                     <div>
                         <dt class="text-sm font-medium text-gray-500">Peran</dt>
                         <dd class="mt-1">
@@ -488,4 +610,75 @@
         </div>
     </div>
 </div>
+
+<!-- KTP Preview Modal -->
+@if($user->ktp_path)
+<div id="ktpModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 overflow-y-auto h-full w-full hidden z-50" onclick="closeKTPModal()">
+    <div class="relative top-10 mx-auto p-5 w-full max-w-4xl">
+        <div class="relative bg-white rounded-lg shadow-xl">
+            <!-- Close button -->
+            <button type="button"
+                    onclick="closeKTPModal()"
+                    class="absolute top-4 right-4 text-gray-400 bg-white rounded-full p-2 hover:text-gray-600 hover:bg-gray-100 focus:outline-none z-10">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- KTP Image -->
+            <div class="p-4">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Foto KTP - {{ $user->name }}</h3>
+                <img src="{{ Storage::url($user->ktp_path) }}"
+                     alt="KTP {{ $user->name }}"
+                     class="w-full h-auto rounded-lg"
+                     onclick="event.stopPropagation()">
+                <div class="mt-4 space-y-2 text-sm text-gray-600">
+                    <p><strong>Nama:</strong> {{ $user->name }}</p>
+                    <p><strong>NIK:</strong> <span class="font-mono">{{ $user->nik }}</span></p>
+                    @if($user->address)
+                        <p><strong>Alamat:</strong> {{ $user->address }}</p>
+                    @endif
+                    @if($user->rt_number || $user->rw_number)
+                        <p><strong>Lurah/RW:</strong> {{ $user->rt_number }}/{{ $user->rw_number }}</p>
+                    @endif
+                    @if($user->verified_at)
+                        <p class="text-green-600 mt-2 flex items-center">
+                            <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Diverifikasi pada: {{ $user->verified_at->format('d M Y, H:i') }}
+                        </p>
+                    @else
+                        <p class="text-yellow-600 mt-2 flex items-center">
+                            <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                            Menunggu verifikasi admin
+                        </p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @endsection
+
+@push('scripts')
+<script>
+    function openKTPModal() {
+        document.getElementById('ktpModal').classList.remove('hidden');
+    }
+
+    function closeKTPModal() {
+        document.getElementById('ktpModal').classList.add('hidden');
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeKTPModal();
+        }
+    });
+</script>
+@endpush

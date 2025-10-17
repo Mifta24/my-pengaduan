@@ -32,7 +32,7 @@
                     Manajemen Keluhan
                 </h1>
                 <p class="mt-1 text-sm text-gray-500">
-                    Kelola semua keluhan yang diterima dari warga RT/RW.
+                    Kelola semua keluhan yang diterima dari warga Lurah/RW.
                 </p>
             </div>
             <div class="flex space-x-3">

@@ -174,47 +174,19 @@
 
                         <!-- Status -->
                         <div>
-                            <label for="status" class="block text-sm font-medium leading-6 text-gray-900">
+                            <label for="is_active" class="block text-sm font-medium leading-6 text-gray-900">
                                 Status <span class="text-red-500">*</span>
                             </label>
                             <div class="mt-2">
-                                <select name="status" id="status" required
+                                <select name="is_active" id="is_active" required
                                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                                    <option value="">Pilih Status</option>
-                                    <option value="draft" {{ old('status', $announcement->status) === 'draft' ? 'selected' : '' }}>Draft</option>
-                                    <option value="published" {{ old('status', $announcement->status) === 'published' ? 'selected' : '' }}>Terbit</option>
-                                    <option value="scheduled" {{ old('status', $announcement->status) === 'scheduled' ? 'selected' : '' }}>Terjadwal</option>
-                                    <option value="archived" {{ old('status', $announcement->status) === 'archived' ? 'selected' : '' }}>Arsip</option>
+                                    <option value="1" {{ old('is_active', $announcement->is_active) == '1' ? 'selected' : '' }}>Aktif</option>
+                                    <option value="0" {{ old('is_active', $announcement->is_active) == '0' ? 'selected' : '' }}>Tidak Aktif</option>
                                 </select>
                             </div>
-                            @error('status')
+                            @error('is_active')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
-                        </div>
-                    </div>
-
-                    <!-- Scheduled Publishing -->
-                    <div x-show="$el.querySelector('select[name=status]').value === 'scheduled'" class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        <div>
-                            <label for="scheduled_date" class="block text-sm font-medium leading-6 text-gray-900">
-                                Tanggal Terbit
-                            </label>
-                            <div class="mt-2">
-                                <input type="date" name="scheduled_date" id="scheduled_date"
-                                       value="{{ old('scheduled_date', $announcement->scheduled_at ? $announcement->scheduled_at->format('Y-m-d') : '') }}"
-                                       class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="scheduled_time" class="block text-sm font-medium leading-6 text-gray-900">
-                                Waktu Terbit
-                            </label>
-                            <div class="mt-2">
-                                <input type="time" name="scheduled_time" id="scheduled_time"
-                                       value="{{ old('scheduled_time', $announcement->scheduled_at ? $announcement->scheduled_at->format('H:i') : '') }}"
-                                       class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            </div>
                         </div>
                     </div>
 
@@ -223,7 +195,13 @@
                         <label class="text-sm font-medium leading-6 text-gray-900">Target Audience</label>
                         <div class="mt-4 space-y-4">
                             @php
-                                $targetAudience = old('target_audience', $announcement->target_audience ? json_decode($announcement->target_audience, true) : []);
+                                // Handle both array and JSON string formats
+                                $targetAudience = old('target_audience',
+                                    is_array($announcement->target_audience)
+                                        ? $announcement->target_audience
+                                        : ($announcement->target_audience ? json_decode($announcement->target_audience, true) : [])
+                                );
+                                $targetAudience = $targetAudience ?? [];
                             @endphp
                             <div class="flex items-center">
                                 <input id="target_all" name="target_audience[]" type="checkbox" value="all"
@@ -232,28 +210,16 @@
                                 <label for="target_all" class="ml-3 text-sm leading-6 text-gray-600">Semua Warga</label>
                             </div>
                             <div class="flex items-center">
-                                <input id="target_rt" name="target_audience[]" type="checkbox" value="rt"
-                                       {{ in_array('rt', $targetAudience) ? 'checked' : '' }}
+                                <input id="target_rt" name="target_audience[]" type="checkbox" value="pengurus_rt"
+                                       {{ in_array('pengurus_rt', $targetAudience) ? 'checked' : '' }}
                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-                                <label for="target_rt" class="ml-3 text-sm leading-6 text-gray-600">Warga RT</label>
-                            </div>
-                            <div class="flex items-center">
-                                <input id="target_rw" name="target_audience[]" type="checkbox" value="rw"
-                                       {{ in_array('rw', $targetAudience) ? 'checked' : '' }}
-                                       class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-                                <label for="target_rw" class="ml-3 text-sm leading-6 text-gray-600">Warga RW</label>
+                                <label for="target_rt" class="ml-3 text-sm leading-6 text-gray-600">Pengurus Lurah</label>
                             </div>
                         </div>
                     </div>
 
                     <!-- Additional Options -->
                     <div class="space-y-4">
-                        <div class="flex items-center">
-                            <input id="send_notification" name="send_notification" type="checkbox"
-                                   {{ old('send_notification', $announcement->send_notification) ? 'checked' : '' }}
-                                   class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-                            <label for="send_notification" class="ml-3 text-sm leading-6 text-gray-600">Kirim Notifikasi</label>
-                        </div>
                         <div class="flex items-center">
                             <input id="is_sticky" name="is_sticky" type="checkbox" value="1"
                                    {{ old('is_sticky', $announcement->is_sticky) ? 'checked' : '' }}
@@ -271,18 +237,22 @@
             </div>
 
             <!-- Existing Attachments -->
-            @if($announcement->attachments && $announcement->attachments->count() > 0)
+            @if($announcement->attachments && is_array($announcement->attachments) && count($announcement->attachments) > 0)
             <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-900">Lampiran Saat Ini</h2>
                 </div>
                 <div class="px-6 py-6">
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        @foreach($announcement->attachments as $attachment)
+                        @foreach($announcement->attachments as $index => $attachment)
                         <div class="relative group bg-gray-50 rounded-lg p-4 hover:bg-gray-100">
                             <div class="flex items-center space-x-3">
                                 <div class="flex-shrink-0">
-                                    @if(str_starts_with($attachment->mime_type, 'image/'))
+                                    @php
+                                        $fileName = is_array($attachment) ? ($attachment['file_name'] ?? $attachment['name'] ?? 'File') : $attachment;
+                                        $isImage = preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $fileName);
+                                    @endphp
+                                    @if($isImage)
                                         <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
@@ -293,17 +263,24 @@
                                     @endif
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-medium text-gray-900 truncate">{{ $attachment->file_name }}</p>
-                                    <p class="text-sm text-gray-500">{{ $this->formatFileSize($attachment->file_size) }}</p>
+                                    <p class="text-sm font-medium text-gray-900 truncate">{{ $fileName }}</p>
+                                    @if(is_array($attachment) && isset($attachment['size']))
+                                        <p class="text-sm text-gray-500">{{ number_format($attachment['size'] / 1024, 2) }} KB</p>
+                                    @endif
                                 </div>
                             </div>
                             <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-50 rounded-lg transition-opacity">
                                 <div class="flex space-x-2">
-                                    <a href="{{ Storage::url($attachment->file_path) }}" target="_blank"
-                                       class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700">
-                                        Lihat
-                                    </a>
-                                    <button type="button" onclick="deleteAttachment({{ $attachment->id }})"
+                                    @php
+                                        $filePath = is_array($attachment) ? ($attachment['path'] ?? $attachment['file_path'] ?? '') : $attachment;
+                                    @endphp
+                                    @if($filePath)
+                                        <a href="{{ Storage::url($filePath) }}" target="_blank"
+                                           class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700">
+                                            Lihat
+                                        </a>
+                                    @endif
+                                    <button type="button" onclick="removeExistingAttachment({{ $index }})"
                                             class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700">
                                         Hapus
                                     </button>
@@ -411,45 +388,22 @@
         }
     }
 
-    function deleteAttachment(attachmentId) {
+    function removeExistingAttachment(index) {
         if (confirm('Apakah Anda yakin ingin menghapus lampiran ini?')) {
-            fetch(`{{ route('admin.attachments.delete', '') }}/${attachmentId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Gagal menghapus lampiran');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan');
-            });
+            // Add hidden input to mark this attachment for deletion
+            const form = document.querySelector('form');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'remove_attachments[]';
+            input.value = index;
+            form.appendChild(input);
+
+            // Hide the attachment visually
+            event.target.closest('.relative').style.display = 'none';
+
+            alert('Lampiran akan dihapus setelah Anda menyimpan perubahan');
         }
     }
-
-    // Auto-hide scheduled fields
-    document.addEventListener('DOMContentLoaded', function() {
-        const statusSelect = document.querySelector('select[name="status"]');
-        const scheduledSection = statusSelect.closest('form').querySelector('[x-show]');
-
-        function toggleScheduledFields() {
-            const isScheduled = statusSelect.value === 'scheduled';
-            if (scheduledSection) {
-                scheduledSection.style.display = isScheduled ? 'block' : 'none';
-            }
-        }
-
-        statusSelect.addEventListener('change', toggleScheduledFields);
-        toggleScheduledFields(); // Initial check
-    });
 </script>
 @endpush
 @endsection
