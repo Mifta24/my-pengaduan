@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Complaint;
 use App\Models\Category;
 use App\Models\Attachment;
+use App\Events\ComplaintCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -119,6 +120,9 @@ class ComplaintController extends Controller
             }
 
             $complaint->load(['category', 'attachments']);
+
+            // Dispatch event to send notification to admins
+            event(new ComplaintCreated($complaint));
 
             return response()->json([
                 'success' => true,

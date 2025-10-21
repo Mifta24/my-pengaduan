@@ -7,6 +7,7 @@ use App\Models\Complaint;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Attachment;
+use App\Events\ComplaintStatusChanged;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -253,11 +254,19 @@ class ComplaintController extends Controller
             'resolution_photos.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
+        // Store old status for event
+        $oldStatus = $complaint->status;
+
         // Update complaint status and response
         $complaint->update([
             'status' => $validated['status'],
             'admin_response' => $validated['admin_response'] ?? $complaint->admin_response,
         ]);
+
+        // Dispatch event to send notification to user
+        if ($oldStatus !== $validated['status']) {
+            event(new ComplaintStatusChanged($complaint, $oldStatus, $validated['status']));
+        }
 
         // Handle resolution photos if status is resolved
         if ($validated['status'] === 'resolved' && $request->hasFile('resolution_photos')) {

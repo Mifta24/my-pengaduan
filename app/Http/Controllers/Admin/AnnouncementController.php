@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use App\Events\AnnouncementCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -118,7 +119,10 @@ class AnnouncementController extends Controller
             $validated['attachments'] = $attachments;
         }
 
-        Announcement::create($validated);
+        $announcement = Announcement::create($validated);
+
+        // Dispatch event to send notification to all users
+        event(new AnnouncementCreated($announcement));
 
         return redirect()->route('admin.announcements.index')
             ->with('success', 'Pengumuman berhasil ditambahkan.');
