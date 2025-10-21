@@ -96,6 +96,27 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    public function devices()
+    {
+        return $this->hasMany(UserDevice::class);
+    }
+
+    public function notificationSettings()
+    {
+        return $this->hasOne(NotificationSetting::class);
+    }
+
+    /**
+     * Get all active device tokens for this user
+     */
+    public function getActiveDeviceTokens()
+    {
+        return $this->devices()
+            ->where('is_active', true)
+            ->pluck('device_token')
+            ->toArray();
+    }
+
     /**
      * Helper methods
      */
