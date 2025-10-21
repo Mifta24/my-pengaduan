@@ -389,7 +389,7 @@
     }
 
     function removeExistingAttachment(index) {
-        if (confirm('Apakah Anda yakin ingin menghapus lampiran ini?')) {
+        showDeleteModal('Apakah Anda yakin ingin menghapus lampiran ini? Perubahan akan disimpan setelah Anda klik tombol Update.', function() {
             // Add hidden input to mark this attachment for deletion
             const form = document.querySelector('form');
             const input = document.createElement('input');
@@ -400,9 +400,8 @@
 
             // Hide the attachment visually
             event.target.closest('.relative').style.display = 'none';
-
-            alert('Lampiran akan dihapus setelah Anda menyimpan perubahan');
-        }
+        });
+    }
     }
 </script>
 @endpush

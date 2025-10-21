@@ -517,18 +517,18 @@
 
     // Status update functions
     function updateStatus(status) {
-        if (confirm(`Apakah Anda yakin ingin mengubah status menjadi ${getStatusText(status)}?`)) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '{{ route("admin.complaints.status", $complaint) }}';
-            form.innerHTML = `
-                @csrf
-                @method('PATCH')
-                <input type="hidden" name="status" value="${status}">
-            `;
-            document.body.appendChild(form);
-            form.submit();
-        }
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("admin.complaints.status", $complaint) }}';
+        form.innerHTML = `
+            @csrf
+            @method('PATCH')
+            <input type="hidden" name="status" value="${status}">
+        `;
+        document.body.appendChild(form);
+
+        // Use beautiful modal
+        showDeleteModal(`Apakah Anda yakin ingin mengubah status menjadi ${getStatusText(status)}?`, form);
     }
 
     function getStatusText(status) {

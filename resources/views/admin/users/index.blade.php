@@ -148,8 +148,8 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
-                                                        class="text-red-600 hover:text-red-900 text-xs"
-                                                        onclick="return confirm('Yakin ingin menghapus pengguna ini?')">
+                                                        class="text-red-600 hover:text-red-900 text-xs transition-colors"
+                                                        data-confirm-delete="Yakin ingin menghapus pengguna '{{ $user->name }}'? Tindakan ini tidak dapat dibatalkan.">
                                                     Hapus
                                                 </button>
                                             </form>
@@ -274,8 +274,8 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit"
-                                                            class="text-{{ $user->is_active ? 'red' : 'green' }}-600 hover:text-{{ $user->is_active ? 'red' : 'green' }}-900"
-                                                            onclick="return confirm('Yakin ingin {{ $user->is_active ? 'menonaktifkan' : 'mengaktifkan' }} pengguna ini?')">
+                                                            class="text-{{ $user->is_active ? 'red' : 'green' }}-600 hover:text-{{ $user->is_active ? 'red' : 'green' }}-900 transition-colors"
+                                                            data-confirm-delete="Yakin ingin {{ $user->is_active ? 'menonaktifkan' : 'mengaktifkan' }} pengguna '{{ $user->name }}'?">
                                                         {{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                                     </button>
                                                 </form>

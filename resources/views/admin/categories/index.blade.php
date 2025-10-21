@@ -135,8 +135,8 @@
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit"
-                                            class="text-{{ $category->is_active ? 'orange' : 'green' }}-600 hover:text-{{ $category->is_active ? 'orange' : 'green' }}-900 text-sm font-medium"
-                                            onclick="return confirm('Yakin ingin {{ $category->is_active ? 'menonaktifkan' : 'mengaktifkan' }} kategori ini?')">
+                                            class="text-{{ $category->is_active ? 'orange' : 'green' }}-600 hover:text-{{ $category->is_active ? 'orange' : 'green' }}-900 text-sm font-medium transition-colors"
+                                            data-confirm-delete="Yakin ingin {{ $category->is_active ? 'menonaktifkan' : 'mengaktifkan' }} kategori '{{ $category->name }}'?">
                                         {{ $category->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                     </button>
                                 </form>
@@ -145,8 +145,8 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
-                                                class="text-red-600 hover:text-red-900 text-sm font-medium"
-                                                onclick="return confirm('Yakin ingin menghapus kategori ini? Tindakan ini tidak dapat dibatalkan.')">
+                                                class="text-red-600 hover:text-red-900 text-sm font-medium transition-colors"
+                                                data-confirm-delete="Yakin ingin menghapus kategori '{{ $category->name }}'? Tindakan ini tidak dapat dibatalkan.">
                                             Hapus
                                         </button>
                                     </form>

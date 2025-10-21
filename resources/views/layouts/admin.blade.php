@@ -449,11 +449,163 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeDeleteModal()"></div>
+
+            <!-- Center modal -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <!-- Modal panel -->
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <!-- Icon -->
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        </svg>
+                    </div>
+                    <!-- Content -->
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Konfirmasi Penghapusan
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500" id="deleteMessage">
+                                Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Actions -->
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirmDeleteBtn" onclick="confirmDelete()"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Ya, Hapus
+                    </button>
+                    <button type="button" onclick="closeDeleteModal()"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
     <style>
         [x-cloak] { display: none !important; }
     </style>
+
+    <script>
+        let deleteForm = null;
+        let deleteCallback = null;
+
+        /**
+         * Show delete confirmation modal
+         * @param {string} message - Custom message to display
+         * @param {HTMLFormElement|Function} formOrCallback - Form to submit or callback function
+         */
+        function showDeleteModal(message, formOrCallback) {
+            const modal = document.getElementById('deleteModal');
+            const messageEl = document.getElementById('deleteMessage');
+
+            if (message) {
+                messageEl.textContent = message;
+            } else {
+                messageEl.textContent = 'Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.';
+            }
+
+            if (typeof formOrCallback === 'function') {
+                deleteCallback = formOrCallback;
+                deleteForm = null;
+            } else {
+                deleteForm = formOrCallback;
+                deleteCallback = null;
+            }
+
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+
+            // Focus on cancel button for accessibility
+            setTimeout(() => {
+                modal.querySelector('button[onclick="closeDeleteModal()"]')?.focus();
+            }, 100);
+        }
+
+        /**
+         * Close delete confirmation modal
+         */
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            deleteForm = null;
+            deleteCallback = null;
+        }
+
+        /**
+         * Confirm and execute delete action
+         */
+        function confirmDelete() {
+            if (deleteCallback && typeof deleteCallback === 'function') {
+                deleteCallback();
+            } else if (deleteForm) {
+                deleteForm.submit();
+            }
+            closeDeleteModal();
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
+
+        // Auto-attach to delete buttons with data-confirm attribute
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle delete buttons with data-confirm
+            document.querySelectorAll('[data-confirm-delete]').forEach(element => {
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const message = this.getAttribute('data-confirm-delete') || 'Apakah Anda yakin ingin menghapus data ini?';
+
+                    // Find the form to submit
+                    let form = this.closest('form');
+                    if (!form && this.hasAttribute('data-form')) {
+                        form = document.getElementById(this.getAttribute('data-form'));
+                    }
+
+                    if (form) {
+                        showDeleteModal(message, form);
+                    }
+                });
+            });
+
+            // Handle forms with data-confirm-delete
+            document.querySelectorAll('form[data-confirm-delete]').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    if (!form.hasAttribute('data-confirmed')) {
+                        e.preventDefault();
+                        const message = form.getAttribute('data-confirm-delete') || 'Apakah Anda yakin ingin menghapus data ini?';
+
+                        showDeleteModal(message, function() {
+                            form.setAttribute('data-confirmed', 'true');
+                            form.submit();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
     @stack('scripts')
 </body>
 </html>

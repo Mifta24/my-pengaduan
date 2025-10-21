@@ -474,7 +474,7 @@
     }
 
     function deleteExistingImage(attachmentId) {
-        if (confirm('Hapus foto ini?')) {
+        showDeleteModal('Hapus foto ini? Tindakan ini tidak dapat dibatalkan.', function() {
             document.getElementById(`image-${attachmentId}`).style.display = 'none';
             document.getElementById(`keep-${attachmentId}`).remove();
 
@@ -484,7 +484,7 @@
             input.name = 'deleted_images[]';
             input.value = attachmentId;
             document.querySelector('form').appendChild(input);
-        }
+        });
     }
 
     // Quick actions
