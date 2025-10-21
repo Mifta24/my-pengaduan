@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ComplaintController;
 use App\Http\Controllers\Api\AnnouncementController;
+use App\Http\Controllers\Api\DeviceTokenController;
+use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -75,6 +77,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{complaint}', [ComplaintController::class, 'show']);
         Route::put('/{complaint}', [ComplaintController::class, 'update']);
         Route::delete('/{complaint}', [ComplaintController::class, 'destroy']);
+    });
+
+    // Device Token routes (for FCM)
+    Route::prefix('device-tokens')->group(function () {
+        Route::post('/', [DeviceTokenController::class, 'store']);
+        Route::get('/', [DeviceTokenController::class, 'index']);
+        Route::delete('/{id}', [DeviceTokenController::class, 'destroy']);
+    });
+
+    // Notification routes
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::post('/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+    });
+
+    // Notification Settings routes
+    Route::prefix('notification-settings')->group(function () {
+        Route::get('/', [NotificationController::class, 'getSettings']);
+        Route::put('/', [NotificationController::class, 'updateSettings']);
     });
 });
 
