@@ -64,6 +64,29 @@ class User extends Authenticatable
     }
 
     /**
+     * Append custom attributes
+     */
+    protected $appends = ['ktp_url'];
+
+    /**
+     * Get KTP URL accessor
+     */
+    public function getKtpUrlAttribute()
+    {
+        if (!$this->ktp_path) {
+            return null;
+        }
+
+        // If already a full URL, return as is
+        if (filter_var($this->ktp_path, FILTER_VALIDATE_URL)) {
+            return $this->ktp_path;
+        }
+
+        // Return full URL with storage path
+        return url('storage/' . $this->ktp_path);
+    }
+
+    /**
      * Activity log configuration
      */
     public function getActivitylogOptions(): LogOptions

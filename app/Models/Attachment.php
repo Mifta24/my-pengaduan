@@ -20,6 +20,11 @@ class Attachment extends Model
     ];
 
     /**
+     * Append custom attributes
+     */
+    protected $appends = ['file_url', 'file_size_human'];
+
+    /**
      * Polymorphic relationship
      */
     public function attachable()
@@ -54,6 +59,16 @@ class Attachment extends Model
 
     public function getFileUrlAttribute()
     {
-        return asset('storage/' . $this->file_path);
+        if (!$this->file_path) {
+            return null;
+        }
+
+        // If already a full URL, return as is
+        if (filter_var($this->file_path, FILTER_VALIDATE_URL)) {
+            return $this->file_path;
+        }
+
+        // Return full URL with storage path
+        return url('storage/' . $this->file_path);
     }
 }

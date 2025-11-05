@@ -20,7 +20,7 @@ class Announcement extends Model
         'target_audience',
         'attachments',
         'is_active',
-        'is_sticky',
+        'is_sticky',  //posisi teratas (pinned)
         'allow_comments',
         'published_at',
         'views_count',
@@ -36,6 +36,8 @@ class Announcement extends Model
         'attachments' => 'array',
         'views_count' => 'integer'
     ];
+
+    protected $appends = ['status'];
 
     protected static function boot()
     {
@@ -136,5 +138,16 @@ class Announcement extends Model
     public function scopeSticky($query)
     {
         return $query->where('is_sticky', true);
+    }
+
+    /**
+     * Get status attribute
+     */
+    public function getStatusAttribute()
+    {
+        if ($this->is_active && $this->published_at && $this->published_at <= now()) {
+            return 'published';
+        }
+        return 'unpublished';
     }
 }
