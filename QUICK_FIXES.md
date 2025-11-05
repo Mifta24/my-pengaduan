@@ -1,4 +1,41 @@
-# 🔧 QUICK FIXES - ADMIN PANEL
+# 🔧 QUICK FIXES - ADMIN PANEL & API
+
+## Latest Fix: Database Column Issue (Oct 27, 2025) ✅
+
+### Fix: ticket_number Column Error
+**Affected Endpoints:**
+- `GET /api/admin/dashboard`
+- `GET /api/admin/complaints` (search)
+
+**Error:**
+```
+SQLSTATE[42703]: Undefined column: 7 ERROR: column "ticket_number" does not exist
+```
+
+**Files Modified:**
+1. `app/Http/Controllers/Api/Admin/DashboardController.php`
+   - Removed `ticket_number` from select query (Line ~51)
+   - Fixed PostgreSQL syntax: `MONTH()` → `EXTRACT(MONTH FROM ...)` (Line ~67)
+
+2. `app/Http/Controllers/Api/Admin/ComplaintController.php`
+   - Removed `ticket_number` from search query (Line ~37-40)
+
+**Root Cause:**
+Tabel `complaints` tidak memiliki kolom `ticket_number`. Controller mencoba SELECT kolom yang tidak ada.
+
+**Solution:**
+```php
+// BEFORE ❌
+->get(['id', 'ticket_number', 'title', ...])
+
+// AFTER ✅
+->get(['id', 'title', 'status', 'user_id', ...])
+```
+
+**Status:** ✅ Fixed
+**Test:** `curl GET http://localhost/api/admin/dashboard -H "Authorization: Bearer TOKEN"`
+
+---
 
 ## Priority: HIGH | Estimated Time: 1 hour
 
