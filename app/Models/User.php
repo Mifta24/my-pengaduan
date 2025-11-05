@@ -129,6 +129,11 @@ class User extends Authenticatable
         return $this->hasOne(NotificationSetting::class);
     }
 
+    public function fcmNotifications()
+    {
+        return $this->hasMany(FcmNotification::class);
+    }
+
     /**
      * Get all active device tokens for this user
      */
