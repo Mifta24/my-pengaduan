@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserDevice;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DeviceTokenController extends Controller
 {
+    use ApiResponse;
     /**
      * Register device token (dipanggil dari mobile app)
      */
@@ -40,11 +42,7 @@ class DeviceTokenController extends Controller
             ]
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Device token registered successfully',
-            'data' => $device,
-        ]);
+        return $this->created($device, 'Device token registered successfully');
     }
 
     /**
@@ -56,10 +54,7 @@ class DeviceTokenController extends Controller
             ->orderBy('last_used_at', 'desc')
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $devices,
-        ]);
+        return $this->success($devices, 'Devices list loaded successfully');
     }
 
     /**
@@ -72,18 +67,12 @@ class DeviceTokenController extends Controller
             ->first();
 
         if (!$device) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Device not found',
-            ], 404);
+            return $this->notFound('Device not found');
         }
 
         $device->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Device removed successfully',
-        ]);
+        return $this->deleted('Device removed successfully');
     }
 }
 

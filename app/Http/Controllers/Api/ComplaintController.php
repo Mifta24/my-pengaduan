@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Complaint;
 use App\Models\Category;
 use App\Models\Attachment;
+use App\Models\Announcement;
 use App\Events\ComplaintCreated;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -14,6 +16,8 @@ use Illuminate\Validation\ValidationException;
 
 class ComplaintController extends Controller
 {
+    use ApiResponse;
+
     public function __construct()
     {
         $this->middleware('auth:sanctum');
@@ -27,7 +31,7 @@ class ComplaintController extends Controller
         try {
             $user = $request->user();
 
-            $query = Complaint::with(['category', 'attachments'])
+            $query = Complaint::with(['category:id,name,icon,color,description', 'attachments'])
                 ->where('user_id', $user->id);
 
             // Filter by status
@@ -51,24 +55,46 @@ class ComplaintController extends Controller
             $complaints = $query->orderBy('report_date', 'desc')
                 ->paginate($request->get('per_page', 15));
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'complaints' => $complaints->items(),
-                    'pagination' => [
-                        'current_page' => $complaints->currentPage(),
-                        'last_page' => $complaints->lastPage(),
-                        'per_page' => $complaints->perPage(),
-                        'total' => $complaints->total()
-                    ]
-                ]
-            ]);
+            // Collect active filters
+            $activeFilters = [];
+            if ($request->has('status')) {
+                $activeFilters['status'] = $request->status;
+            }
+            if ($request->has('category_id')) {
+                $activeFilters['category_id'] = (int) $request->category_id;
+            }
+            if ($request->has('search')) {
+                $activeFilters['search'] = $request->search;
+            }
+            if ($request->has('per_page')) {
+                $activeFilters['per_page'] = (int) $request->per_page;
+            }
+
+            // Transform data to hide unnecessary fields
+            $complaints->getCollection()->transform(function ($complaint) {
+                return [
+                    'id' => $complaint->id,
+                    'title' => $complaint->title,
+                    'description' => $complaint->description,
+                    'location' => $complaint->location,
+                    'priority' => $complaint->priority,
+                    'status' => $complaint->status,
+                    'photo' => $complaint->photo,
+                    'photo_url' => $complaint->photo_url,
+                    'admin_response' => $complaint->admin_response,
+                    'estimated_resolution' => $complaint->estimated_resolution ? $complaint->estimated_resolution->format('Y-m-d\TH:i:s.u\Z') : null,
+                    'report_date' => $complaint->report_date ? $complaint->report_date->format('Y-m-d\TH:i:s.u\Z') : null,
+                    'created_at' => $complaint->created_at->format('Y-m-d\TH:i:s.u\Z'),
+                    'updated_at' => $complaint->updated_at->format('Y-m-d\TH:i:s.u\Z'),
+                    'category' => $complaint->category,
+                    'attachments' => $complaint->attachments,
+                ];
+            });
+
+            return $this->successWithPagination($complaints, 'Complaints list loaded successfully', $activeFilters);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat mengambil data keluhan'
-            ], 500);
+            return $this->serverError('Failed to load complaints list', $e);
         }
     }
 
@@ -119,28 +145,34 @@ class ComplaintController extends Controller
                 }
             }
 
-            $complaint->load(['category', 'attachments']);
+            $complaint->load(['category:id,name,icon,color,description', 'attachments']);
 
             // Dispatch event to send notification to admins
             event(new ComplaintCreated($complaint));
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Keluhan berhasil dikirim',
-                'data' => $complaint
-            ], 201);
+            // Transform data to hide unnecessary fields
+            $data = [
+                'id' => $complaint->id,
+                'title' => $complaint->title,
+                'description' => $complaint->description,
+                'location' => $complaint->location,
+                'priority' => $complaint->priority,
+                'status' => $complaint->status,
+                'photo' => $complaint->photo,
+                'photo_url' => $complaint->photo_url,
+                'report_date' => $complaint->report_date ? $complaint->report_date->format('Y-m-d\TH:i:s.u\Z') : null,
+                'created_at' => $complaint->created_at->format('Y-m-d\TH:i:s.u\Z'),
+                'updated_at' => $complaint->updated_at->format('Y-m-d\TH:i:s.u\Z'),
+                'category' => $complaint->category,
+                'attachments' => $complaint->attachments,
+            ];
+
+            return $this->created($data, 'Complaint submitted successfully');
 
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $e->errors()
-            ], 422);
+            return $this->validationError($e->errors());
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat menyimpan keluhan'
-            ], 500);
+            return $this->serverError('Failed to submit complaint', $e);
         }
     }
 
@@ -152,24 +184,34 @@ class ComplaintController extends Controller
         try {
             // Check if user owns this complaint
             if ($complaint->user_id !== $request->user()->id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Anda tidak memiliki akses ke keluhan ini'
-                ], 403);
+                return $this->unauthorized('You do not have access to this complaint');
             }
 
-            $complaint->load(['category', 'attachments']);
+            $complaint->load(['category:id,name,icon,color,description', 'attachments']);
 
-            return response()->json([
-                'success' => true,
-                'data' => $complaint
-            ]);
+            // Transform data to hide unnecessary fields
+            $data = [
+                'id' => $complaint->id,
+                'title' => $complaint->title,
+                'description' => $complaint->description,
+                'location' => $complaint->location,
+                'priority' => $complaint->priority,
+                'status' => $complaint->status,
+                'photo' => $complaint->photo,
+                'photo_url' => $complaint->photo_url,
+                'admin_response' => $complaint->admin_response,
+                'estimated_resolution' => $complaint->estimated_resolution ? $complaint->estimated_resolution->format('Y-m-d\TH:i:s.u\Z') : null,
+                'report_date' => $complaint->report_date ? $complaint->report_date->format('Y-m-d\TH:i:s.u\Z') : null,
+                'created_at' => $complaint->created_at->format('Y-m-d\TH:i:s.u\Z'),
+                'updated_at' => $complaint->updated_at->format('Y-m-d\TH:i:s.u\Z'),
+                'category' => $complaint->category,
+                'attachments' => $complaint->attachments,
+            ];
+
+            return $this->success($data, 'Complaint details loaded successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat mengambil detail keluhan'
-            ], 500);
+            return $this->serverError('Failed to load complaint details', $e);
         }
     }
 
@@ -181,18 +223,12 @@ class ComplaintController extends Controller
         try {
             // Check if user owns this complaint
             if ($complaint->user_id !== $request->user()->id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Anda tidak memiliki akses ke keluhan ini'
-                ], 403);
+                return $this->unauthorized('You do not have access to this complaint');
             }
 
             // Check if complaint can be updated
             if ($complaint->status !== 'pending') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Keluhan yang sudah diproses tidak dapat diubah'
-                ], 422);
+                return $this->error('Complaints that have been processed cannot be modified');
             }
 
             $validated = $request->validate([
@@ -236,25 +272,33 @@ class ComplaintController extends Controller
                 }
             }
 
-            $complaint->load(['category', 'attachments']);
+            $complaint->load(['category:id,name,icon,color,description', 'attachments']);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Keluhan berhasil diperbarui',
-                'data' => $complaint
-            ]);
+            // Transform data to hide unnecessary fields
+            $data = [
+                'id' => $complaint->id,
+                'title' => $complaint->title,
+                'description' => $complaint->description,
+                'location' => $complaint->location,
+                'priority' => $complaint->priority,
+                'status' => $complaint->status,
+                'photo' => $complaint->photo,
+                'photo_url' => $complaint->photo_url,
+                'admin_response' => $complaint->admin_response,
+                'estimated_resolution' => $complaint->estimated_resolution ? $complaint->estimated_resolution->format('Y-m-d\TH:i:s.u\Z') : null,
+                'report_date' => $complaint->report_date ? $complaint->report_date->format('Y-m-d\TH:i:s.u\Z') : null,
+                'created_at' => $complaint->created_at->format('Y-m-d\TH:i:s.u\Z'),
+                'updated_at' => $complaint->updated_at->format('Y-m-d\TH:i:s.u\Z'),
+                'category' => $complaint->category,
+                'attachments' => $complaint->attachments,
+            ];
+
+            return $this->success($data, 'Complaint updated successfully');
 
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $e->errors()
-            ], 422);
+            return $this->validationError($e->errors());
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat memperbarui keluhan'
-            ], 500);
+            return $this->serverError('Failed to update complaint', $e);
         }
     }
 
@@ -266,18 +310,12 @@ class ComplaintController extends Controller
         try {
             // Check if user owns this complaint
             if ($complaint->user_id !== $request->user()->id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Anda tidak memiliki akses ke keluhan ini'
-                ], 403);
+                return $this->unauthorized('You do not have access to this complaint');
             }
 
             // Check if complaint can be deleted
             if ($complaint->status !== 'pending') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Keluhan yang sudah diproses tidak dapat dihapus'
-                ], 422);
+                return $this->error('Complaints that have been processed cannot be deleted');
             }
 
             // Delete files
@@ -292,16 +330,10 @@ class ComplaintController extends Controller
 
             $complaint->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Keluhan berhasil dihapus'
-            ]);
+            return $this->deleted('Complaint deleted successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat menghapus keluhan'
-            ], 500);
+            return $this->serverError('Failed to delete complaint', $e);
         }
     }
 
@@ -316,16 +348,10 @@ class ComplaintController extends Controller
                 ->orderBy('name')
                 ->get();
 
-            return response()->json([
-                'success' => true,
-                'data' => $categories
-            ]);
+            return $this->success($categories, 'Categories list loaded successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat mengambil kategori'
-            ], 500);
+            return $this->serverError('Failed to load categories', $e);
         }
     }
 
@@ -341,20 +367,144 @@ class ComplaintController extends Controller
                 'total' => $user->complaints()->count(),
                 'pending' => $user->complaints()->where('status', 'pending')->count(),
                 'in_progress' => $user->complaints()->where('status', 'in_progress')->count(),
-                'completed' => $user->complaints()->where('status', 'completed')->count(),
+                'resolved' => $user->complaints()->where('status', 'resolved')->count(),
                 'rejected' => $user->complaints()->where('status', 'rejected')->count(),
             ];
 
-            return response()->json([
-                'success' => true,
-                'data' => $stats
-            ]);
+            return $this->success($stats, 'Statistics loaded successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat mengambil statistik'
-            ], 500);
+            return $this->serverError('Failed to load statistics', $e);
+        }
+    }
+
+    /**
+     * User dashboard with stats and recent activities
+     */
+    public function dashboard(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            // Get user's complaint statistics
+            $stats = [
+                'total' => Complaint::where('user_id', $user->id)->count(),
+                'pending' => Complaint::where('user_id', $user->id)->where('status', 'pending')->count(),
+                'in_progress' => Complaint::where('user_id', $user->id)->where('status', 'in_progress')->count(),
+                'resolved' => Complaint::where('user_id', $user->id)->where('status', 'resolved')->count(),
+                'rejected' => Complaint::where('user_id', $user->id)->where('status', 'rejected')->count(),
+            ];
+
+            // Get user's recent complaints (latest 5)
+            $recentComplaints = Complaint::where('user_id', $user->id)
+                ->with(['category'])
+                ->latest()
+                ->take(5)
+                ->get();
+
+            // Get latest announcements (active, urgent, or sticky)
+            $announcements = Announcement::where('is_active', true)
+                ->where(function($query) {
+                    $query->where('priority', 'urgent')
+                          ->orWhere('is_sticky', true);
+                })
+                ->latest('published_at')
+                ->take(3)
+                ->get();
+
+            $data = [
+                'stats' => $stats,
+                'recent_complaints' => $recentComplaints,
+                'announcements' => $announcements,
+            ];
+
+            return $this->success($data, 'Dashboard data loaded successfully');
+
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to load dashboard data', $e);
+        }
+    }
+
+    /**
+     * Track complaint with full timeline
+     */
+    public function track($id, Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            // Get complaint with relationships
+            $complaint = Complaint::with([
+                'category',
+                'attachments',
+                'responses' => function($query) {
+                    $query->latest();
+                }
+            ])->findOrFail($id);
+
+            // Check if user owns this complaint
+            if ($complaint->user_id !== $user->id) {
+                return $this->unauthorized('You do not have access to this complaint');
+            }
+
+            // Build timeline from status changes and responses
+            $timeline = [];
+
+            // Add created event
+            $timeline[] = [
+                'type' => 'created',
+                'status' => 'pending',
+                'title' => 'Complaint Created',
+                'description' => 'Your complaint has been successfully created',
+                'created_at' => $complaint->created_at->format('Y-m-d\TH:i:s.u\Z'),
+            ];
+
+            // Add status change events (if status_history column exists)
+            // Otherwise, just show current status
+            if ($complaint->status !== 'pending') {
+                $statusLabels = [
+                    'in_progress' => 'In Progress',
+                    'resolved' => 'Resolved',
+                    'rejected' => 'Rejected',
+                ];
+
+                $timeline[] = [
+                    'type' => 'status_change',
+                    'status' => $complaint->status,
+                    'title' => $statusLabels[$complaint->status] ?? 'Status Changed',
+                    'description' => 'Complaint status has been updated',
+                    'created_at' => $complaint->updated_at->format('Y-m-d\TH:i:s.u\Z'),
+                ];
+            }
+
+            // Add response events
+            foreach ($complaint->responses as $response) {
+                $timeline[] = [
+                    'type' => 'response',
+                    'status' => $complaint->status,
+                    'title' => 'Response from Admin',
+                    'description' => $response->content,
+                    'photo' => $response->photo,
+                    'created_at' => $response->created_at->format('Y-m-d\TH:i:s.u\Z'),
+                ];
+            }
+
+            // Sort timeline by date (newest first)
+            usort($timeline, function($a, $b) {
+                return strcmp($b['created_at'], $a['created_at']);
+            });
+
+            $data = [
+                'complaint' => $complaint,
+                'timeline' => $timeline,
+            ];
+
+            return $this->success($data, 'Complaint tracking loaded successfully');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFound('Complaint not found');
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to track complaint', $e);
         }
     }
 }

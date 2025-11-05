@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    use ApiResponse;
     /**
      * Register a new user
      */
@@ -39,27 +41,18 @@ class AuthController extends Controller
             // Create token
             $token = $user->createToken('api_token')->plainTextToken;
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Registrasi berhasil',
-                'data' => [
-                    'user' => $user->only(['id', 'name', 'email', 'address', 'phone']),
-                    'token' => $token,
-                    'token_type' => 'Bearer'
-                ]
-            ], 201);
+            $data = [
+                'user' => $user->only(['id', 'name', 'email', 'address', 'phone']),
+                'token' => $token,
+                'token_type' => 'Bearer'
+            ];
+
+            return $this->created($data, 'Registration successful');
 
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $e->errors()
-            ], 422);
+            return $this->validationError($e->errors());
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat registrasi'
-            ], 500);
+            return $this->serverError('Registration failed', $e);
         }
     }
 
@@ -75,36 +68,24 @@ class AuthController extends Controller
             ]);
 
             if (!Auth::attempt($validated)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Email atau password salah'
-                ], 401);
+                return $this->unauthorized('Invalid email or password');
             }
 
             $user = Auth::user();
             $token = $user->createToken('api_token')->plainTextToken;
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Login berhasil',
-                'data' => [
-                    'user' => $user->only(['id', 'name', 'email', 'address', 'phone']),
-                    'token' => $token,
-                    'token_type' => 'Bearer'
-                ]
-            ]);
+            $data = [
+                'user' => $user->only(['id', 'name', 'email', 'address', 'phone']),
+                'token' => $token,
+                'token_type' => 'Bearer'
+            ];
+
+            return $this->success($data, 'Login successful');
 
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $e->errors()
-            ], 422);
+            return $this->validationError($e->errors());
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat login'
-            ], 500);
+            return $this->serverError('Login failed', $e);
         }
     }
 
@@ -116,18 +97,14 @@ class AuthController extends Controller
         try {
             $user = $request->user();
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'user' => $user->only(['id', 'name', 'email', 'address', 'phone', 'email_verified_at'])
-                ]
-            ]);
+            $data = [
+                'user' => $user->only(['id', 'name', 'email', 'address', 'phone', 'email_verified_at'])
+            ];
+
+            return $this->success($data, 'Profile loaded successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat mengambil profil'
-            ], 500);
+            return $this->serverError('Failed to load profile', $e);
         }
     }
 
@@ -147,25 +124,16 @@ class AuthController extends Controller
 
             $user->update($validated);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Profil berhasil diperbarui',
-                'data' => [
-                    'user' => $user->only(['id', 'name', 'email', 'address', 'phone'])
-                ]
-            ]);
+            $data = [
+                'user' => $user->only(['id', 'name', 'email', 'address', 'phone'])
+            ];
+
+            return $this->success($data, 'Profile updated successfully');
 
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $e->errors()
-            ], 422);
+            return $this->validationError($e->errors());
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat memperbarui profil'
-            ], 500);
+            return $this->serverError('Failed to update profile', $e);
         }
     }
 
@@ -183,32 +151,19 @@ class AuthController extends Controller
             $user = $request->user();
 
             if (!Hash::check($validated['current_password'], $user->password)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Password saat ini salah'
-                ], 401);
+                return $this->unauthorized('Current password is incorrect');
             }
 
             $user->update([
                 'password' => Hash::make($validated['password'])
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Password berhasil diubah'
-            ]);
+            return $this->success(null, 'Password changed successfully');
 
         } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $e->errors()
-            ], 422);
+            return $this->validationError($e->errors());
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat mengubah password'
-            ], 500);
+            return $this->serverError('Failed to change password', $e);
         }
     }
 
@@ -220,16 +175,10 @@ class AuthController extends Controller
         try {
             $request->user()->currentAccessToken()->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Logout berhasil'
-            ]);
+            return $this->success(null, 'Logged out successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat logout'
-            ], 500);
+            return $this->serverError('Logout failed', $e);
         }
     }
 
@@ -241,16 +190,10 @@ class AuthController extends Controller
         try {
             $request->user()->tokens()->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Logout dari semua perangkat berhasil'
-            ]);
+            return $this->success(null, 'Logged out from all devices successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat logout'
-            ], 500);
+            return $this->serverError('Logout failed', $e);
         }
     }
 }

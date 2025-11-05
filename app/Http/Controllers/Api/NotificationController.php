@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\NotificationSetting;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
+    use ApiResponse;
     /**
      * Get user notifications (from database)
      */
@@ -23,11 +25,18 @@ class NotificationController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return response()->json([
-            'success' => true,
-            'data' => $notifications,
+        // Collect active filters
+        $activeFilters = [];
+        if ($request->has('unread')) {
+            $activeFilters['unread'] = $request->boolean('unread');
+        }
+
+        $data = [
+            'notifications' => $notifications,
             'unread_count' => $user->unreadNotifications()->count(),
-        ]);
+        ];
+
+        return $this->successWithPagination($notifications, 'Notifications loaded successfully', $activeFilters);
     }
 
     /**
@@ -38,18 +47,12 @@ class NotificationController extends Controller
         $notification = Auth::user()->notifications()->find($id);
 
         if (!$notification) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Notification not found',
-            ], 404);
+            return $this->notFound('Notification not found');
         }
 
         $notification->markAsRead();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Notification marked as read',
-        ]);
+        return $this->success(null, 'Notification marked as read');
     }
 
     /**
@@ -59,10 +62,7 @@ class NotificationController extends Controller
     {
         Auth::user()->unreadNotifications->markAsRead();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'All notifications marked as read',
-        ]);
+        return $this->success(null, 'All notifications marked as read');
     }
 
     /**
@@ -84,10 +84,7 @@ class NotificationController extends Controller
             ]);
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $settings,
-        ]);
+        return $this->success($settings, 'Notification settings loaded successfully');
     }
 
     /**
@@ -113,11 +110,7 @@ class NotificationController extends Controller
         $settings->fill($request->all());
         $settings->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Notification settings updated',
-            'data' => $settings,
-        ]);
+        return $this->success($settings, 'Notification settings updated successfully');
     }
 }
 
