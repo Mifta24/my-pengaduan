@@ -1,6 +1,13 @@
-# 📱 Android Development - Quick Start Summary
+# 📱 Mobile Development - Quick Start Summary
 
-## ✅ Yang Sudah Siap untuk Android
+> **🎯 Recommended:** Gunakan **Flutter** untuk development! 
+> Lihat [FLUTTER_QUICK_START.md](./FLUTTER_QUICK_START.md) untuk panduan lengkap.
+>
+> Flutter mendukung **Android + iOS** sekaligus dengan satu codebase!
+
+---
+
+## ✅ Yang Sudah Siap untuk Mobile (Android/iOS/Flutter)
 
 ### 1. **Backend API** ✓
 - ✅ RESTful API dengan Laravel 10.x
@@ -351,10 +358,16 @@ class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
 
 ## 🔗 Resources
 
-1. **ANDROID_INTEGRATION_GUIDE.md** - Complete API documentation
+### For Flutter (Recommended) 🎯
+1. **FLUTTER_QUICK_START.md** - Quick start guide untuk Flutter
+2. **FLUTTER_INTEGRATION_GUIDE.md** - Complete Flutter integration guide
+3. **NOTIFICATION_TYPES_ANDROID.md** - FCM notification details
+4. **Postman Collection** - API testing collection
+
+### For Native Android
+1. **ANDROID_INTEGRATION_GUIDE.md** - Native Android API documentation
 2. **NOTIFICATION_TYPES_ANDROID.md** - FCM notification details
-3. **Postman Collection** - API testing collection
-4. **API_TESTING_GUIDE.md** - Backend testing guide
+3. **API_TESTING_GUIDE.md** - Backend testing guide
 
 ---
 
