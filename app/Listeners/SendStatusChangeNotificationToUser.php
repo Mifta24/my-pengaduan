@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\ComplaintStatusChanged;
 use App\Services\FirebaseService;
+use App\Models\FcmNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -66,6 +67,16 @@ class SendStatusChangeNotificationToUser implements ShouldQueue
         // Send notification
         $this->firebaseService->sendToMultipleDevices($tokens, $title, $body, $data);
 
+        // Save notification to database
+        FcmNotification::create([
+            'user_id' => $user->id,
+            'type' => 'complaint_status_changed',
+            'title' => $title,
+            'body' => $body,
+            'data' => $data,
+            'is_read' => false,
+        ]);
+
         Log::info('Status change notification sent to user', [
             'user_id' => $user->id,
             'complaint_id' => $complaint->id,
@@ -82,8 +93,8 @@ class SendStatusChangeNotificationToUser implements ShouldQueue
     {
         return match($status) {
             'pending' => 'Menunggu',
-            'process' => 'Diproses',
-            'completed' => 'Selesai',
+            'in_progress' => 'Diproses',
+            'resolved' => 'Selesai',
             'rejected' => 'Ditolak',
             default => ucfirst($status),
         };
@@ -96,8 +107,8 @@ class SendStatusChangeNotificationToUser implements ShouldQueue
     {
         return match($status) {
             'pending' => '⏳',
-            'process' => '🔄',
-            'completed' => '✅',
+            'in_progress' => '🔄',
+            'resolved' => '✅',
             'rejected' => '❌',
             default => '📋',
         };

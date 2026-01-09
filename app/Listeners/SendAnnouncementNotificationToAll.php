@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\AnnouncementCreated;
 use App\Services\FirebaseService;
 use App\Models\User;
+use App\Models\FcmNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -49,7 +50,7 @@ class SendAnnouncementNotificationToAll implements ShouldQueue
             'click_action' => 'OPEN_ANNOUNCEMENT',
         ];
 
-        // Collect all active device tokens
+        // Collect all active device tokens and save notifications
         $allTokens = [];
         $notifiedUserCount = 0;
 
@@ -67,6 +68,17 @@ class SendAnnouncementNotificationToAll implements ShouldQueue
             }
 
             $allTokens = array_merge($allTokens, $tokens);
+
+            // Save notification to database for each user
+            FcmNotification::create([
+                'user_id' => $user->id,
+                'type' => 'announcement_created',
+                'title' => $title,
+                'body' => $body,
+                'data' => $data,
+                'is_read' => false,
+            ]);
+
             $notifiedUserCount++;
         }
 

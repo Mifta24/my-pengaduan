@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\ComplaintCreated;
 use App\Services\FirebaseService;
 use App\Models\User;
+use App\Models\FcmNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -65,6 +66,16 @@ class SendComplaintNotificationToAdmin implements ShouldQueue
 
             // Send to all admin's devices
             $this->firebaseService->sendToMultipleDevices($tokens, $title, $body, $data);
+
+            // Save notification to database
+            FcmNotification::create([
+                'user_id' => $admin->id,
+                'type' => 'complaint_created',
+                'title' => $title,
+                'body' => $body,
+                'data' => $data,
+                'is_read' => false,
+            ]);
 
             Log::info('Complaint notification sent to admin', [
                 'admin_id' => $admin->id,
