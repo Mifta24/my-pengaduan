@@ -1,0 +1,209 @@
+name: '📱 Device Tokens (User)'
+description: |-
+
+  Endpoints untuk mengelola FCM device tokens untuk push notifications.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/device-tokens
+    metadata:
+      custom: []
+      groupName: '📱 Device Tokens (User)'
+      groupDescription: |-
+
+        Endpoints untuk mengelola FCM device tokens untuk push notifications.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Register Device Token'
+      description: 'Register FCM device token untuk menerima push notifications.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      device_token:
+        custom: []
+        name: device_token
+        description: 'FCM Device Token.'
+        required: true
+        example: dABC123...
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      device_type:
+        custom: []
+        name: device_type
+        description: 'Device type (android/ios).'
+        required: false
+        example: android
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      device_model:
+        custom: []
+        name: device_model
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      os_version:
+        custom: []
+        name: os_version
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      app_version:
+        custom: []
+        name: app_version
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      device_name:
+        custom: []
+        name: device_name
+        description: 'Device name.'
+        required: false
+        example: 'Samsung Galaxy S21'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      device_token: dABC123...
+      device_type: android
+      device_model: architecto
+      os_version: architecto
+      app_version: architecto
+      device_name: 'Samsung Galaxy S21'
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/device-tokens
+    metadata:
+      custom: []
+      groupName: '📱 Device Tokens (User)'
+      groupDescription: |-
+
+        Endpoints untuk mengelola FCM device tokens untuk push notifications.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get user devices'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/device-tokens/{id}'
+    metadata:
+      custom: []
+      groupName: '📱 Device Tokens (User)'
+      groupDescription: |-
+
+        Endpoints untuk mengelola FCM device tokens untuk push notifications.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete device token'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the device token.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null

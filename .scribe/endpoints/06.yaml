@@ -1,0 +1,97 @@
+name: '👨‍💼 Admin - Dashboard'
+description: |-
+
+  Endpoints untuk data dashboard admin.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/admin/dashboard
+    metadata:
+      custom: []
+      groupName: '👨‍💼 Admin - Dashboard'
+      groupDescription: |-
+
+        Endpoints untuk data dashboard admin.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get Dashboard Statistics'
+      description: 'Mendapatkan statistik lengkap untuk dashboard admin.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/admin/dashboard/quick-stats
+    metadata:
+      custom: []
+      groupName: '👨‍💼 Admin - Dashboard'
+      groupDescription: |-
+
+        Endpoints untuk data dashboard admin.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get quick stats for mobile dashboard'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null

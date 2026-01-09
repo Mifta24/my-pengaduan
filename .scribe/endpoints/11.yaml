@@ -1,0 +1,180 @@
+name: '👨‍💼 Admin - Reports'
+description: |-
+
+  Endpoints untuk admin melihat laporan dan statistik.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/admin/reports/overview
+    metadata:
+      custom: []
+      groupName: '👨‍💼 Admin - Reports'
+      groupDescription: |-
+
+        Endpoints untuk admin melihat laporan dan statistik.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get Report Overview'
+      description: 'Mendapatkan overview statistik dan trends untuk dashboard admin.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/admin/reports/complaints
+    metadata:
+      custom: []
+      groupName: '👨‍💼 Admin - Reports'
+      groupDescription: |-
+
+        Endpoints untuk admin melihat laporan dan statistik.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get complaints report with filters'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/admin/reports/users
+    metadata:
+      custom: []
+      groupName: '👨‍💼 Admin - Reports'
+      groupDescription: |-
+
+        Endpoints untuk admin melihat laporan dan statistik.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get users report with filters'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/admin/reports/export
+    metadata:
+      custom: []
+      groupName: '👨‍💼 Admin - Reports'
+      groupDescription: |-
+
+        Endpoints untuk admin melihat laporan dan statistik.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Export report data'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null

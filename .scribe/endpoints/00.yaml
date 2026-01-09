@@ -1,0 +1,428 @@
+name: Authentication
+description: |-
+
+  Endpoints untuk registrasi, login, dan logout user
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/auth/register
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Endpoints untuk registrasi, login, dan logout user
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Register User'
+      description: |-
+        Mendaftarkan user baru ke sistem MyPengaduan.
+        Setelah registrasi berhasil, user akan mendapat token untuk autentikasi.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'Nama lengkap user.'
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Email address yang valid.'
+        required: true
+        example: john@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: 'Password minimal 8 karakter.'
+        required: true
+        example: password123
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      password_confirmation:
+        custom: []
+        name: password_confirmation
+        description: 'Konfirmasi password harus sama.'
+        required: true
+        example: password123
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      address:
+        custom: []
+        name: address
+        description: 'Alamat lengkap user.'
+        required: true
+        example: 'Jl. Mawar No. 10, RT 01/RW 01'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      phone:
+        custom: []
+        name: phone
+        description: 'Nomor telepon user.'
+        required: false
+        example: '081234567890'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: 'John Doe'
+      email: john@example.com
+      password: password123
+      password_confirmation: password123
+      address: 'Jl. Mawar No. 10, RT 01/RW 01'
+      phone: '081234567890'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+            "status": true,
+            "message": "User berhasil didaftarkan",
+            "data": {
+              "user": {
+                "id": 1,
+                "name": "John Doe",
+                "email": "john@example.com",
+                "address": "Jl. Mawar No. 10",
+                "phone": "081234567890"
+              },
+              "token": "1|abc123def456..."
+            }
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: |-
+          {
+            "status": false,
+            "message": "Validation failed",
+            "data": {
+              "email": ["The email has already been taken."]
+            }
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/auth/login
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Endpoints untuk registrasi, login, dan logout user
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Login User'
+      description: |-
+        Login dengan email dan password untuk mendapatkan authentication token.
+        Token ini digunakan untuk mengakses endpoint yang memerlukan autentikasi.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        custom: []
+        name: email
+        description: 'Email user yang terdaftar.'
+        required: true
+        example: john@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: 'Password user.'
+        required: true
+        example: password123
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      email: john@example.com
+      password: password123
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "status": true,
+            "message": "Login berhasil",
+            "data": {
+              "user": {
+                "id": 1,
+                "name": "John Doe",
+                "email": "john@example.com",
+                "address": "Jl. Mawar No. 10",
+                "phone": "081234567890"
+              },
+              "token": "1|abc123def456..."
+            }
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: |-
+          {
+            "status": false,
+            "message": "Email atau password salah"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/auth/profile
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Endpoints untuk registrasi, login, dan logout user
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get user profile'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: api/auth/profile
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Endpoints untuk registrasi, login, dan logout user
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update user profile'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: api/auth/change-password
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Endpoints untuk registrasi, login, dan logout user
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Change password'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/auth/logout
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Endpoints untuk registrasi, login, dan logout user
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Logout user'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/auth/logout-all
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Endpoints untuk registrasi, login, dan logout user
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Logout from all devices'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
