@@ -13,7 +13,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Intervention\Image\Laravel\Facades\Image;
 
+/**
+ * @group Complaints (User)
+ *
+ * Endpoints untuk user mengelola pengaduan mereka sendiri
+ */
 class ComplaintController extends Controller
 {
     use ApiResponse;
@@ -99,7 +105,43 @@ class ComplaintController extends Controller
     }
 
     /**
-     * Store a newly created complaint
+     * Create Complaint
+     *
+     * Membuat pengaduan baru. Mendukung upload foto dan attachment.
+     * Foto akan otomatis dikompress untuk menghemat storage.
+     *
+     * @authenticated
+     *
+     * @bodyParam title string required Judul pengaduan (max: 255). Example: Lampu Jalan Rusak
+     * @bodyParam description string required Deskripsi detail pengaduan. Example: Lampu jalan di depan rumah no. 15 sudah mati sejak 3 hari lalu
+     * @bodyParam category_id integer required ID kategori pengaduan. Example: 1
+     * @bodyParam location string required Lokasi kejadian (max: 255). Example: Jl. Mawar No. 15, RT 01/RW 01
+     * @bodyParam priority string Priority level. Opsi: low, medium, high, urgent. Default: medium. Example: high
+     * @bodyParam report_date date Tanggal kejadian (format: Y-m-d). Default: today. Example: 2025-01-09
+     * @bodyParam photo file Foto pengaduan (jpeg,png,jpg,webp, max: 5MB).
+     * @bodyParam attachments file[] Dokumen pendukung (pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp, max: 10MB per file).
+     *
+     * @response 201 {
+     *   "status": true,
+     *   "message": "Pengaduan berhasil dibuat",
+     *   "data": {
+     *     "complaint": {
+     *       "id": 1,
+     *       "title": "Lampu Jalan Rusak",
+     *       "status": "pending",
+     *       "priority": "high",
+     *       "created_at": "2025-01-09T10:00:00.000000Z"
+     *     }
+     *   }
+     * }
+     *
+     * @response 422 {
+     *   "status": false,
+     *   "message": "Validation failed",
+     *   "data": {
+     *     "title": ["The title field is required."]
+     *   }
+     * }
      */
     public function store(Request $request)
     {
@@ -109,8 +151,10 @@ class ComplaintController extends Controller
                 'description' => 'required|string',
                 'category_id' => 'required|exists:categories,id',
                 'location' => 'required|string|max:255',
-                'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                'attachments.*' => 'nullable|file|max:10240'
+                'priority' => 'nullable|in:low,medium,high,urgent',
+                'report_date' => 'nullable|date|before_or_equal:today',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+                'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240'
             ]);
 
             $complaint = Complaint::create([
@@ -119,28 +163,94 @@ class ComplaintController extends Controller
                 'description' => $validated['description'],
                 'category_id' => $validated['category_id'],
                 'location' => $validated['location'],
+                'priority' => $validated['priority'] ?? 'medium',
                 'status' => 'pending',
-                'report_date' => now()
+                'report_date' => isset($validated['report_date']) ? $validated['report_date'] : now()
             ]);
 
-            // Handle photo upload
+            // Handle photo upload with compression
             if ($request->hasFile('photo')) {
-                $photoPath = $request->file('photo')->store('complaints/photos', 'public');
+                $photo = $request->file('photo');
+                $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                $storagePath = storage_path('app/public/complaints/photos');
+
+                // Create directory if not exists
+                if (!file_exists($storagePath)) {
+                    mkdir($storagePath, 0755, true);
+                }
+
+                $fullPath = $storagePath . '/' . $fileName;
+
+                // Compress and save image
+                $image = Image::read($photo->getRealPath());
+
+                // Resize if larger than 1920px width, maintaining aspect ratio
+                if ($image->width() > 1920) {
+                    $image->scale(width: 1920);
+                }
+
+                // Save with 85% quality for JPEG/WebP
+                $extension = strtolower($photo->getClientOriginalExtension());
+                if (in_array($extension, ['jpg', 'jpeg'])) {
+                    $image->toJpeg(quality: 85)->save($fullPath);
+                } elseif ($extension === 'webp') {
+                    $image->toWebp(quality: 85)->save($fullPath);
+                } else {
+                    $image->toPng()->save($fullPath);
+                }
+
+                $photoPath = 'complaints/photos/' . $fileName;
                 $complaint->update(['photo' => $photoPath]);
             }
 
-            // Handle attachments
+            // Handle attachments with validation and compression for images
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('complaints/attachments', 'public');
+                    $mimeType = $file->getMimeType();
+                    $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                    $storagePath = storage_path('app/public/complaints/attachments');
+
+                    // Create directory if not exists
+                    if (!file_exists($storagePath)) {
+                        mkdir($storagePath, 0755, true);
+                    }
+
+                    // Check if file is an image and compress it
+                    if (in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])) {
+                        $image = Image::read($file->getRealPath());
+
+                        // Resize if larger than 1920px width
+                        if ($image->width() > 1920) {
+                            $image->scale(width: 1920);
+                        }
+
+                        $fullPath = $storagePath . '/' . $fileName;
+                        $extension = strtolower($file->getClientOriginalExtension());
+
+                        if (in_array($extension, ['jpg', 'jpeg'])) {
+                            $image->toJpeg(quality: 85)->save($fullPath);
+                        } elseif ($extension === 'webp') {
+                            $image->toWebp(quality: 85)->save($fullPath);
+                        } else {
+                            $image->toPng()->save($fullPath);
+                        }
+
+                        $fileSize = filesize($fullPath);
+                    } else {
+                        // Non-image files, store normally
+                        $file->storeAs('complaints/attachments', $fileName, 'public');
+                        $fileSize = $file->getSize();
+                    }
+
+                    $path = 'complaints/attachments/' . $fileName;
 
                     Attachment::create([
                         'attachable_type' => Complaint::class,
                         'attachable_id' => $complaint->id,
                         'file_name' => $file->getClientOriginalName(),
                         'file_path' => $path,
-                        'file_size' => $file->getSize(),
-                        'mime_type' => $file->getMimeType(),
+                        'file_size' => $fileSize,
+                        'mime_type' => $mimeType,
                     ]);
                 }
             }
@@ -187,7 +297,13 @@ class ComplaintController extends Controller
                 return $this->unauthorized('You do not have access to this complaint');
             }
 
-            $complaint->load(['category:id,name,icon,color,description', 'attachments']);
+            $complaint->load([
+                'category:id,name,icon,color,description',
+                'attachments',
+                'responses' => function($query) {
+                    $query->with(['user:id,name,email', 'attachments'])->latest();
+                }
+            ]);
 
             // Transform data to hide unnecessary fields
             $data = [
@@ -206,6 +322,18 @@ class ComplaintController extends Controller
                 'updated_at' => $complaint->updated_at->format('Y-m-d\TH:i:s.u\Z'),
                 'category' => $complaint->category,
                 'attachments' => $complaint->attachments,
+                'responses' => $complaint->responses->map(function($response) {
+                    return [
+                        'id' => $response->id,
+                        'content' => $response->content,
+                        'photo' => $response->photo,
+                        'photo_url' => $response->photo_url,
+                        'created_at' => $response->created_at->format('Y-m-d\TH:i:s.u\Z'),
+                        'user' => $response->user,
+                        'attachments' => $response->attachments,
+                    ];
+                }),
+                'responses_count' => $complaint->responses->count(),
             ];
 
             return $this->success($data, 'Complaint details loaded successfully');
@@ -236,38 +364,119 @@ class ComplaintController extends Controller
                 'description' => 'required|string',
                 'category_id' => 'required|exists:categories,id',
                 'location' => 'required|string|max:255',
-                'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                'attachments.*' => 'nullable|file|max:10240'
+                'priority' => 'nullable|in:low,medium,high,urgent',
+                'report_date' => 'nullable|date|before_or_equal:today',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+                'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240'
             ]);
 
-            $complaint->update([
+            $updateData = [
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'category_id' => $validated['category_id'],
                 'location' => $validated['location']
-            ]);
+            ];
 
-            // Handle photo update
+            // Add priority if provided
+            if (isset($validated['priority'])) {
+                $updateData['priority'] = $validated['priority'];
+            }
+
+            // Add report_date if provided
+            if (isset($validated['report_date'])) {
+                $updateData['report_date'] = $validated['report_date'];
+            }
+
+            $complaint->update($updateData);
+
+            // Handle photo update with compression
             if ($request->hasFile('photo')) {
+                // Delete old photo
                 if ($complaint->photo) {
                     Storage::disk('public')->delete($complaint->photo);
                 }
-                $photoPath = $request->file('photo')->store('complaints/photos', 'public');
+
+                $photo = $request->file('photo');
+                $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                $storagePath = storage_path('app/public/complaints/photos');
+
+                // Create directory if not exists
+                if (!file_exists($storagePath)) {
+                    mkdir($storagePath, 0755, true);
+                }
+
+                $fullPath = $storagePath . '/' . $fileName;
+
+                // Compress and save image
+                $image = Image::read($photo->getRealPath());
+
+                // Resize if larger than 1920px width, maintaining aspect ratio
+                if ($image->width() > 1920) {
+                    $image->scale(width: 1920);
+                }
+
+                // Save with 85% quality for JPEG/WebP
+                $extension = strtolower($photo->getClientOriginalExtension());
+                if (in_array($extension, ['jpg', 'jpeg'])) {
+                    $image->toJpeg(quality: 85)->save($fullPath);
+                } elseif ($extension === 'webp') {
+                    $image->toWebp(quality: 85)->save($fullPath);
+                } else {
+                    $image->toPng()->save($fullPath);
+                }
+
+                $photoPath = 'complaints/photos/' . $fileName;
                 $complaint->update(['photo' => $photoPath]);
             }
 
-            // Handle new attachments
+            // Handle new attachments with compression for images
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('complaints/attachments', 'public');
+                    $mimeType = $file->getMimeType();
+                    $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                    $storagePath = storage_path('app/public/complaints/attachments');
+
+                    // Create directory if not exists
+                    if (!file_exists($storagePath)) {
+                        mkdir($storagePath, 0755, true);
+                    }
+
+                    // Check if file is an image and compress it
+                    if (in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])) {
+                        $image = Image::read($file->getRealPath());
+
+                        // Resize if larger than 1920px width
+                        if ($image->width() > 1920) {
+                            $image->scale(width: 1920);
+                        }
+
+                        $fullPath = $storagePath . '/' . $fileName;
+                        $extension = strtolower($file->getClientOriginalExtension());
+
+                        if (in_array($extension, ['jpg', 'jpeg'])) {
+                            $image->toJpeg(quality: 85)->save($fullPath);
+                        } elseif ($extension === 'webp') {
+                            $image->toWebp(quality: 85)->save($fullPath);
+                        } else {
+                            $image->toPng()->save($fullPath);
+                        }
+
+                        $fileSize = filesize($fullPath);
+                    } else {
+                        // Non-image files, store normally
+                        $file->storeAs('complaints/attachments', $fileName, 'public');
+                        $fileSize = $file->getSize();
+                    }
+
+                    $path = 'complaints/attachments/' . $fileName;
 
                     Attachment::create([
                         'attachable_type' => Complaint::class,
                         'attachable_id' => $complaint->id,
                         'file_name' => $file->getClientOriginalName(),
                         'file_path' => $path,
-                        'file_size' => $file->getSize(),
-                        'mime_type' => $file->getMimeType(),
+                        'file_size' => $fileSize,
+                        'mime_type' => $mimeType,
                     ]);
                 }
             }

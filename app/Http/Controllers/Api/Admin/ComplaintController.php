@@ -12,12 +12,30 @@ use App\Events\ComplaintStatusChanged;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Response as ComplaintResponse;
+use Intervention\Image\Laravel\Facades\Image;
 
+/**
+ * @group 👨‍💼 Admin - Complaints
+ * 
+ * Endpoints untuk admin mengelola semua pengaduan dari seluruh user.
+ */
 class ComplaintController extends Controller
 {
     use ApiResponse;
+    
     /**
-     * Get all complaints (admin view)
+     * Get All Complaints (Admin)
+     * 
+     * Mendapatkan semua pengaduan dengan filtering dan pagination.
+     * 
+     * @authenticated
+     * 
+     * @queryParam status string Filter by status (pending, in_progress, resolved, rejected). Example: pending
+     * @queryParam priority string Filter by priority (low, medium, high, urgent). Example: high
+     * @queryParam category_id integer Filter by category. Example: 1
+     * @queryParam user_id integer Filter by user. Example: 5
+     * @queryParam search string Search in title/description. Example: lampu
+     * @queryParam page integer Page number. Example: 1
      */
     public function index(Request $request)
     {
@@ -112,8 +130,8 @@ class ComplaintController extends Controller
                 'location' => 'required|string|max:255',
                 'priority' => 'nullable|in:low,medium,high,urgent',
                 'status' => 'nullable|in:pending,in_progress,resolved,rejected',
-                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'attachments.*' => 'nullable|file|max:10240',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+                'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240',
                 'report_date' => 'nullable|date',
             ]);
 
@@ -133,24 +151,80 @@ class ComplaintController extends Controller
                 'report_date' => $request->get('report_date', now()),
             ]);
 
-            // Handle main photo upload
+            // Handle main photo upload with compression
             if ($request->hasFile('photo')) {
-                $photoPath = $request->file('photo')->store('complaints/photos', 'public');
+                $photo = $request->file('photo');
+                $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                $storagePath = storage_path('app/public/complaints/photos');
+
+                if (!file_exists($storagePath)) {
+                    mkdir($storagePath, 0755, true);
+                }
+
+                $fullPath = $storagePath . '/' . $fileName;
+                $image = Image::read($photo->getRealPath());
+
+                if ($image->width() > 1920) {
+                    $image->scale(width: 1920);
+                }
+
+                $extension = strtolower($photo->getClientOriginalExtension());
+                if (in_array($extension, ['jpg', 'jpeg'])) {
+                    $image->toJpeg(quality: 85)->save($fullPath);
+                } elseif ($extension === 'webp') {
+                    $image->toWebp(quality: 85)->save($fullPath);
+                } else {
+                    $image->toPng()->save($fullPath);
+                }
+
+                $photoPath = 'complaints/photos/' . $fileName;
                 $complaint->update(['photo' => $photoPath]);
             }
 
-            // Handle additional attachments
+            // Handle additional attachments with compression for images
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('complaints', 'public');
+                    $mimeType = $file->getMimeType();
+                    $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                    $storagePath = storage_path('app/public/complaints/attachments');
+
+                    if (!file_exists($storagePath)) {
+                        mkdir($storagePath, 0755, true);
+                    }
+
+                    if (in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])) {
+                        $image = Image::read($file->getRealPath());
+
+                        if ($image->width() > 1920) {
+                            $image->scale(width: 1920);
+                        }
+
+                        $fullPath = $storagePath . '/' . $fileName;
+                        $extension = strtolower($file->getClientOriginalExtension());
+
+                        if (in_array($extension, ['jpg', 'jpeg'])) {
+                            $image->toJpeg(quality: 85)->save($fullPath);
+                        } elseif ($extension === 'webp') {
+                            $image->toWebp(quality: 85)->save($fullPath);
+                        } else {
+                            $image->toPng()->save($fullPath);
+                        }
+
+                        $fileSize = filesize($fullPath);
+                    } else {
+                        $file->storeAs('complaints/attachments', $fileName, 'public');
+                        $fileSize = $file->getSize();
+                    }
+
+                    $path = 'complaints/attachments/' . $fileName;
 
                     Attachment::create([
                         'attachable_type' => Complaint::class,
                         'attachable_id' => $complaint->id,
                         'file_name' => $file->getClientOriginalName(),
                         'file_path' => $path,
-                        'file_size' => $file->getSize(),
-                        'mime_type' => $file->getMimeType(),
+                        'file_size' => $fileSize,
+                        'mime_type' => $mimeType,
                         'attachment_type' => 'complaint',
                     ]);
                 }
@@ -204,13 +278,37 @@ class ComplaintController extends Controller
                 'estimated_resolution',
             ]));
 
-            // Handle photo update
+            // Handle photo update with compression
             if ($request->hasFile('photo')) {
-                // Delete old photo
                 if ($complaint->photo) {
                     Storage::disk('public')->delete($complaint->photo);
                 }
-                $photoPath = $request->file('photo')->store('complaints/photos', 'public');
+
+                $photo = $request->file('photo');
+                $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                $storagePath = storage_path('app/public/complaints/photos');
+
+                if (!file_exists($storagePath)) {
+                    mkdir($storagePath, 0755, true);
+                }
+
+                $fullPath = $storagePath . '/' . $fileName;
+                $image = Image::read($photo->getRealPath());
+
+                if ($image->width() > 1920) {
+                    $image->scale(width: 1920);
+                }
+
+                $extension = strtolower($photo->getClientOriginalExtension());
+                if (in_array($extension, ['jpg', 'jpeg'])) {
+                    $image->toJpeg(quality: 85)->save($fullPath);
+                } elseif ($extension === 'webp') {
+                    $image->toWebp(quality: 85)->save($fullPath);
+                } else {
+                    $image->toPng()->save($fullPath);
+                }
+
+                $photoPath = 'complaints/photos/' . $fileName;
                 $complaint->update(['photo' => $photoPath]);
             }
 
@@ -225,18 +323,50 @@ class ComplaintController extends Controller
                 }
             }
 
-            // Handle new attachments
+            // Handle new attachments with compression for images
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('complaints', 'public');
+                    $mimeType = $file->getMimeType();
+                    $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                    $storagePath = storage_path('app/public/complaints/attachments');
+
+                    if (!file_exists($storagePath)) {
+                        mkdir($storagePath, 0755, true);
+                    }
+
+                    if (in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])) {
+                        $image = Image::read($file->getRealPath());
+
+                        if ($image->width() > 1920) {
+                            $image->scale(width: 1920);
+                        }
+
+                        $fullPath = $storagePath . '/' . $fileName;
+                        $extension = strtolower($file->getClientOriginalExtension());
+
+                        if (in_array($extension, ['jpg', 'jpeg'])) {
+                            $image->toJpeg(quality: 85)->save($fullPath);
+                        } elseif ($extension === 'webp') {
+                            $image->toWebp(quality: 85)->save($fullPath);
+                        } else {
+                            $image->toPng()->save($fullPath);
+                        }
+
+                        $fileSize = filesize($fullPath);
+                    } else {
+                        $file->storeAs('complaints/attachments', $fileName, 'public');
+                        $fileSize = $file->getSize();
+                    }
+
+                    $path = 'complaints/attachments/' . $fileName;
 
                     Attachment::create([
                         'attachable_type' => Complaint::class,
                         'attachable_id' => $complaint->id,
                         'file_name' => $file->getClientOriginalName(),
                         'file_path' => $path,
-                        'file_size' => $file->getSize(),
-                        'mime_type' => $file->getMimeType(),
+                        'file_size' => $fileSize,
+                        'mime_type' => $mimeType,
                         'attachment_type' => 'complaint',
                     ]);
                 }
@@ -321,13 +451,16 @@ class ComplaintController extends Controller
     }
 
     /**
-     * Add response/comment to complaint
+     * Add response/comment to complaint (Enhanced with photo and attachments support)
      */
     public function addResponse(Request $request, $id)
     {
         try {
             $validator = Validator::make($request->all(), [
                 'message' => 'required|string',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+                'attachments' => 'nullable|array|max:5',
+                'attachments.*' => 'file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240',
             ]);
 
             if ($validator->fails()) {
@@ -336,13 +469,146 @@ class ComplaintController extends Controller
 
             $complaint = Complaint::findOrFail($id);
 
+            // Create response record
             $response = ComplaintResponse::create([
                 'complaint_id' => $complaint->id,
                 'user_id' => $request->user()->id,
                 'content' => $request->message,
             ]);
 
-            return $this->created($response->load('user:id,name,email'), 'Response added successfully');
+            // Handle photo upload with compression
+            if ($request->hasFile('photo')) {
+                $photo = $request->file('photo');
+                $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                $storagePath = storage_path('app/public/responses/photos');
+
+                if (!file_exists($storagePath)) {
+                    mkdir($storagePath, 0755, true);
+                }
+
+                $fullPath = $storagePath . '/' . $fileName;
+                $image = Image::read($photo->getRealPath());
+
+                if ($image->width() > 1920) {
+                    $image->scale(width: 1920);
+                }
+
+                $extension = strtolower($photo->getClientOriginalExtension());
+                if (in_array($extension, ['jpg', 'jpeg'])) {
+                    $image->toJpeg(quality: 85)->save($fullPath);
+                } elseif ($extension === 'webp') {
+                    $image->toWebp(quality: 85)->save($fullPath);
+                } else {
+                    $image->toPng()->save($fullPath);
+                }
+
+                $photoPath = 'responses/photos/' . $fileName;
+                $response->update(['photo' => $photoPath]);
+            }
+
+            // Handle attachments with compression for images
+            $uploadedAttachments = [];
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $mimeType = $file->getMimeType();
+                    $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                    $storagePath = storage_path('app/public/responses/attachments');
+
+                    if (!file_exists($storagePath)) {
+                        mkdir($storagePath, 0755, true);
+                    }
+
+                    if (in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])) {
+                        $image = Image::read($file->getRealPath());
+
+                        if ($image->width() > 1920) {
+                            $image->scale(width: 1920);
+                        }
+
+                        $fullPath = $storagePath . '/' . $fileName;
+                        $extension = strtolower($file->getClientOriginalExtension());
+
+                        if (in_array($extension, ['jpg', 'jpeg'])) {
+                            $image->toJpeg(quality: 85)->save($fullPath);
+                        } elseif ($extension === 'webp') {
+                            $image->toWebp(quality: 85)->save($fullPath);
+                        } else {
+                            $image->toPng()->save($fullPath);
+                        }
+
+                        $fileSize = filesize($fullPath);
+                    } else {
+                        $file->storeAs('responses/attachments', $fileName, 'public');
+                        $fileSize = $file->getSize();
+                    }
+
+                    $path = 'responses/attachments/' . $fileName;
+
+                    $attachment = Attachment::create([
+                        'attachable_type' => ComplaintResponse::class,
+                        'attachable_id' => $response->id,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_path' => $path,
+                        'file_size' => $fileSize,
+                        'mime_type' => $mimeType,
+                        'attachment_type' => 'response',
+                    ]);
+
+                    $uploadedAttachments[] = [
+                        'id' => $attachment->id,
+                        'file_name' => $attachment->file_name,
+                        'file_url' => $attachment->file_url,
+                        'file_size_human' => $attachment->file_size_human,
+                    ];
+                }
+            }
+
+            // Update complaint's admin_response field with latest response
+            $complaint->update([
+                'admin_response' => $request->message,
+            ]);
+
+            // Send notification to user about new response
+            try {
+                $firebaseService = app(\App\Services\FirebaseService::class);
+                $user = $complaint->user;
+
+                if ($user && $user->fcm_token) {
+                    $notificationData = [
+                        'type' => 'complaint_response',
+                        'complaint_id' => $complaint->id,
+                        'response_id' => $response->id,
+                        'title' => $complaint->title,
+                    ];
+
+                    $firebaseService->sendToDevice(
+                        $user->fcm_token,
+                        'Admin Response',
+                        "Admin telah merespons pengaduan Anda: {$complaint->title}",
+                        $notificationData
+                    );
+
+                    // Save notification to database
+                    \App\Models\FcmNotification::create([
+                        'user_id' => $user->id,
+                        'type' => 'complaint_response',
+                        'title' => 'Admin Response',
+                        'body' => "Admin telah merespons pengaduan Anda: {$complaint->title}",
+                        'data' => json_encode($notificationData),
+                    ]);
+                }
+            } catch (\Exception $e) {
+                // Log but don't fail the response creation
+                \Illuminate\Support\Facades\Log::error('Failed to send response notification: ' . $e->getMessage());
+            }
+
+            $responseData = [
+                'response' => $response->load('user:id,name,email'),
+                'attachments' => $uploadedAttachments,
+                'attachments_count' => count($uploadedAttachments),
+            ];
+
+            return $this->created($responseData, 'Response added successfully');
         } catch (\Exception $e) {
             return $this->serverError('Failed to add response', $e);
         }

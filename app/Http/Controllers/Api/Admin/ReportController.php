@@ -12,12 +12,21 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @group 👨‍💼 Admin - Reports
+ * 
+ * Endpoints untuk admin melihat laporan dan statistik.
+ */
 class ReportController extends Controller
 {
     use ApiResponse;
 
     /**
-     * Get overview statistics and trends
+     * Get Report Overview
+     * 
+     * Mendapatkan overview statistik dan trends untuk dashboard admin.
+     * 
+     * @authenticated
      */
     public function overview(Request $request)
     {
@@ -141,7 +150,7 @@ class ReportController extends Controller
                 'date_to' => 'nullable|date|after_or_equal:date_from',
                 'status' => 'nullable|in:pending,in_progress,resolved,rejected',
                 'category_id' => 'nullable|exists:categories,id',
-                'priority' => 'nullable|in:low,medium,high',
+                'priority' => 'nullable|in:low,medium,high,urgent',
                 'per_page' => 'nullable|integer|min:1|max:100',
             ]);
 
