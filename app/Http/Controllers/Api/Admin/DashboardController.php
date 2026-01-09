@@ -11,11 +11,21 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @group 👨‍💼 Admin - Dashboard
+ *
+ * Endpoints untuk data dashboard admin.
+ */
 class DashboardController extends Controller
 {
     use ApiResponse;
+
     /**
-     * Get admin dashboard statistics
+     * Get Dashboard Statistics
+     *
+     * Mendapatkan statistik lengkap untuk dashboard admin.
+     *
+     * @authenticated
      */
     public function index()
     {

@@ -16,20 +16,20 @@ use Intervention\Image\Laravel\Facades\Image;
 
 /**
  * @group 👨‍💼 Admin - Complaints
- * 
+ *
  * Endpoints untuk admin mengelola semua pengaduan dari seluruh user.
  */
 class ComplaintController extends Controller
 {
     use ApiResponse;
-    
+
     /**
      * Get All Complaints (Admin)
-     * 
+     *
      * Mendapatkan semua pengaduan dengan filtering dan pagination.
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @queryParam status string Filter by status (pending, in_progress, resolved, rejected). Example: pending
      * @queryParam priority string Filter by priority (low, medium, high, urgent). Example: high
      * @queryParam category_id integer Filter by category. Example: 1

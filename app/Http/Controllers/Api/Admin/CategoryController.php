@@ -9,11 +9,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
+/**
+ * @group 👨‍💼 Admin - Categories
+ *
+ * Endpoints untuk admin mengelola kategori pengaduan.
+ */
 class CategoryController extends Controller
 {
     use ApiResponse;
+
     /**
-     * Get all categories
+     * Get All Categories (Admin)
+     *
+     * Mendapatkan semua kategori dengan statistik complaint.
+     *
+     * @authenticated
+     *
+     * @queryParam search string Search category name. Example: infrastruktur
+     * @queryParam is_active boolean Filter by status. Example: 1
      */
     public function index(Request $request)
     {

@@ -12,11 +12,26 @@ use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * @group 👨‍💼 Admin - Announcements
+ *
+ * Endpoints untuk admin mengelola pengumuman.
+ */
 class AnnouncementController extends Controller
 {
     use ApiResponse;
+
     /**
-     * Get all announcements (admin view)
+     * Get All Announcements (Admin)
+     *
+     * Mendapatkan semua pengumuman termasuk draft dan unpublished.
+     *
+     * @authenticated
+     *
+     * @queryParam search string Search in title/content. Example: gotong
+     * @queryParam priority string Filter by priority. Example: urgent
+     * @queryParam is_active boolean Filter active status. Example: 1
+     * @queryParam page integer Page number. Example: 1
      */
     public function index(Request $request)
     {

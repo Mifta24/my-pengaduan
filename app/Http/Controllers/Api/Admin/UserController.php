@@ -10,11 +10,26 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * @group 👨‍💼 Admin - Users
+ *
+ * Endpoints untuk admin mengelola user.
+ */
 class UserController extends Controller
 {
     use ApiResponse;
+
     /**
-     * Get all users
+     * Get All Users (Admin)
+     *
+     * Mendapatkan daftar semua user dengan filtering.
+     *
+     * @authenticated
+     *
+     * @queryParam search string Search by name/email. Example: john
+     * @queryParam role string Filter by role (admin/user). Example: user
+     * @queryParam is_verified boolean Filter verified users. Example: 1
+     * @queryParam page integer Page number. Example: 1
      */
     public function index(Request $request)
     {

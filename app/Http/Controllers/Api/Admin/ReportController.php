@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * @group 👨‍💼 Admin - Reports
- * 
+ *
  * Endpoints untuk admin melihat laporan dan statistik.
  */
 class ReportController extends Controller
@@ -23,9 +23,9 @@ class ReportController extends Controller
 
     /**
      * Get Report Overview
-     * 
+     *
      * Mendapatkan overview statistik dan trends untuk dashboard admin.
-     * 
+     *
      * @authenticated
      */
     public function overview(Request $request)
