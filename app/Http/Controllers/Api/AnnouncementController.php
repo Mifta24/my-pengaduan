@@ -9,11 +9,26 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * @group 📢 Announcements (Public)
+ *
+ * Endpoints untuk melihat pengumuman. Tidak memerlukan autentikasi.
+ */
 class AnnouncementController extends Controller
 {
     use ApiResponse;
+
     /**
-     * Display a listing of active announcements
+     * Get Active Announcements
+     *
+     * Mendapatkan daftar pengumuman yang aktif dan sudah dipublish.
+     * Support pagination dan filtering.
+     *
+     * @unauthenticated
+     *
+     * @queryParam page integer Nomor halaman. Example: 1
+     * @queryParam per_page integer Item per halaman. Example: 10
+     * @queryParam priority string Filter by priority (low, medium, high, urgent). Example: high
      */
     public function index(Request $request)
     {

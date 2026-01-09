@@ -8,11 +8,25 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @group 📱 Device Tokens (User)
+ *
+ * Endpoints untuk mengelola FCM device tokens untuk push notifications.
+ */
 class DeviceTokenController extends Controller
 {
     use ApiResponse;
+
     /**
-     * Register device token (dipanggil dari mobile app)
+     * Register Device Token
+     *
+     * Register FCM device token untuk menerima push notifications.
+     *
+     * @authenticated
+     *
+     * @bodyParam device_token string required FCM Device Token. Example: dABC123...
+     * @bodyParam device_type string Device type (android/ios). Example: android
+     * @bodyParam device_name string Device name. Example: Samsung Galaxy S21
      */
     public function store(Request $request)
     {

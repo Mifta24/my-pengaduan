@@ -10,11 +10,52 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @group Authentication
+ *
+ * Endpoints untuk registrasi, login, dan logout user
+ */
 class AuthController extends Controller
 {
     use ApiResponse;
+
     /**
-     * Register a new user
+     * Register User
+     *
+     * Mendaftarkan user baru ke sistem MyPengaduan.
+     * Setelah registrasi berhasil, user akan mendapat token untuk autentikasi.
+     *
+     * @unauthenticated
+     *
+     * @bodyParam name string required Nama lengkap user. Example: John Doe
+     * @bodyParam email string required Email address yang valid. Example: john@example.com
+     * @bodyParam password string required Password minimal 8 karakter. Example: password123
+     * @bodyParam password_confirmation string required Konfirmasi password harus sama. Example: password123
+     * @bodyParam address string required Alamat lengkap user. Example: Jl. Mawar No. 10, RT 01/RW 01
+     * @bodyParam phone string Nomor telepon user. Example: 081234567890
+     *
+     * @response 201 {
+     *   "status": true,
+     *   "message": "User berhasil didaftarkan",
+     *   "data": {
+     *     "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "john@example.com",
+     *       "address": "Jl. Mawar No. 10",
+     *       "phone": "081234567890"
+     *     },
+     *     "token": "1|abc123def456..."
+     *   }
+     * }
+     *
+     * @response 422 {
+     *   "status": false,
+     *   "message": "Validation failed",
+     *   "data": {
+     *     "email": ["The email has already been taken."]
+     *   }
+     * }
      */
     public function register(Request $request)
     {
@@ -57,7 +98,35 @@ class AuthController extends Controller
     }
 
     /**
-     * Login user
+     * Login User
+     *
+     * Login dengan email dan password untuk mendapatkan authentication token.
+     * Token ini digunakan untuk mengakses endpoint yang memerlukan autentikasi.
+     *
+     * @unauthenticated
+     *
+     * @bodyParam email string required Email user yang terdaftar. Example: john@example.com
+     * @bodyParam password string required Password user. Example: password123
+     *
+     * @response 200 {
+     *   "status": true,
+     *   "message": "Login berhasil",
+     *   "data": {
+     *     "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "john@example.com",
+     *       "address": "Jl. Mawar No. 10",
+     *       "phone": "081234567890"
+     *     },
+     *     "token": "1|abc123def456..."
+     *   }
+     * }
+     *
+     * @response 401 {
+     *   "status": false,
+     *   "message": "Email atau password salah"
+     * }
      */
     public function login(Request $request)
     {

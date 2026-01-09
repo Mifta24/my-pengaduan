@@ -9,12 +9,24 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @group 🔔 Notifications (User)
+ *
+ * Endpoints untuk mengelola notifikasi user.
+ */
 class NotificationController extends Controller
 {
     use ApiResponse;
 
     /**
-     * Get user FCM notifications
+     * Get User Notifications
+     *
+     * Mendapatkan daftar notifikasi user dengan pagination.
+     *
+     * @authenticated
+     *
+     * @queryParam page integer Nomor halaman. Example: 1
+     * @queryParam per_page integer Item per halaman (default: 20). Example: 20
      */
     public function index(Request $request)
     {
