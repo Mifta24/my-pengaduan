@@ -44,7 +44,7 @@ class CategorySeeder extends Seeder
             ],
             [
                 'name' => 'Layanan Publik',
-                'description' => 'Laporan terkait pelayanan Lurah/RW dan administrasi',
+                'description' => 'Laporan terkait pelayanan RT dan administrasi',
                 'icon' => 'users',
                 'color' => 'orange',
                 'is_active' => true,

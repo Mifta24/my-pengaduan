@@ -34,44 +34,65 @@ class RolePermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Create roles
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $userRole = Role::firstOrCreate(['name' => 'user']);
+        // Create roles - RT sebagai admin, warga sebagai user
+        $rtRole = Role::firstOrCreate(['name' => 'admin']);
+        $wargaRole = Role::firstOrCreate(['name' => 'user']);
 
-        // Assign all permissions to admin
-        $adminRole->givePermissionTo(Permission::all());
+        // Assign all permissions to RT (admin)
+        $rtRole->givePermissionTo(Permission::all());
 
-        // Give limited permissions to user
-        $userRole->givePermissionTo([
+        // Give limited permissions to warga (user)
+        $wargaRole->givePermissionTo([
             'view-complaints',
             'create-complaints',
             'edit-complaints'
         ]);
 
-        // Create admin user
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@Lurah.com'],
+        // Create RT (admin) user
+        $rt = User::firstOrCreate(
+            ['email' => 'rt@rt.com'],
             [
-                'name' => 'Admin Lurah',
+                'name' => 'Ketua RT',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
-                'address' => 'Kantor Lurah 01/RW 01'
+                'address' => 'Kantor RT 01/RW 01'
             ]
         );
 
-        $admin->assignRole('admin');
+        $rt->assignRole('admin');
 
-        // Create test user
-        $user = User::firstOrCreate(
-            ['email' => 'warga@test.com'],
+        // Create warga (user) users
+        $warga1 = User::firstOrCreate(
+            ['email' => 'warga1@test.com'],
             [
-                'name' => 'Warga Test',
+                'name' => 'Budi Santoso',
                 'password' => Hash::make('password'),
                 'role' => 'user',
-                'address' => 'Jl. Test No. 123, Lurah 01/RW 01'
+                'address' => 'Jl. Mawar No. 15, RT 01/RW 01'
             ]
         );
+        $warga1->assignRole('user');
 
-        $user->assignRole('user');
+        $warga2 = User::firstOrCreate(
+            ['email' => 'warga2@test.com'],
+            [
+                'name' => 'Siti Nurhaliza',
+                'password' => Hash::make('password'),
+                'role' => 'user',
+                'address' => 'Jl. Melati No. 8, RT 01/RW 01'
+            ]
+        );
+        $warga2->assignRole('user');
+
+        $warga3 = User::firstOrCreate(
+            ['email' => 'warga3@test.com'],
+            [
+                'name' => 'Ahmad Fauzi',
+                'password' => Hash::make('password'),
+                'role' => 'user',
+                'address' => 'Jl. Kenanga No. 23, RT 01/RW 01'
+            ]
+        );
+        $warga3->assignRole('user');
     }
 }

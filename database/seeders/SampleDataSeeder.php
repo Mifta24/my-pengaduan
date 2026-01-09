@@ -17,8 +17,8 @@ class SampleDataSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::where('email', 'admin@Lurah.com')->first();
-        $user = User::where('email', 'warga@test.com')->first();
+        $admin = User::where('email', 'rt@rt.com')->first();
+        $user = User::where('email', 'warga1@test.com')->first();
 
         // Get categories
         $infrastruktur = Category::where('name', 'Infrastruktur')->first();
@@ -33,6 +33,7 @@ class SampleDataSeeder extends Seeder
                 'category_id' => $infrastruktur->id,
                 'location' => 'Jl. Mawar No. 15, Lurah 01/RW 01',
                 'status' => 'pending',
+                'priority' => 'high',
                 'report_date' => now()->subDays(3),
             ],
             [
@@ -41,8 +42,8 @@ class SampleDataSeeder extends Seeder
                 'description' => 'Tempat pembuangan sampah di ujung gang sudah penuh dan menumpuk. Bau tidak sedap mulai tercium.',
                 'category_id' => $kebersihan->id,
                 'location' => 'Gang Melati, Lurah 01/RW 01',
-                'status' => 'processing',
-                'response' => 'Laporan sudah diterima. Tim kebersihan akan datang besok pagi.',
+                'status' => 'in_progress',
+                'priority' => 'medium',
                 'report_date' => now()->subDays(1),
             ],
             [
@@ -51,8 +52,8 @@ class SampleDataSeeder extends Seeder
                 'description' => 'Jalan di depan Lurah rusak dan berlubang besar. Berbahaya untuk kendaraan yang lewat.',
                 'category_id' => $infrastruktur->id,
                 'location' => 'Jl. Kenanga, Lurah 01/RW 01',
-                'status' => 'completed',
-                'response' => 'Jalan sudah diperbaiki oleh tim infrastruktur. Terima kasih atas laporannya.',
+                'status' => 'resolved',
+                'priority' => 'high',
                 'report_date' => now()->subWeek(),
             ]
         ];
@@ -66,8 +67,8 @@ class SampleDataSeeder extends Seeder
             [
                 'title' => 'Gotong Royong Mingguan',
                 'slug' => 'gotong-royong-mingguan',
-                'summary' => 'Mengundang seluruh warga Lurah 01 untuk mengikuti gotong royong setiap hari Minggu pagi.',
-                'content' => 'Mengundang seluruh warga Lurah 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di balai Lurah kemudian melakukan kerja bakti bersama.',
+                'summary' => 'Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi.',
+                'content' => 'Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di pos RT kemudian melakukan kerja bakti bersama.',
                 'priority' => 'high',
                 'target_audience' => ['all'],
                 'is_active' => true,
@@ -78,10 +79,10 @@ class SampleDataSeeder extends Seeder
                 'author_id' => $admin->id,
             ],
             [
-                'title' => 'Rapat Lurah Bulanan',
-                'slug' => 'rapat-Lurah-bulanan',
-                'summary' => 'Rapat Lurah akan dilaksanakan pada hari Rabu, 15 Oktober 2025 pukul 19.30 WIB.',
-                'content' => 'Rapat Lurah akan dilaksanakan pada hari Rabu, 15 Oktober 2025 pukul 19.30 WIB di Balai Lurah. Agenda: pembahasan iuran Lurah dan program kerja bulan depan. Diharapkan seluruh warga dapat hadir tepat waktu.',
+                'title' => 'Rapat RT Bulanan',
+                'slug' => 'rapat-rt-bulanan',
+                'summary' => 'Rapat RT akan dilaksanakan pada hari Rabu, 15 Oktober 2025 pukul 19.30 WIB.',
+                'content' => 'Rapat RT akan dilaksanakan pada hari Rabu, 15 Oktober 2025 pukul 19.30 WIB di Pos RT. Agenda: pembahasan iuran RT dan program kerja bulan depan. Diharapkan seluruh warga dapat hadir tepat waktu.',
                 'priority' => 'medium',
                 'target_audience' => ['all'],
                 'is_active' => true,
@@ -108,8 +109,8 @@ class SampleDataSeeder extends Seeder
             [
                 'title' => 'Pengumuman Penting: Pemadaman Listrik',
                 'slug' => 'pengumuman-penting-pemadaman-listrik',
-                'summary' => 'PLN akan melakukan pemadaman listrik bergilir di wilayah Lurah 01.',
-                'content' => 'Berdasarkan informasi dari PLN, akan dilakukan pemadaman listrik bergilir di wilayah Lurah 01 pada hari Sabtu, 12 Oktober 2025 mulai pukul 08.00 - 16.00 WIB. Mohon maaf atas ketidaknyamanan ini. Harap persiapkan kebutuhan selama pemadaman.',
+                'summary' => 'PLN akan melakukan pemadaman listrik bergilir di wilayah RT 01.',
+                'content' => 'Berdasarkan informasi dari PLN, akan dilakukan pemadaman listrik bergilir di wilayah RT 01 pada hari Sabtu, 12 Oktober 2025 mulai pukul 08.00 - 16.00 WIB. Mohon maaf atas ketidaknyamanan ini. Harap persiapkan kebutuhan selama pemadaman.',
                 'priority' => 'urgent',
                 'target_audience' => ['all'],
                 'is_active' => true,
@@ -125,13 +126,23 @@ class SampleDataSeeder extends Seeder
             Announcement::create($announcementData);
         }
 
-        // Create sample responses
-        $complaint = Complaint::where('status', 'completed')->first();
-        if ($complaint) {
+        // Create sample responses for resolved complaints
+        $resolvedComplaint = Complaint::where('status', 'resolved')->first();
+        if ($resolvedComplaint) {
             Response::create([
-                'complaint_id' => $complaint->id,
+                'complaint_id' => $resolvedComplaint->id,
                 'user_id' => $admin->id,
                 'content' => 'Perbaikan jalan telah selesai dilakukan. Tim infrastruktur telah menambal lubang dan menghaluskan permukaan jalan.',
+            ]);
+        }
+
+        // Create response for in_progress complaint
+        $inProgressComplaint = Complaint::where('status', 'in_progress')->first();
+        if ($inProgressComplaint) {
+            Response::create([
+                'complaint_id' => $inProgressComplaint->id,
+                'user_id' => $admin->id,
+                'content' => 'Laporan sudah diterima. Tim kebersihan akan datang besok pagi untuk menangani masalah sampah.',
             ]);
         }
     }
