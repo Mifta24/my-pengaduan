@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Sistem Pengaduan Lurah/RW')</title>
+    <title>@yield('title', 'Sistem Pengaduan RT/RW')</title>
 
     <!-- Tailwind CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -171,7 +171,7 @@
                         <span class="ml-2 text-xl font-bold text-gray-900">SiPengRT</span>
                     </div>
                     <p class="mt-4 text-gray-600">
-                        Sistem Pengaduan Lurah/RW untuk memudahkan warga dalam menyampaikan keluhan dan aspirasi kepada pengurus Lurah/RW.
+                        Sistem Pengaduan RT/RW untuk memudahkan warga dalam menyampaikan keluhan dan aspirasi kepada pengurus RT/RW.
                     </p>
                 </div>
                 <div>
@@ -185,15 +185,15 @@
                 <div>
                     <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Kontak</h3>
                     <ul class="mt-4 space-y-2">
-                        <li class="text-gray-600">Lurah 005/RW 001</li>
+                        <li class="text-gray-600">RT 005/RW 001</li>
                         <li class="text-gray-600">Gang Annur 2</li>
                         <li class="text-gray-600">Phone: (021) 12345678</li>
-                        <li class="text-gray-600">Email: info@rt001rw002.id</li>
+                        <li class="text-gray-600">Email: info@anuur2rt005rw001.id</li>
                     </ul>
                 </div>
             </div>
             <div class="mt-8 border-t border-gray-200 pt-8">
-                <p class="text-center text-gray-400">&copy; {{ date('Y') }} Sistem Pengaduan Lurah/RW. All rights reserved.</p>
+                <p class="text-center text-gray-400">&copy; {{ date('Y') }} Sistem Pengaduan RT/RW. All rights reserved.</p>
             </div>
         </div>
     </footer>

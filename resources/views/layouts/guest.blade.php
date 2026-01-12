@@ -30,7 +30,7 @@
                         </div>
                         <div>
                             <h1 class="text-2xl font-bold text-white">MyPengaduan</h1>
-                            <p class="text-indigo-200 text-sm">Sistem Pengaduan Lurah/RW</p>
+                            <p class="text-indigo-200 text-sm">Sistem Pengaduan /RW</p>
                         </div>
                     </div>
 
