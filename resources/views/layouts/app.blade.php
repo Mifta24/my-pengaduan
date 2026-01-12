@@ -23,7 +23,7 @@
                             <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2-2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 3v18m3 0h4M9 7h3m-3 4h3m-3 4h3" />
                             </svg>
-                            <span class="ml-2 text-xl font-bold text-gray-900">SiPengRT</span>
+                            <span class="ml-2 text-xl font-bold text-gray-900">MyPengaduan</span>
                         </a>
                     </div>
                     <div class="hidden md:ml-6 md:flex md:space-x-8">
@@ -168,7 +168,7 @@
                         <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2-2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 3v18m3 0h4M9 7h3m-3 4h3m-3 4h3" />
                         </svg>
-                        <span class="ml-2 text-xl font-bold text-gray-900">SiPengRT</span>
+                        <span class="ml-2 text-xl font-bold text-gray-900">MyPengaduan</span>
                     </div>
                     <p class="mt-4 text-gray-600">
                         Sistem Pengaduan RT/RW untuk memudahkan warga dalam menyampaikan keluhan dan aspirasi kepada pengurus RT/RW.
