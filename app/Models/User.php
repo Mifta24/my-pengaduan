@@ -135,6 +135,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Bookmarked announcements
+     */
+    public function bookmarkedAnnouncements()
+    {
+        return $this->belongsToMany(Announcement::class, 'announcement_bookmarks')
+                    ->withTimestamps();
+    }
+
+    /**
      * Get all active device tokens for this user
      */
     public function getActiveDeviceTokens()

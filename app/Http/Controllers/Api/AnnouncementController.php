@@ -192,4 +192,125 @@ class AnnouncementController extends Controller
             return $this->serverError('Failed to add comment', $e);
         }
     }
+
+    /**
+     * Toggle bookmark for an announcement
+     */
+    public function toggleBookmark(Request $request, $id)
+    {
+        try {
+            $announcement = Announcement::findOrFail($id);
+
+            // Check if announcement is active and published
+            if (!$announcement->is_active || $announcement->published_at > now()) {
+                return $this->notFound('Announcement not found or not yet published');
+            }
+
+            $user = $request->user();
+
+            // Check if already bookmarked
+            if ($user->bookmarkedAnnouncements()->where('announcement_id', $id)->exists()) {
+                // Remove bookmark
+                $user->bookmarkedAnnouncements()->detach($id);
+                return $this->success([
+                    'is_bookmarked' => false,
+                    'message' => 'Bookmark removed successfully'
+                ], 'Bookmark removed successfully');
+            } else {
+                // Add bookmark
+                $user->bookmarkedAnnouncements()->attach($id);
+                return $this->success([
+                    'is_bookmarked' => true,
+                    'message' => 'Announcement bookmarked successfully'
+                ], 'Announcement bookmarked successfully');
+            }
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFound('Announcement not found');
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to toggle bookmark', $e);
+        }
+    }
+
+    /**
+     * Get user's bookmarked announcements
+     */
+    public function getBookmarkedAnnouncements(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            $bookmarkedAnnouncements = $user->bookmarkedAnnouncements()
+                ->where('is_active', true)
+                ->where('published_at', '<=', now())
+                ->orderBy('announcement_bookmarks.created_at', 'desc')
+                ->paginate($request->get('per_page', 10));
+
+            return $this->successWithPagination(
+                $bookmarkedAnnouncements,
+                'Bookmarked announcements loaded successfully'
+            );
+
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to load bookmarked announcements', $e);
+        }
+    }
+
+    /**
+     * Get comments for an announcement
+     */
+    public function getComments(Request $request, $id)
+    {
+        try {
+            $announcement = Announcement::findOrFail($id);
+
+            // Check if announcement is active and published
+            if (!$announcement->is_active || $announcement->published_at > now()) {
+                return $this->notFound('Announcement not found or not yet published');
+            }
+
+            $comments = $announcement->comments()
+                ->with('user:id,name,email')
+                ->paginate($request->get('per_page', 20));
+
+            return $this->successWithPagination($comments, 'Comments loaded successfully');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFound('Announcement not found');
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to load comments', $e);
+        }
+    }
+
+    /**
+     * Delete a comment
+     */
+    public function deleteComment(Request $request, $announcementId, $commentId)
+    {
+        try {
+            $announcement = Announcement::findOrFail($announcementId);
+            $comment = Comment::findOrFail($commentId);
+
+            // Check if comment belongs to the announcement
+            if ($comment->commentable_id != $announcementId || $comment->commentable_type != 'App\Models\Announcement') {
+                return $this->notFound('Comment not found for this announcement');
+            }
+
+            $user = $request->user();
+
+            // Only the comment owner or admin can delete
+            if ($comment->user_id != $user->id && !$user->hasRole('admin')) {
+                return $this->unauthorized('You are not authorized to delete this comment');
+            }
+
+            $comment->delete();
+
+            return $this->success(null, 'Comment deleted successfully');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFound('Announcement or comment not found');
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to delete comment', $e);
+        }
+    }
 }

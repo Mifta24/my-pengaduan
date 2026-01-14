@@ -83,8 +83,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{complaint}', [ComplaintController::class, 'destroy']);
     });
 
-    // Announcement comments
-    Route::post('/announcements/{announcement}/comments', [AnnouncementController::class, 'storeComment']);
+    // Announcement interactions
+    Route::prefix('announcements')->group(function () {
+        // Bookmarks
+        Route::post('/{announcement}/bookmark', [AnnouncementController::class, 'toggleBookmark']);
+        Route::get('/bookmarked', [AnnouncementController::class, 'getBookmarkedAnnouncements']);
+
+        // Comments
+        Route::post('/{announcement}/comments', [AnnouncementController::class, 'storeComment']);
+        Route::get('/{announcement}/comments', [AnnouncementController::class, 'getComments']);
+        Route::delete('/{announcement}/comments/{commentId}', [AnnouncementController::class, 'deleteComment']);
+    });
 
     // Device Token routes (for FCM)
     Route::prefix('device-tokens')->group(function () {

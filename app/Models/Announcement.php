@@ -100,6 +100,15 @@ class Announcement extends Model
     }
 
     /**
+     * Users who bookmarked this announcement
+     */
+    public function bookmarkedBy()
+    {
+        return $this->belongsToMany(User::class, 'announcement_bookmarks')
+                    ->withTimestamps();
+    }
+
+    /**
      * Get comments count
      */
     public function getCommentsCountAttribute()
