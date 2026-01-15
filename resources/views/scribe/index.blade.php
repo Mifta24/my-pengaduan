@@ -28,7 +28,7 @@
             </style>
 
     <script>
-        var tryItOutBaseUrl = "http://localhost";
+        var tryItOutBaseUrl = "http://localhost:8000";
         var useCsrf = Boolean();
         var csrfUrl = "/sanctum/csrf-cookie";
     </script>
@@ -330,8 +330,20 @@
                                                                                 <li class="tocify-item level-2" data-unique="announcements-public-GETapi-announcements--announcement_slug-">
                                 <a href="#announcements-public-GETapi-announcements--announcement_slug-">Display the specified announcement</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="announcements-public-POSTapi-announcements--announcement--bookmark">
+                                <a href="#announcements-public-POSTapi-announcements--announcement--bookmark">Toggle bookmark for an announcement</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="announcements-public-GETapi-announcements-bookmarked">
+                                <a href="#announcements-public-GETapi-announcements-bookmarked">Get user's bookmarked announcements</a>
+                            </li>
                                                                                 <li class="tocify-item level-2" data-unique="announcements-public-POSTapi-announcements--announcement--comments">
                                 <a href="#announcements-public-POSTapi-announcements--announcement--comments">Store a comment for an announcement</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="announcements-public-GETapi-announcements--announcement--comments">
+                                <a href="#announcements-public-GETapi-announcements--announcement--comments">Get comments for an announcement</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="announcements-public-DELETEapi-announcements--announcement--comments--commentId-">
+                                <a href="#announcements-public-DELETEapi-announcements--announcement--comments--commentId-">Delete a comment</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -382,7 +394,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: January 9, 2026</li>
+        <li>Last updated: January 15, 2026</li>
     </ul>
 </div>
 
@@ -392,7 +404,7 @@
         <h1 id="introduction">Introduction</h1>
 <p>REST API untuk sistem pengaduan masyarakat RT/RW. API ini memungkinkan warga untuk melaporkan keluhan, melihat pengumuman, dan berinteraksi dengan admin.</p>
 <aside>
-    <strong>Base URL</strong>: <code>http://localhost</code>
+    <strong>Base URL</strong>: <code>http://localhost:8000</code>
 </aside>
 <pre><code>## Selamat Datang di MyPengaduan API
 
@@ -440,7 +452,7 @@ Setelah registrasi berhasil, user akan mendapat token untuk autentikasi.</p>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/register" \
+    "http://localhost:8000/api/auth/register" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -456,7 +468,7 @@ Setelah registrasi berhasil, user akan mendapat token untuk autentikasi.</p>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/register"
+    "http://localhost:8000/api/auth/register"
 );
 
 const headers = {
@@ -482,7 +494,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/register';
+$url = 'http://localhost:8000/api/auth/register';
 $response = $client-&gt;post(
     $url,
     [
@@ -508,7 +520,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/register'
+url = 'http://localhost:8000/api/auth/register'
 payload = {
     "name": "John Doe",
     "email": "john@example.com",
@@ -724,7 +736,7 @@ Token ini digunakan untuk mengakses endpoint yang memerlukan autentikasi.</p>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/login" \
+    "http://localhost:8000/api/auth/login" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -736,7 +748,7 @@ Token ini digunakan untuk mengakses endpoint yang memerlukan autentikasi.</p>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/login"
+    "http://localhost:8000/api/auth/login"
 );
 
 const headers = {
@@ -758,7 +770,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/login';
+$url = 'http://localhost:8000/api/auth/login';
 $response = $client-&gt;post(
     $url,
     [
@@ -780,7 +792,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/login'
+url = 'http://localhost:8000/api/auth/login'
 payload = {
     "email": "john@example.com",
     "password": "password123"
@@ -939,7 +951,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/auth/profile" \
+    --get "http://localhost:8000/api/auth/profile" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -947,7 +959,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/profile"
+    "http://localhost:8000/api/auth/profile"
 );
 
 const headers = {
@@ -964,7 +976,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/profile';
+$url = 'http://localhost:8000/api/auth/profile';
 $response = $client-&gt;get(
     $url,
     [
@@ -983,7 +995,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/profile'
+url = 'http://localhost:8000/api/auth/profile'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -1005,7 +1017,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -1112,7 +1124,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/auth/profile" \
+    "http://localhost:8000/api/auth/profile" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1120,7 +1132,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/profile"
+    "http://localhost:8000/api/auth/profile"
 );
 
 const headers = {
@@ -1137,7 +1149,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/profile';
+$url = 'http://localhost:8000/api/auth/profile';
 $response = $client-&gt;put(
     $url,
     [
@@ -1156,7 +1168,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/profile'
+url = 'http://localhost:8000/api/auth/profile'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -1269,7 +1281,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/auth/change-password" \
+    "http://localhost:8000/api/auth/change-password" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1277,7 +1289,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/change-password"
+    "http://localhost:8000/api/auth/change-password"
 );
 
 const headers = {
@@ -1294,7 +1306,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/change-password';
+$url = 'http://localhost:8000/api/auth/change-password';
 $response = $client-&gt;put(
     $url,
     [
@@ -1313,7 +1325,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/change-password'
+url = 'http://localhost:8000/api/auth/change-password'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -1426,7 +1438,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/logout" \
+    "http://localhost:8000/api/auth/logout" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1434,7 +1446,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/logout"
+    "http://localhost:8000/api/auth/logout"
 );
 
 const headers = {
@@ -1451,7 +1463,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/logout';
+$url = 'http://localhost:8000/api/auth/logout';
 $response = $client-&gt;post(
     $url,
     [
@@ -1470,7 +1482,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/logout'
+url = 'http://localhost:8000/api/auth/logout'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -1583,7 +1595,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/auth/logout-all" \
+    "http://localhost:8000/api/auth/logout-all" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1591,7 +1603,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/auth/logout-all"
+    "http://localhost:8000/api/auth/logout-all"
 );
 
 const headers = {
@@ -1608,7 +1620,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/auth/logout-all';
+$url = 'http://localhost:8000/api/auth/logout-all';
 $response = $client-&gt;post(
     $url,
     [
@@ -1627,7 +1639,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/auth/logout-all'
+url = 'http://localhost:8000/api/auth/logout-all'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -1744,7 +1756,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/dashboard" \
+    --get "http://localhost:8000/api/dashboard" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1752,7 +1764,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/dashboard"
+    "http://localhost:8000/api/dashboard"
 );
 
 const headers = {
@@ -1769,7 +1781,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/dashboard';
+$url = 'http://localhost:8000/api/dashboard';
 $response = $client-&gt;get(
     $url,
     [
@@ -1788,7 +1800,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/dashboard'
+url = 'http://localhost:8000/api/dashboard'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -1810,7 +1822,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -1917,7 +1929,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/complaints" \
+    --get "http://localhost:8000/api/complaints" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -1925,7 +1937,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/complaints"
+    "http://localhost:8000/api/complaints"
 );
 
 const headers = {
@@ -1942,7 +1954,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/complaints';
+$url = 'http://localhost:8000/api/complaints';
 $response = $client-&gt;get(
     $url,
     [
@@ -1961,7 +1973,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/complaints'
+url = 'http://localhost:8000/api/complaints'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -1983,7 +1995,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -2091,7 +2103,7 @@ Foto akan otomatis dikompress untuk menghemat storage.</p>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/complaints" \
+    "http://localhost:8000/api/complaints" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
@@ -2101,13 +2113,13 @@ Foto akan otomatis dikompress untuk menghemat storage.</p>
     --form "location=Jl. Mawar No. 15, RT 01/RW 01"\
     --form "priority=high"\
     --form "report_date=2025-01-09"\
-    --form "photo=@C:\Users\62838\AppData\Local\Temp\php7DF5.tmp" \
-    --form "attachments[]=@C:\Users\62838\AppData\Local\Temp\php7E06.tmp" </code></pre></div>
+    --form "photo=@C:\Users\62838\AppData\Local\Temp\php7F4D.tmp" \
+    --form "attachments[]=@C:\Users\62838\AppData\Local\Temp\php7F5E.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/complaints"
+    "http://localhost:8000/api/complaints"
 );
 
 const headers = {
@@ -2135,7 +2147,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/complaints';
+$url = 'http://localhost:8000/api/complaints';
 $response = $client-&gt;post(
     $url,
     [
@@ -2171,11 +2183,11 @@ $response = $client-&gt;post(
             ],
             [
                 'name' =&gt; 'photo',
-                'contents' =&gt; fopen('C:\Users\62838\AppData\Local\Temp\php7DF5.tmp', 'r')
+                'contents' =&gt; fopen('C:\Users\62838\AppData\Local\Temp\php7F4D.tmp', 'r')
             ],
             [
                 'name' =&gt; 'attachments[]',
-                'contents' =&gt; fopen('C:\Users\62838\AppData\Local\Temp\php7E06.tmp', 'r')
+                'contents' =&gt; fopen('C:\Users\62838\AppData\Local\Temp\php7F5E.tmp', 'r')
             ],
         ],
     ]
@@ -2188,7 +2200,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/complaints'
+url = 'http://localhost:8000/api/complaints'
 files = {
   'title': (None, 'Lampu Jalan Rusak'),
   'description': (None, 'Lampu jalan di depan rumah no. 15 sudah mati sejak 3 hari lalu'),
@@ -2196,8 +2208,8 @@ files = {
   'location': (None, 'Jl. Mawar No. 15, RT 01/RW 01'),
   'priority': (None, 'high'),
   'report_date': (None, '2025-01-09'),
-  'photo': open('C:\Users\62838\AppData\Local\Temp\php7DF5.tmp', 'rb'),
-  'attachments[]': open('C:\Users\62838\AppData\Local\Temp\php7E06.tmp', 'rb')}
+  'photo': open('C:\Users\62838\AppData\Local\Temp\php7F4D.tmp', 'rb'),
+  'attachments[]': open('C:\Users\62838\AppData\Local\Temp\php7F5E.tmp', 'rb')}
 payload = {
     "title": "Lampu Jalan Rusak",
     "description": "Lampu jalan di depan rumah no. 15 sudah mati sejak 3 hari lalu",
@@ -2419,7 +2431,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Foto pengaduan (jpeg,png,jpg,webp, max: 5MB). Example: <code>C:\Users\62838\AppData\Local\Temp\php7DF5.tmp</code></p>
+<p>Foto pengaduan (jpeg,png,jpg,webp, max: 5MB). Example: <code>C:\Users\62838\AppData\Local\Temp\php7F4D.tmp</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>attachments</code></b>&nbsp;&nbsp;
@@ -2451,7 +2463,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/complaints/statistics" \
+    --get "http://localhost:8000/api/complaints/statistics" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2459,7 +2471,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/complaints/statistics"
+    "http://localhost:8000/api/complaints/statistics"
 );
 
 const headers = {
@@ -2476,7 +2488,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/complaints/statistics';
+$url = 'http://localhost:8000/api/complaints/statistics';
 $response = $client-&gt;get(
     $url,
     [
@@ -2495,7 +2507,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/complaints/statistics'
+url = 'http://localhost:8000/api/complaints/statistics'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -2517,7 +2529,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -2624,7 +2636,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/complaints/categories" \
+    --get "http://localhost:8000/api/complaints/categories" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2632,7 +2644,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/complaints/categories"
+    "http://localhost:8000/api/complaints/categories"
 );
 
 const headers = {
@@ -2649,7 +2661,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/complaints/categories';
+$url = 'http://localhost:8000/api/complaints/categories';
 $response = $client-&gt;get(
     $url,
     [
@@ -2668,7 +2680,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/complaints/categories'
+url = 'http://localhost:8000/api/complaints/categories'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -2690,7 +2702,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -2797,7 +2809,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/complaints/1" \
+    --get "http://localhost:8000/api/complaints/1" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2805,7 +2817,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/complaints/1"
+    "http://localhost:8000/api/complaints/1"
 );
 
 const headers = {
@@ -2822,7 +2834,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/complaints/1';
+$url = 'http://localhost:8000/api/complaints/1';
 $response = $client-&gt;get(
     $url,
     [
@@ -2841,7 +2853,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/complaints/1'
+url = 'http://localhost:8000/api/complaints/1'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -2863,7 +2875,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -2983,7 +2995,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/complaints/1/track" \
+    --get "http://localhost:8000/api/complaints/1/track" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -2991,7 +3003,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/complaints/1/track"
+    "http://localhost:8000/api/complaints/1/track"
 );
 
 const headers = {
@@ -3008,7 +3020,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/complaints/1/track';
+$url = 'http://localhost:8000/api/complaints/1/track';
 $response = $client-&gt;get(
     $url,
     [
@@ -3027,7 +3039,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/complaints/1/track'
+url = 'http://localhost:8000/api/complaints/1/track'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -3049,7 +3061,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -3169,7 +3181,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/complaints/1" \
+    "http://localhost:8000/api/complaints/1" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -3177,7 +3189,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/complaints/1"
+    "http://localhost:8000/api/complaints/1"
 );
 
 const headers = {
@@ -3194,7 +3206,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/complaints/1';
+$url = 'http://localhost:8000/api/complaints/1';
 $response = $client-&gt;put(
     $url,
     [
@@ -3213,7 +3225,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/complaints/1'
+url = 'http://localhost:8000/api/complaints/1'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -3339,7 +3351,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/complaints/1" \
+    "http://localhost:8000/api/complaints/1" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -3347,7 +3359,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/complaints/1"
+    "http://localhost:8000/api/complaints/1"
 );
 
 const headers = {
@@ -3364,7 +3376,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/complaints/1';
+$url = 'http://localhost:8000/api/complaints/1';
 $response = $client-&gt;delete(
     $url,
     [
@@ -3383,7 +3395,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/complaints/1'
+url = 'http://localhost:8000/api/complaints/1'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -3513,7 +3525,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/user" \
+    --get "http://localhost:8000/api/user" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -3521,7 +3533,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/user"
+    "http://localhost:8000/api/user"
 );
 
 const headers = {
@@ -3538,7 +3550,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/user';
+$url = 'http://localhost:8000/api/user';
 $response = $client-&gt;get(
     $url,
     [
@@ -3557,7 +3569,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/user'
+url = 'http://localhost:8000/api/user'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -3579,7 +3591,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -3690,7 +3702,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/announcements?search=gotong&amp;priority=urgent&amp;is_active=1&amp;page=1" \
+    --get "http://localhost:8000/api/admin/announcements?search=gotong&amp;priority=urgent&amp;is_active=1&amp;page=1" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -3698,7 +3710,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/announcements"
+    "http://localhost:8000/api/admin/announcements"
 );
 
 const params = {
@@ -3724,7 +3736,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/announcements';
+$url = 'http://localhost:8000/api/admin/announcements';
 $response = $client-&gt;get(
     $url,
     [
@@ -3749,7 +3761,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/announcements'
+url = 'http://localhost:8000/api/admin/announcements'
 params = {
   'search': 'gotong',
   'priority': 'urgent',
@@ -3777,7 +3789,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -3943,7 +3955,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/announcements/gotong-royong-mingguan" \
+    --get "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -3951,7 +3963,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan"
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan"
 );
 
 const headers = {
@@ -3968,7 +3980,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan';
+$url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan';
 $response = $client-&gt;get(
     $url,
     [
@@ -3987,7 +3999,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan'
+url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -4009,7 +4021,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -4129,7 +4141,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/announcements" \
+    "http://localhost:8000/api/admin/announcements" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4137,7 +4149,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/announcements"
+    "http://localhost:8000/api/admin/announcements"
 );
 
 const headers = {
@@ -4154,7 +4166,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/announcements';
+$url = 'http://localhost:8000/api/admin/announcements';
 $response = $client-&gt;post(
     $url,
     [
@@ -4173,7 +4185,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/announcements'
+url = 'http://localhost:8000/api/admin/announcements'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -4286,7 +4298,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan" \
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4294,7 +4306,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan"
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan"
 );
 
 const headers = {
@@ -4311,7 +4323,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan';
+$url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan';
 $response = $client-&gt;put(
     $url,
     [
@@ -4330,7 +4342,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan'
+url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -4456,7 +4468,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan" \
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4464,7 +4476,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan"
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan"
 );
 
 const headers = {
@@ -4481,7 +4493,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan';
+$url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan';
 $response = $client-&gt;delete(
     $url,
     [
@@ -4500,7 +4512,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan'
+url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -4626,7 +4638,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan/toggle-status" \
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/toggle-status" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4634,7 +4646,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan/toggle-status"
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/toggle-status"
 );
 
 const headers = {
@@ -4651,7 +4663,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan/toggle-status';
+$url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/toggle-status';
 $response = $client-&gt;patch(
     $url,
     [
@@ -4670,7 +4682,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan/toggle-status'
+url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/toggle-status'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -4796,7 +4808,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan/toggle-sticky" \
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/toggle-sticky" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4804,7 +4816,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan/toggle-sticky"
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/toggle-sticky"
 );
 
 const headers = {
@@ -4821,7 +4833,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan/toggle-sticky';
+$url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/toggle-sticky';
 $response = $client-&gt;patch(
     $url,
     [
@@ -4840,7 +4852,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan/toggle-sticky'
+url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/toggle-sticky'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -4966,7 +4978,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan/publish" \
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/publish" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -4974,7 +4986,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan/publish"
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/publish"
 );
 
 const headers = {
@@ -4991,7 +5003,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan/publish';
+$url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/publish';
 $response = $client-&gt;post(
     $url,
     [
@@ -5010,7 +5022,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan/publish'
+url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/publish'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -5136,7 +5148,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan/unpublish" \
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/unpublish" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5144,7 +5156,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/announcements/gotong-royong-mingguan/unpublish"
+    "http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/unpublish"
 );
 
 const headers = {
@@ -5161,7 +5173,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan/unpublish';
+$url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/unpublish';
 $response = $client-&gt;post(
     $url,
     [
@@ -5180,7 +5192,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/announcements/gotong-royong-mingguan/unpublish'
+url = 'http://localhost:8000/api/admin/announcements/gotong-royong-mingguan/unpublish'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -5310,7 +5322,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/categories?search=infrastruktur&amp;is_active=1" \
+    --get "http://localhost:8000/api/admin/categories?search=infrastruktur&amp;is_active=1" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5318,7 +5330,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/categories"
+    "http://localhost:8000/api/admin/categories"
 );
 
 const params = {
@@ -5342,7 +5354,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/categories';
+$url = 'http://localhost:8000/api/admin/categories';
 $response = $client-&gt;get(
     $url,
     [
@@ -5365,7 +5377,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/categories'
+url = 'http://localhost:8000/api/admin/categories'
 params = {
   'search': 'infrastruktur',
   'is_active': '1',
@@ -5391,7 +5403,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -5533,7 +5545,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/categories/active" \
+    --get "http://localhost:8000/api/admin/categories/active" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5541,7 +5553,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/categories/active"
+    "http://localhost:8000/api/admin/categories/active"
 );
 
 const headers = {
@@ -5558,7 +5570,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/categories/active';
+$url = 'http://localhost:8000/api/admin/categories/active';
 $response = $client-&gt;get(
     $url,
     [
@@ -5577,7 +5589,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/categories/active'
+url = 'http://localhost:8000/api/admin/categories/active'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -5599,7 +5611,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -5706,7 +5718,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/categories/architecto" \
+    --get "http://localhost:8000/api/admin/categories/architecto" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5714,7 +5726,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/categories/architecto"
+    "http://localhost:8000/api/admin/categories/architecto"
 );
 
 const headers = {
@@ -5731,7 +5743,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/categories/architecto';
+$url = 'http://localhost:8000/api/admin/categories/architecto';
 $response = $client-&gt;get(
     $url,
     [
@@ -5750,7 +5762,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/categories/architecto'
+url = 'http://localhost:8000/api/admin/categories/architecto'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -5772,7 +5784,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -5892,7 +5904,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/categories" \
+    "http://localhost:8000/api/admin/categories" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5900,7 +5912,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/categories"
+    "http://localhost:8000/api/admin/categories"
 );
 
 const headers = {
@@ -5917,7 +5929,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/categories';
+$url = 'http://localhost:8000/api/admin/categories';
 $response = $client-&gt;post(
     $url,
     [
@@ -5936,7 +5948,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/categories'
+url = 'http://localhost:8000/api/admin/categories'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -6049,7 +6061,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/admin/categories/architecto" \
+    "http://localhost:8000/api/admin/categories/architecto" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -6057,7 +6069,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/categories/architecto"
+    "http://localhost:8000/api/admin/categories/architecto"
 );
 
 const headers = {
@@ -6074,7 +6086,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/categories/architecto';
+$url = 'http://localhost:8000/api/admin/categories/architecto';
 $response = $client-&gt;put(
     $url,
     [
@@ -6093,7 +6105,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/categories/architecto'
+url = 'http://localhost:8000/api/admin/categories/architecto'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -6219,7 +6231,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/admin/categories/architecto" \
+    "http://localhost:8000/api/admin/categories/architecto" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -6227,7 +6239,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/categories/architecto"
+    "http://localhost:8000/api/admin/categories/architecto"
 );
 
 const headers = {
@@ -6244,7 +6256,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/categories/architecto';
+$url = 'http://localhost:8000/api/admin/categories/architecto';
 $response = $client-&gt;delete(
     $url,
     [
@@ -6263,7 +6275,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/categories/architecto'
+url = 'http://localhost:8000/api/admin/categories/architecto'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -6389,7 +6401,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "http://localhost/api/admin/categories/architecto/toggle-status" \
+    "http://localhost:8000/api/admin/categories/architecto/toggle-status" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -6397,7 +6409,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/categories/architecto/toggle-status"
+    "http://localhost:8000/api/admin/categories/architecto/toggle-status"
 );
 
 const headers = {
@@ -6414,7 +6426,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/categories/architecto/toggle-status';
+$url = 'http://localhost:8000/api/admin/categories/architecto/toggle-status';
 $response = $client-&gt;patch(
     $url,
     [
@@ -6433,7 +6445,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/categories/architecto/toggle-status'
+url = 'http://localhost:8000/api/admin/categories/architecto/toggle-status'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -6559,7 +6571,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/categories/bulk-action" \
+    "http://localhost:8000/api/admin/categories/bulk-action" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -6567,7 +6579,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/categories/bulk-action"
+    "http://localhost:8000/api/admin/categories/bulk-action"
 );
 
 const headers = {
@@ -6584,7 +6596,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/categories/bulk-action';
+$url = 'http://localhost:8000/api/admin/categories/bulk-action';
 $response = $client-&gt;post(
     $url,
     [
@@ -6603,7 +6615,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/categories/bulk-action'
+url = 'http://localhost:8000/api/admin/categories/bulk-action'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -6720,7 +6732,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/complaints?status=pending&amp;priority=high&amp;category_id=1&amp;user_id=5&amp;search=lampu&amp;page=1" \
+    --get "http://localhost:8000/api/admin/complaints?status=pending&amp;priority=high&amp;category_id=1&amp;user_id=5&amp;search=lampu&amp;page=1" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -6728,7 +6740,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints"
+    "http://localhost:8000/api/admin/complaints"
 );
 
 const params = {
@@ -6756,7 +6768,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints';
+$url = 'http://localhost:8000/api/admin/complaints';
 $response = $client-&gt;get(
     $url,
     [
@@ -6783,7 +6795,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints'
+url = 'http://localhost:8000/api/admin/complaints'
 params = {
   'status': 'pending',
   'priority': 'high',
@@ -6813,7 +6825,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -6993,7 +7005,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/complaints" \
+    "http://localhost:8000/api/admin/complaints" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7001,7 +7013,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints"
+    "http://localhost:8000/api/admin/complaints"
 );
 
 const headers = {
@@ -7018,7 +7030,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints';
+$url = 'http://localhost:8000/api/admin/complaints';
 $response = $client-&gt;post(
     $url,
     [
@@ -7037,7 +7049,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints'
+url = 'http://localhost:8000/api/admin/complaints'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -7150,7 +7162,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/complaints/statistics" \
+    --get "http://localhost:8000/api/admin/complaints/statistics" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7158,7 +7170,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints/statistics"
+    "http://localhost:8000/api/admin/complaints/statistics"
 );
 
 const headers = {
@@ -7175,7 +7187,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints/statistics';
+$url = 'http://localhost:8000/api/admin/complaints/statistics';
 $response = $client-&gt;get(
     $url,
     [
@@ -7194,7 +7206,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints/statistics'
+url = 'http://localhost:8000/api/admin/complaints/statistics'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -7216,7 +7228,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -7323,7 +7335,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/complaints/1" \
+    --get "http://localhost:8000/api/admin/complaints/1" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7331,7 +7343,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints/1"
+    "http://localhost:8000/api/admin/complaints/1"
 );
 
 const headers = {
@@ -7348,7 +7360,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints/1';
+$url = 'http://localhost:8000/api/admin/complaints/1';
 $response = $client-&gt;get(
     $url,
     [
@@ -7367,7 +7379,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints/1'
+url = 'http://localhost:8000/api/admin/complaints/1'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -7389,7 +7401,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -7509,7 +7521,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/admin/complaints/1" \
+    "http://localhost:8000/api/admin/complaints/1" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7517,7 +7529,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints/1"
+    "http://localhost:8000/api/admin/complaints/1"
 );
 
 const headers = {
@@ -7534,7 +7546,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints/1';
+$url = 'http://localhost:8000/api/admin/complaints/1';
 $response = $client-&gt;put(
     $url,
     [
@@ -7553,7 +7565,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints/1'
+url = 'http://localhost:8000/api/admin/complaints/1'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -7679,7 +7691,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/admin/complaints/1" \
+    "http://localhost:8000/api/admin/complaints/1" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7687,7 +7699,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints/1"
+    "http://localhost:8000/api/admin/complaints/1"
 );
 
 const headers = {
@@ -7704,7 +7716,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints/1';
+$url = 'http://localhost:8000/api/admin/complaints/1';
 $response = $client-&gt;delete(
     $url,
     [
@@ -7723,7 +7735,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints/1'
+url = 'http://localhost:8000/api/admin/complaints/1'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -7849,7 +7861,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "http://localhost/api/admin/complaints/1/status" \
+    "http://localhost:8000/api/admin/complaints/1/status" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -7857,7 +7869,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints/1/status"
+    "http://localhost:8000/api/admin/complaints/1/status"
 );
 
 const headers = {
@@ -7874,7 +7886,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints/1/status';
+$url = 'http://localhost:8000/api/admin/complaints/1/status';
 $response = $client-&gt;patch(
     $url,
     [
@@ -7893,7 +7905,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints/1/status'
+url = 'http://localhost:8000/api/admin/complaints/1/status'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -8019,7 +8031,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/complaints/1/resolve" \
+    "http://localhost:8000/api/admin/complaints/1/resolve" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -8027,7 +8039,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints/1/resolve"
+    "http://localhost:8000/api/admin/complaints/1/resolve"
 );
 
 const headers = {
@@ -8044,7 +8056,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints/1/resolve';
+$url = 'http://localhost:8000/api/admin/complaints/1/resolve';
 $response = $client-&gt;post(
     $url,
     [
@@ -8063,7 +8075,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints/1/resolve'
+url = 'http://localhost:8000/api/admin/complaints/1/resolve'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -8189,7 +8201,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/complaints/1/response" \
+    "http://localhost:8000/api/admin/complaints/1/response" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -8197,7 +8209,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints/1/response"
+    "http://localhost:8000/api/admin/complaints/1/response"
 );
 
 const headers = {
@@ -8214,7 +8226,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints/1/response';
+$url = 'http://localhost:8000/api/admin/complaints/1/response';
 $response = $client-&gt;post(
     $url,
     [
@@ -8233,7 +8245,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints/1/response'
+url = 'http://localhost:8000/api/admin/complaints/1/response'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -8359,7 +8371,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/admin/complaints/attachments/architecto" \
+    "http://localhost:8000/api/admin/complaints/attachments/architecto" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -8367,7 +8379,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints/attachments/architecto"
+    "http://localhost:8000/api/admin/complaints/attachments/architecto"
 );
 
 const headers = {
@@ -8384,7 +8396,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints/attachments/architecto';
+$url = 'http://localhost:8000/api/admin/complaints/attachments/architecto';
 $response = $client-&gt;delete(
     $url,
     [
@@ -8403,7 +8415,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints/attachments/architecto'
+url = 'http://localhost:8000/api/admin/complaints/attachments/architecto'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -8529,7 +8541,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/complaints/bulk-update" \
+    "http://localhost:8000/api/admin/complaints/bulk-update" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -8537,7 +8549,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/complaints/bulk-update"
+    "http://localhost:8000/api/admin/complaints/bulk-update"
 );
 
 const headers = {
@@ -8554,7 +8566,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/complaints/bulk-update';
+$url = 'http://localhost:8000/api/admin/complaints/bulk-update';
 $response = $client-&gt;post(
     $url,
     [
@@ -8573,7 +8585,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/complaints/bulk-update'
+url = 'http://localhost:8000/api/admin/complaints/bulk-update'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -8690,7 +8702,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/dashboard" \
+    --get "http://localhost:8000/api/admin/dashboard" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -8698,7 +8710,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/dashboard"
+    "http://localhost:8000/api/admin/dashboard"
 );
 
 const headers = {
@@ -8715,7 +8727,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/dashboard';
+$url = 'http://localhost:8000/api/admin/dashboard';
 $response = $client-&gt;get(
     $url,
     [
@@ -8734,7 +8746,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/dashboard'
+url = 'http://localhost:8000/api/admin/dashboard'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -8756,7 +8768,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -8863,7 +8875,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/dashboard/quick-stats" \
+    --get "http://localhost:8000/api/admin/dashboard/quick-stats" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -8871,7 +8883,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/dashboard/quick-stats"
+    "http://localhost:8000/api/admin/dashboard/quick-stats"
 );
 
 const headers = {
@@ -8888,7 +8900,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/dashboard/quick-stats';
+$url = 'http://localhost:8000/api/admin/dashboard/quick-stats';
 $response = $client-&gt;get(
     $url,
     [
@@ -8907,7 +8919,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/dashboard/quick-stats'
+url = 'http://localhost:8000/api/admin/dashboard/quick-stats'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -8929,7 +8941,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -9040,7 +9052,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/reports/overview" \
+    --get "http://localhost:8000/api/admin/reports/overview" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -9048,7 +9060,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/reports/overview"
+    "http://localhost:8000/api/admin/reports/overview"
 );
 
 const headers = {
@@ -9065,7 +9077,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/reports/overview';
+$url = 'http://localhost:8000/api/admin/reports/overview';
 $response = $client-&gt;get(
     $url,
     [
@@ -9084,7 +9096,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/reports/overview'
+url = 'http://localhost:8000/api/admin/reports/overview'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -9106,7 +9118,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -9213,7 +9225,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/reports/complaints" \
+    --get "http://localhost:8000/api/admin/reports/complaints" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -9221,7 +9233,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/reports/complaints"
+    "http://localhost:8000/api/admin/reports/complaints"
 );
 
 const headers = {
@@ -9238,7 +9250,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/reports/complaints';
+$url = 'http://localhost:8000/api/admin/reports/complaints';
 $response = $client-&gt;get(
     $url,
     [
@@ -9257,7 +9269,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/reports/complaints'
+url = 'http://localhost:8000/api/admin/reports/complaints'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -9279,7 +9291,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -9386,7 +9398,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/reports/users" \
+    --get "http://localhost:8000/api/admin/reports/users" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -9394,7 +9406,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/reports/users"
+    "http://localhost:8000/api/admin/reports/users"
 );
 
 const headers = {
@@ -9411,7 +9423,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/reports/users';
+$url = 'http://localhost:8000/api/admin/reports/users';
 $response = $client-&gt;get(
     $url,
     [
@@ -9430,7 +9442,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/reports/users'
+url = 'http://localhost:8000/api/admin/reports/users'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -9452,7 +9464,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -9559,7 +9571,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/reports/export" \
+    "http://localhost:8000/api/admin/reports/export" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -9567,7 +9579,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/reports/export"
+    "http://localhost:8000/api/admin/reports/export"
 );
 
 const headers = {
@@ -9584,7 +9596,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/reports/export';
+$url = 'http://localhost:8000/api/admin/reports/export';
 $response = $client-&gt;post(
     $url,
     [
@@ -9603,7 +9615,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/reports/export'
+url = 'http://localhost:8000/api/admin/reports/export'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -9720,7 +9732,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/users?search=john&amp;role=user&amp;is_verified=1&amp;page=1" \
+    --get "http://localhost:8000/api/admin/users?search=john&amp;role=user&amp;is_verified=1&amp;page=1" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -9728,7 +9740,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/users"
+    "http://localhost:8000/api/admin/users"
 );
 
 const params = {
@@ -9754,7 +9766,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/users';
+$url = 'http://localhost:8000/api/admin/users';
 $response = $client-&gt;get(
     $url,
     [
@@ -9779,7 +9791,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/users'
+url = 'http://localhost:8000/api/admin/users'
 params = {
   'search': 'john',
   'role': 'user',
@@ -9807,7 +9819,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -9973,7 +9985,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/admin/users/architecto" \
+    --get "http://localhost:8000/api/admin/users/architecto" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -9981,7 +9993,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/users/architecto"
+    "http://localhost:8000/api/admin/users/architecto"
 );
 
 const headers = {
@@ -9998,7 +10010,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/users/architecto';
+$url = 'http://localhost:8000/api/admin/users/architecto';
 $response = $client-&gt;get(
     $url,
     [
@@ -10017,7 +10029,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/users/architecto'
+url = 'http://localhost:8000/api/admin/users/architecto'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -10039,7 +10051,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -10159,7 +10171,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/admin/users" \
+    "http://localhost:8000/api/admin/users" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -10167,7 +10179,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/users"
+    "http://localhost:8000/api/admin/users"
 );
 
 const headers = {
@@ -10184,7 +10196,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/users';
+$url = 'http://localhost:8000/api/admin/users';
 $response = $client-&gt;post(
     $url,
     [
@@ -10203,7 +10215,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/users'
+url = 'http://localhost:8000/api/admin/users'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -10316,7 +10328,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/admin/users/architecto" \
+    "http://localhost:8000/api/admin/users/architecto" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -10324,7 +10336,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/users/architecto"
+    "http://localhost:8000/api/admin/users/architecto"
 );
 
 const headers = {
@@ -10341,7 +10353,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/users/architecto';
+$url = 'http://localhost:8000/api/admin/users/architecto';
 $response = $client-&gt;put(
     $url,
     [
@@ -10360,7 +10372,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/users/architecto'
+url = 'http://localhost:8000/api/admin/users/architecto'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -10486,7 +10498,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/admin/users/architecto" \
+    "http://localhost:8000/api/admin/users/architecto" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -10494,7 +10506,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/users/architecto"
+    "http://localhost:8000/api/admin/users/architecto"
 );
 
 const headers = {
@@ -10511,7 +10523,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/users/architecto';
+$url = 'http://localhost:8000/api/admin/users/architecto';
 $response = $client-&gt;delete(
     $url,
     [
@@ -10530,7 +10542,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/users/architecto'
+url = 'http://localhost:8000/api/admin/users/architecto'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -10656,7 +10668,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "http://localhost/api/admin/users/architecto/verify-email" \
+    "http://localhost:8000/api/admin/users/architecto/verify-email" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -10664,7 +10676,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/users/architecto/verify-email"
+    "http://localhost:8000/api/admin/users/architecto/verify-email"
 );
 
 const headers = {
@@ -10681,7 +10693,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/users/architecto/verify-email';
+$url = 'http://localhost:8000/api/admin/users/architecto/verify-email';
 $response = $client-&gt;patch(
     $url,
     [
@@ -10700,7 +10712,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/users/architecto/verify-email'
+url = 'http://localhost:8000/api/admin/users/architecto/verify-email'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -10826,7 +10838,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "http://localhost/api/admin/users/architecto/verify-user" \
+    "http://localhost:8000/api/admin/users/architecto/verify-user" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -10834,7 +10846,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/users/architecto/verify-user"
+    "http://localhost:8000/api/admin/users/architecto/verify-user"
 );
 
 const headers = {
@@ -10851,7 +10863,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/users/architecto/verify-user';
+$url = 'http://localhost:8000/api/admin/users/architecto/verify-user';
 $response = $client-&gt;patch(
     $url,
     [
@@ -10870,7 +10882,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/users/architecto/verify-user'
+url = 'http://localhost:8000/api/admin/users/architecto/verify-user'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -10996,7 +11008,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "http://localhost/api/admin/users/architecto/change-role" \
+    "http://localhost:8000/api/admin/users/architecto/change-role" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -11004,7 +11016,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/users/architecto/change-role"
+    "http://localhost:8000/api/admin/users/architecto/change-role"
 );
 
 const headers = {
@@ -11021,7 +11033,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/users/architecto/change-role';
+$url = 'http://localhost:8000/api/admin/users/architecto/change-role';
 $response = $client-&gt;patch(
     $url,
     [
@@ -11040,7 +11052,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/users/architecto/change-role'
+url = 'http://localhost:8000/api/admin/users/architecto/change-role'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -11166,7 +11178,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "http://localhost/api/admin/users/architecto/reset-password" \
+    "http://localhost:8000/api/admin/users/architecto/reset-password" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -11174,7 +11186,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/admin/users/architecto/reset-password"
+    "http://localhost:8000/api/admin/users/architecto/reset-password"
 );
 
 const headers = {
@@ -11191,7 +11203,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/admin/users/architecto/reset-password';
+$url = 'http://localhost:8000/api/admin/users/architecto/reset-password';
 $response = $client-&gt;patch(
     $url,
     [
@@ -11210,7 +11222,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/admin/users/architecto/reset-password'
+url = 'http://localhost:8000/api/admin/users/architecto/reset-password'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -11340,14 +11352,14 @@ Support pagination dan filtering.</p>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/announcements?page=1&amp;per_page=10&amp;priority=high" \
+    --get "http://localhost:8000/api/announcements?page=1&amp;per_page=10&amp;priority=high" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/announcements"
+    "http://localhost:8000/api/announcements"
 );
 
 const params = {
@@ -11371,7 +11383,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/announcements';
+$url = 'http://localhost:8000/api/announcements';
 $response = $client-&gt;get(
     $url,
     [
@@ -11394,7 +11406,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/announcements'
+url = 'http://localhost:8000/api/announcements'
 params = {
   'page': '1',
   'per_page': '10',
@@ -11420,7 +11432,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -11444,9 +11456,12 @@ access-control-allow-origin: *
         {
             &quot;id&quot;: 1,
             &quot;title&quot;: &quot;Gotong Royong Mingguan&quot;,
+            &quot;content&quot;: &quot;Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di pos RT kemudian melakukan kerja bakti bersama.&quot;,
+            &quot;author_id&quot;: 1,
+            &quot;created_at&quot;: &quot;2026-01-12T03:27:06Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-01-12T03:27:06Z&quot;,
             &quot;slug&quot;: &quot;gotong-royong-mingguan&quot;,
             &quot;summary&quot;: &quot;Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi.&quot;,
-            &quot;content&quot;: &quot;Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di pos RT kemudian melakukan kerja bakti bersama.&quot;,
             &quot;priority&quot;: &quot;high&quot;,
             &quot;target_audience&quot;: [
                 &quot;all&quot;
@@ -11455,11 +11470,8 @@ access-control-allow-origin: *
             &quot;is_active&quot;: true,
             &quot;is_sticky&quot;: true,
             &quot;allow_comments&quot;: true,
-            &quot;published_at&quot;: &quot;2026-01-08T05:58:00.000000Z&quot;,
+            &quot;published_at&quot;: &quot;2026-01-11T03:27:06.000000Z&quot;,
             &quot;views_count&quot;: 15,
-            &quot;author_id&quot;: 1,
-            &quot;created_at&quot;: &quot;2026-01-09T05:58:00Z&quot;,
-            &quot;updated_at&quot;: &quot;2026-01-09T05:58:00Z&quot;,
             &quot;deleted_at&quot;: null,
             &quot;status&quot;: &quot;published&quot;
         }
@@ -11591,7 +11603,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/announcements/urgent" \
+    --get "http://localhost:8000/api/announcements/urgent" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -11599,7 +11611,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/announcements/urgent"
+    "http://localhost:8000/api/announcements/urgent"
 );
 
 const headers = {
@@ -11616,7 +11628,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/announcements/urgent';
+$url = 'http://localhost:8000/api/announcements/urgent';
 $response = $client-&gt;get(
     $url,
     [
@@ -11635,7 +11647,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/announcements/urgent'
+url = 'http://localhost:8000/api/announcements/urgent'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -11657,7 +11669,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -11668,7 +11680,7 @@ access-control-allow-origin: *
             &quot;id&quot;: 4,
             &quot;title&quot;: &quot;Pengumuman Penting: Pemadaman Listrik&quot;,
             &quot;content&quot;: &quot;Berdasarkan informasi dari PLN, akan dilakukan pemadaman listrik bergilir di wilayah RT 01 pada hari Sabtu, 12 Oktober 2025 mulai pukul 08.00 - 16.00 WIB. Mohon maaf atas ketidaknyamanan ini. Harap persiapkan kebutuhan selama pemadaman.&quot;,
-            &quot;published_at&quot;: &quot;2026-01-08T23:58:00.000000Z&quot;,
+            &quot;published_at&quot;: &quot;2026-01-11T21:27:06.000000Z&quot;,
             &quot;status&quot;: &quot;unpublished&quot;
         }
     ]
@@ -11774,7 +11786,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/announcements/latest" \
+    --get "http://localhost:8000/api/announcements/latest" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -11782,7 +11794,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/announcements/latest"
+    "http://localhost:8000/api/announcements/latest"
 );
 
 const headers = {
@@ -11799,7 +11811,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/announcements/latest';
+$url = 'http://localhost:8000/api/announcements/latest';
 $response = $client-&gt;get(
     $url,
     [
@@ -11818,7 +11830,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/announcements/latest'
+url = 'http://localhost:8000/api/announcements/latest'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -11840,7 +11852,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -11853,7 +11865,7 @@ access-control-allow-origin: *
             &quot;content&quot;: &quot;Berdasarkan informasi dari PLN, akan dilakukan pemadaman listrik bergilir di wilayah RT 01 pada hari Sabtu, 12 Oktober 2025 mulai pukul 08.00 - 16.00 WIB. Mohon maaf atas ketidaknyamanan ini. Harap persiapkan kebutuhan selama pemadaman.&quot;,
             &quot;priority&quot;: &quot;urgent&quot;,
             &quot;is_sticky&quot;: true,
-            &quot;published_at&quot;: &quot;2026-01-08T23:58:00.000000Z&quot;,
+            &quot;published_at&quot;: &quot;2026-01-11T21:27:06.000000Z&quot;,
             &quot;status&quot;: &quot;unpublished&quot;
         },
         {
@@ -11862,7 +11874,7 @@ access-control-allow-origin: *
             &quot;content&quot;: &quot;Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di pos RT kemudian melakukan kerja bakti bersama.&quot;,
             &quot;priority&quot;: &quot;high&quot;,
             &quot;is_sticky&quot;: true,
-            &quot;published_at&quot;: &quot;2026-01-08T05:58:00.000000Z&quot;,
+            &quot;published_at&quot;: &quot;2026-01-11T03:27:06.000000Z&quot;,
             &quot;status&quot;: &quot;unpublished&quot;
         },
         {
@@ -11871,7 +11883,7 @@ access-control-allow-origin: *
             &quot;content&quot;: &quot;Rapat RT akan dilaksanakan pada hari Rabu, 15 Oktober 2025 pukul 19.30 WIB di Pos RT. Agenda: pembahasan iuran RT dan program kerja bulan depan. Diharapkan seluruh warga dapat hadir tepat waktu.&quot;,
             &quot;priority&quot;: &quot;medium&quot;,
             &quot;is_sticky&quot;: false,
-            &quot;published_at&quot;: &quot;2026-01-08T17:58:00.000000Z&quot;,
+            &quot;published_at&quot;: &quot;2026-01-11T15:27:06.000000Z&quot;,
             &quot;status&quot;: &quot;unpublished&quot;
         }
     ]
@@ -11977,7 +11989,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/announcements/gotong-royong-mingguan" \
+    --get "http://localhost:8000/api/announcements/gotong-royong-mingguan" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -11985,7 +11997,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/announcements/gotong-royong-mingguan"
+    "http://localhost:8000/api/announcements/gotong-royong-mingguan"
 );
 
 const headers = {
@@ -12002,7 +12014,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/announcements/gotong-royong-mingguan';
+$url = 'http://localhost:8000/api/announcements/gotong-royong-mingguan';
 $response = $client-&gt;get(
     $url,
     [
@@ -12021,7 +12033,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/announcements/gotong-royong-mingguan'
+url = 'http://localhost:8000/api/announcements/gotong-royong-mingguan'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -12043,7 +12055,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -12058,15 +12070,15 @@ access-control-allow-origin: *
         &quot;published_at&quot;: {
             &quot;year&quot;: 2026,
             &quot;month&quot;: 1,
-            &quot;day&quot;: 8,
-            &quot;dayOfWeek&quot;: 4,
-            &quot;dayOfYear&quot;: 8,
-            &quot;hour&quot;: 5,
-            &quot;minute&quot;: 58,
-            &quot;second&quot;: 0,
+            &quot;day&quot;: 11,
+            &quot;dayOfWeek&quot;: 0,
+            &quot;dayOfYear&quot;: 11,
+            &quot;hour&quot;: 3,
+            &quot;minute&quot;: 27,
+            &quot;second&quot;: 6,
             &quot;micro&quot;: 0,
-            &quot;timestamp&quot;: 1767851880,
-            &quot;formatted&quot;: &quot;2026-01-08 05:58:00&quot;,
+            &quot;timestamp&quot;: 1768102026,
+            &quot;formatted&quot;: &quot;2026-01-11 03:27:06&quot;,
             &quot;timezone&quot;: {
                 &quot;timezone_type&quot;: 3,
                 &quot;timezone&quot;: &quot;UTC&quot;
@@ -12075,15 +12087,15 @@ access-control-allow-origin: *
         &quot;created_at&quot;: {
             &quot;year&quot;: 2026,
             &quot;month&quot;: 1,
-            &quot;day&quot;: 9,
-            &quot;dayOfWeek&quot;: 5,
-            &quot;dayOfYear&quot;: 9,
-            &quot;hour&quot;: 5,
-            &quot;minute&quot;: 58,
-            &quot;second&quot;: 0,
+            &quot;day&quot;: 12,
+            &quot;dayOfWeek&quot;: 1,
+            &quot;dayOfYear&quot;: 12,
+            &quot;hour&quot;: 3,
+            &quot;minute&quot;: 27,
+            &quot;second&quot;: 6,
             &quot;micro&quot;: 0,
-            &quot;timestamp&quot;: 1767938280,
-            &quot;formatted&quot;: &quot;2026-01-09 05:58:00&quot;,
+            &quot;timestamp&quot;: 1768188426,
+            &quot;formatted&quot;: &quot;2026-01-12 03:27:06&quot;,
             &quot;timezone&quot;: {
                 &quot;timezone_type&quot;: 3,
                 &quot;timezone&quot;: &quot;UTC&quot;
@@ -12191,7 +12203,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
-                    <h2 id="announcements-public-POSTapi-announcements--announcement--comments">Store a comment for an announcement</h2>
+                    <h2 id="announcements-public-POSTapi-announcements--announcement--bookmark">Toggle bookmark for an announcement</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -12199,13 +12211,13 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 
 
-<span id="example-requests-POSTapi-announcements--announcement--comments">
+<span id="example-requests-POSTapi-announcements--announcement--bookmark">
 <blockquote>Example request:</blockquote>
 
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/announcements/gotong-royong-mingguan/comments" \
+    "http://localhost:8000/api/announcements/gotong-royong-mingguan/bookmark" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -12213,7 +12225,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/announcements/gotong-royong-mingguan/comments"
+    "http://localhost:8000/api/announcements/gotong-royong-mingguan/bookmark"
 );
 
 const headers = {
@@ -12230,7 +12242,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/announcements/gotong-royong-mingguan/comments';
+$url = 'http://localhost:8000/api/announcements/gotong-royong-mingguan/bookmark';
 $response = $client-&gt;post(
     $url,
     [
@@ -12249,7 +12261,350 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/announcements/gotong-royong-mingguan/comments'
+url = 'http://localhost:8000/api/announcements/gotong-royong-mingguan/bookmark'
+headers = {
+  'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('POST', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-announcements--announcement--bookmark">
+</span>
+<span id="execution-results-POSTapi-announcements--announcement--bookmark" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-announcements--announcement--bookmark"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-announcements--announcement--bookmark"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-announcements--announcement--bookmark" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-announcements--announcement--bookmark">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-announcements--announcement--bookmark" data-method="POST"
+      data-path="api/announcements/{announcement}/bookmark"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-announcements--announcement--bookmark', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-announcements--announcement--bookmark"
+                    onclick="tryItOut('POSTapi-announcements--announcement--bookmark');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-announcements--announcement--bookmark"
+                    onclick="cancelTryOut('POSTapi-announcements--announcement--bookmark');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-announcements--announcement--bookmark"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/announcements/{announcement}/bookmark</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-announcements--announcement--bookmark"
+               value="Bearer Bearer {YOUR_TOKEN_HERE}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer Bearer {YOUR_TOKEN_HERE}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-announcements--announcement--bookmark"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-announcements--announcement--bookmark"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>announcement</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="announcement"                data-endpoint="POSTapi-announcements--announcement--bookmark"
+               value="gotong-royong-mingguan"
+               data-component="url">
+    <br>
+<p>The announcement. Example: <code>gotong-royong-mingguan</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="announcements-public-GETapi-announcements-bookmarked">Get user&#039;s bookmarked announcements</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-GETapi-announcements-bookmarked">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/announcements/bookmarked" \
+    --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/announcements/bookmarked"
+);
+
+const headers = {
+    "Authorization": "Bearer Bearer {YOUR_TOKEN_HERE}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/announcements/bookmarked';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer Bearer {YOUR_TOKEN_HERE}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost:8000/api/announcements/bookmarked'
+headers = {
+  'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('GET', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-announcements-bookmarked">
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+vary: Origin
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;No query results for model [App\\Models\\Announcement] bookmarked&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-announcements-bookmarked" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-announcements-bookmarked"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-announcements-bookmarked"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-announcements-bookmarked" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-announcements-bookmarked">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-announcements-bookmarked" data-method="GET"
+      data-path="api/announcements/bookmarked"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-announcements-bookmarked', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-announcements-bookmarked"
+                    onclick="tryItOut('GETapi-announcements-bookmarked');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-announcements-bookmarked"
+                    onclick="cancelTryOut('GETapi-announcements-bookmarked');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-announcements-bookmarked"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/announcements/bookmarked</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-announcements-bookmarked"
+               value="Bearer Bearer {YOUR_TOKEN_HERE}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer Bearer {YOUR_TOKEN_HERE}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-announcements-bookmarked"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-announcements-bookmarked"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="announcements-public-POSTapi-announcements--announcement--comments">Store a comment for an announcement</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-POSTapi-announcements--announcement--comments">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/announcements/gotong-royong-mingguan/comments" \
+    --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/announcements/gotong-royong-mingguan/comments"
+);
+
+const headers = {
+    "Authorization": "Bearer Bearer {YOUR_TOKEN_HERE}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/announcements/gotong-royong-mingguan/comments';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer Bearer {YOUR_TOKEN_HERE}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost:8000/api/announcements/gotong-royong-mingguan/comments'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -12361,6 +12716,374 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
+                    <h2 id="announcements-public-GETapi-announcements--announcement--comments">Get comments for an announcement</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-GETapi-announcements--announcement--comments">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/announcements/gotong-royong-mingguan/comments" \
+    --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/announcements/gotong-royong-mingguan/comments"
+);
+
+const headers = {
+    "Authorization": "Bearer Bearer {YOUR_TOKEN_HERE}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/announcements/gotong-royong-mingguan/comments';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer Bearer {YOUR_TOKEN_HERE}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost:8000/api/announcements/gotong-royong-mingguan/comments'
+headers = {
+  'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('GET', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-announcements--announcement--comments">
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+vary: Origin
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-announcements--announcement--comments" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-announcements--announcement--comments"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-announcements--announcement--comments"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-announcements--announcement--comments" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-announcements--announcement--comments">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-announcements--announcement--comments" data-method="GET"
+      data-path="api/announcements/{announcement}/comments"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-announcements--announcement--comments', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-announcements--announcement--comments"
+                    onclick="tryItOut('GETapi-announcements--announcement--comments');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-announcements--announcement--comments"
+                    onclick="cancelTryOut('GETapi-announcements--announcement--comments');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-announcements--announcement--comments"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/announcements/{announcement}/comments</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-announcements--announcement--comments"
+               value="Bearer Bearer {YOUR_TOKEN_HERE}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer Bearer {YOUR_TOKEN_HERE}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-announcements--announcement--comments"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-announcements--announcement--comments"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>announcement</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="announcement"                data-endpoint="GETapi-announcements--announcement--comments"
+               value="gotong-royong-mingguan"
+               data-component="url">
+    <br>
+<p>The announcement. Example: <code>gotong-royong-mingguan</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="announcements-public-DELETEapi-announcements--announcement--comments--commentId-">Delete a comment</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-DELETEapi-announcements--announcement--comments--commentId-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request DELETE \
+    "http://localhost:8000/api/announcements/gotong-royong-mingguan/comments/architecto" \
+    --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/announcements/gotong-royong-mingguan/comments/architecto"
+);
+
+const headers = {
+    "Authorization": "Bearer Bearer {YOUR_TOKEN_HERE}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "DELETE",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/announcements/gotong-royong-mingguan/comments/architecto';
+$response = $client-&gt;delete(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer Bearer {YOUR_TOKEN_HERE}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost:8000/api/announcements/gotong-royong-mingguan/comments/architecto'
+headers = {
+  'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('DELETE', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-DELETEapi-announcements--announcement--comments--commentId-">
+</span>
+<span id="execution-results-DELETEapi-announcements--announcement--comments--commentId-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-DELETEapi-announcements--announcement--comments--commentId-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-DELETEapi-announcements--announcement--comments--commentId-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-DELETEapi-announcements--announcement--comments--commentId-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-DELETEapi-announcements--announcement--comments--commentId-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-DELETEapi-announcements--announcement--comments--commentId-" data-method="DELETE"
+      data-path="api/announcements/{announcement}/comments/{commentId}"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-announcements--announcement--comments--commentId-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-DELETEapi-announcements--announcement--comments--commentId-"
+                    onclick="tryItOut('DELETEapi-announcements--announcement--comments--commentId-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-DELETEapi-announcements--announcement--comments--commentId-"
+                    onclick="cancelTryOut('DELETEapi-announcements--announcement--comments--commentId-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-DELETEapi-announcements--announcement--comments--commentId-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-red">DELETE</small>
+            <b><code>api/announcements/{announcement}/comments/{commentId}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-announcements--announcement--comments--commentId-"
+               value="Bearer Bearer {YOUR_TOKEN_HERE}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer Bearer {YOUR_TOKEN_HERE}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="DELETEapi-announcements--announcement--comments--commentId-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="DELETEapi-announcements--announcement--comments--commentId-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>announcement</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="announcement"                data-endpoint="DELETEapi-announcements--announcement--comments--commentId-"
+               value="gotong-royong-mingguan"
+               data-component="url">
+    <br>
+<p>The announcement. Example: <code>gotong-royong-mingguan</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>commentId</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="commentId"                data-endpoint="DELETEapi-announcements--announcement--comments--commentId-"
+               value="architecto"
+               data-component="url">
+    <br>
+<p>Example: <code>architecto</code></p>
+            </div>
+                    </form>
+
                 <h1 id="device-tokens-user">📱 Device Tokens (User)</h1>
 
     <p>Endpoints untuk mengelola FCM device tokens untuk push notifications.</p>
@@ -12379,7 +13102,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/device-tokens" \
+    "http://localhost:8000/api/device-tokens" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -12396,7 +13119,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/device-tokens"
+    "http://localhost:8000/api/device-tokens"
 );
 
 const headers = {
@@ -12423,7 +13146,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/device-tokens';
+$url = 'http://localhost:8000/api/device-tokens';
 $response = $client-&gt;post(
     $url,
     [
@@ -12450,7 +13173,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/device-tokens'
+url = 'http://localhost:8000/api/device-tokens'
 payload = {
     "device_token": "dABC123...",
     "device_type": "android",
@@ -12644,7 +13367,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/device-tokens" \
+    --get "http://localhost:8000/api/device-tokens" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -12652,7 +13375,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/device-tokens"
+    "http://localhost:8000/api/device-tokens"
 );
 
 const headers = {
@@ -12669,7 +13392,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/device-tokens';
+$url = 'http://localhost:8000/api/device-tokens';
 $response = $client-&gt;get(
     $url,
     [
@@ -12688,7 +13411,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/device-tokens'
+url = 'http://localhost:8000/api/device-tokens'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -12710,7 +13433,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -12817,7 +13540,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/device-tokens/architecto" \
+    "http://localhost:8000/api/device-tokens/architecto" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -12825,7 +13548,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/device-tokens/architecto"
+    "http://localhost:8000/api/device-tokens/architecto"
 );
 
 const headers = {
@@ -12842,7 +13565,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/device-tokens/architecto';
+$url = 'http://localhost:8000/api/device-tokens/architecto';
 $response = $client-&gt;delete(
     $url,
     [
@@ -12861,7 +13584,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/device-tokens/architecto'
+url = 'http://localhost:8000/api/device-tokens/architecto'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -12991,7 +13714,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/notifications?page=1&amp;per_page=20" \
+    --get "http://localhost:8000/api/notifications?page=1&amp;per_page=20" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -12999,7 +13722,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/notifications"
+    "http://localhost:8000/api/notifications"
 );
 
 const params = {
@@ -13023,7 +13746,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/notifications';
+$url = 'http://localhost:8000/api/notifications';
 $response = $client-&gt;get(
     $url,
     [
@@ -13046,7 +13769,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/notifications'
+url = 'http://localhost:8000/api/notifications'
 params = {
   'page': '1',
   'per_page': '20',
@@ -13072,7 +13795,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -13204,7 +13927,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/notifications/architecto/read" \
+    "http://localhost:8000/api/notifications/architecto/read" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -13212,7 +13935,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/notifications/architecto/read"
+    "http://localhost:8000/api/notifications/architecto/read"
 );
 
 const headers = {
@@ -13229,7 +13952,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/notifications/architecto/read';
+$url = 'http://localhost:8000/api/notifications/architecto/read';
 $response = $client-&gt;post(
     $url,
     [
@@ -13248,7 +13971,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/notifications/architecto/read'
+url = 'http://localhost:8000/api/notifications/architecto/read'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -13374,7 +14097,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/notifications/read-all" \
+    "http://localhost:8000/api/notifications/read-all" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -13382,7 +14105,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/notifications/read-all"
+    "http://localhost:8000/api/notifications/read-all"
 );
 
 const headers = {
@@ -13399,7 +14122,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/notifications/read-all';
+$url = 'http://localhost:8000/api/notifications/read-all';
 $response = $client-&gt;post(
     $url,
     [
@@ -13418,7 +14141,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/notifications/read-all'
+url = 'http://localhost:8000/api/notifications/read-all'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -13531,7 +14254,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/notification-settings" \
+    --get "http://localhost:8000/api/notification-settings" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -13539,7 +14262,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/notification-settings"
+    "http://localhost:8000/api/notification-settings"
 );
 
 const headers = {
@@ -13556,7 +14279,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/notification-settings';
+$url = 'http://localhost:8000/api/notification-settings';
 $response = $client-&gt;get(
     $url,
     [
@@ -13575,7 +14298,7 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/notification-settings'
+url = 'http://localhost:8000/api/notification-settings'
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
   'Content-Type': 'application/json',
@@ -13597,7 +14320,7 @@ response.json()</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: *
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -13704,15 +14427,15 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/notification-settings" \
+    "http://localhost:8000/api/notification-settings" \
     --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"complaint_created\": false,
+    \"complaint_created\": true,
     \"complaint_status_changed\": false,
-    \"announcement_created\": false,
-    \"admin_response\": false,
+    \"announcement_created\": true,
+    \"admin_response\": true,
     \"comment_added\": false,
     \"push_enabled\": true
 }"
@@ -13721,7 +14444,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/notification-settings"
+    "http://localhost:8000/api/notification-settings"
 );
 
 const headers = {
@@ -13731,10 +14454,10 @@ const headers = {
 };
 
 let body = {
-    "complaint_created": false,
+    "complaint_created": true,
     "complaint_status_changed": false,
-    "announcement_created": false,
-    "admin_response": false,
+    "announcement_created": true,
+    "admin_response": true,
     "comment_added": false,
     "push_enabled": true
 };
@@ -13748,7 +14471,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost/api/notification-settings';
+$url = 'http://localhost:8000/api/notification-settings';
 $response = $client-&gt;put(
     $url,
     [
@@ -13758,10 +14481,10 @@ $response = $client-&gt;put(
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'complaint_created' =&gt; false,
+            'complaint_created' =&gt; true,
             'complaint_status_changed' =&gt; false,
-            'announcement_created' =&gt; false,
-            'admin_response' =&gt; false,
+            'announcement_created' =&gt; true,
+            'admin_response' =&gt; true,
             'comment_added' =&gt; false,
             'push_enabled' =&gt; true,
         ],
@@ -13775,12 +14498,12 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://localhost/api/notification-settings'
+url = 'http://localhost:8000/api/notification-settings'
 payload = {
-    "complaint_created": false,
+    "complaint_created": true,
     "complaint_status_changed": false,
-    "announcement_created": false,
-    "admin_response": false,
+    "announcement_created": true,
+    "admin_response": true,
     "comment_added": false,
     "push_enabled": true
 }
@@ -13901,7 +14624,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>complaint_status_changed</code></b>&nbsp;&nbsp;
@@ -13945,7 +14668,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>admin_response</code></b>&nbsp;&nbsp;
@@ -13967,7 +14690,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>comment_added</code></b>&nbsp;&nbsp;

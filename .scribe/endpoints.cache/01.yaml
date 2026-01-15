@@ -74,11 +74,11 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"success":true,"message":"Announcements list loaded successfully","meta":{"current_page":1,"per_page":10,"total":1,"last_page":1,"has_next_page":false,"has_prev_page":false,"next_page":null,"prev_page":null,"filters":{"priority":"high","per_page":10}},"data":[{"id":1,"title":"Gotong Royong Mingguan","slug":"gotong-royong-mingguan","summary":"Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi.","content":"Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di pos RT kemudian melakukan kerja bakti bersama.","priority":"high","target_audience":["all"],"attachments":null,"is_active":true,"is_sticky":true,"allow_comments":true,"published_at":"2026-01-08T05:58:00.000000Z","views_count":15,"author_id":1,"created_at":"2026-01-09T05:58:00Z","updated_at":"2026-01-09T05:58:00Z","deleted_at":null,"status":"published"}]}'
+        content: '{"success":true,"message":"Announcements list loaded successfully","meta":{"current_page":1,"per_page":10,"total":1,"last_page":1,"has_next_page":false,"has_prev_page":false,"next_page":null,"prev_page":null,"filters":{"priority":"high","per_page":10}},"data":[{"id":1,"title":"Gotong Royong Mingguan","content":"Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di pos RT kemudian melakukan kerja bakti bersama.","author_id":1,"created_at":"2026-01-12T03:27:06Z","updated_at":"2026-01-12T03:27:06Z","slug":"gotong-royong-mingguan","summary":"Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi.","priority":"high","target_audience":["all"],"attachments":null,"is_active":true,"is_sticky":true,"allow_comments":true,"published_at":"2026-01-11T03:27:06.000000Z","views_count":15,"deleted_at":null,"status":"published"}]}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: '*'
+          vary: Origin
         description: null
     responseFields: []
     auth: []
@@ -117,11 +117,11 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"success":true,"message":"Urgent announcements loaded successfully","data":[{"id":4,"title":"Pengumuman Penting: Pemadaman Listrik","content":"Berdasarkan informasi dari PLN, akan dilakukan pemadaman listrik bergilir di wilayah RT 01 pada hari Sabtu, 12 Oktober 2025 mulai pukul 08.00 - 16.00 WIB. Mohon maaf atas ketidaknyamanan ini. Harap persiapkan kebutuhan selama pemadaman.","published_at":"2026-01-08T23:58:00.000000Z","status":"unpublished"}]}'
+        content: '{"success":true,"message":"Urgent announcements loaded successfully","data":[{"id":4,"title":"Pengumuman Penting: Pemadaman Listrik","content":"Berdasarkan informasi dari PLN, akan dilakukan pemadaman listrik bergilir di wilayah RT 01 pada hari Sabtu, 12 Oktober 2025 mulai pukul 08.00 - 16.00 WIB. Mohon maaf atas ketidaknyamanan ini. Harap persiapkan kebutuhan selama pemadaman.","published_at":"2026-01-11T21:27:06.000000Z","status":"unpublished"}]}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: '*'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -163,11 +163,11 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"success":true,"message":"Latest announcements loaded successfully","data":[{"id":4,"title":"Pengumuman Penting: Pemadaman Listrik","content":"Berdasarkan informasi dari PLN, akan dilakukan pemadaman listrik bergilir di wilayah RT 01 pada hari Sabtu, 12 Oktober 2025 mulai pukul 08.00 - 16.00 WIB. Mohon maaf atas ketidaknyamanan ini. Harap persiapkan kebutuhan selama pemadaman.","priority":"urgent","is_sticky":true,"published_at":"2026-01-08T23:58:00.000000Z","status":"unpublished"},{"id":1,"title":"Gotong Royong Mingguan","content":"Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di pos RT kemudian melakukan kerja bakti bersama.","priority":"high","is_sticky":true,"published_at":"2026-01-08T05:58:00.000000Z","status":"unpublished"},{"id":2,"title":"Rapat RT Bulanan","content":"Rapat RT akan dilaksanakan pada hari Rabu, 15 Oktober 2025 pukul 19.30 WIB di Pos RT. Agenda: pembahasan iuran RT dan program kerja bulan depan. Diharapkan seluruh warga dapat hadir tepat waktu.","priority":"medium","is_sticky":false,"published_at":"2026-01-08T17:58:00.000000Z","status":"unpublished"}]}'
+        content: '{"success":true,"message":"Latest announcements loaded successfully","data":[{"id":4,"title":"Pengumuman Penting: Pemadaman Listrik","content":"Berdasarkan informasi dari PLN, akan dilakukan pemadaman listrik bergilir di wilayah RT 01 pada hari Sabtu, 12 Oktober 2025 mulai pukul 08.00 - 16.00 WIB. Mohon maaf atas ketidaknyamanan ini. Harap persiapkan kebutuhan selama pemadaman.","priority":"urgent","is_sticky":true,"published_at":"2026-01-11T21:27:06.000000Z","status":"unpublished"},{"id":1,"title":"Gotong Royong Mingguan","content":"Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di pos RT kemudian melakukan kerja bakti bersama.","priority":"high","is_sticky":true,"published_at":"2026-01-11T03:27:06.000000Z","status":"unpublished"},{"id":2,"title":"Rapat RT Bulanan","content":"Rapat RT akan dilaksanakan pada hari Rabu, 15 Oktober 2025 pukul 19.30 WIB di Pos RT. Agenda: pembahasan iuran RT dan program kerja bulan depan. Diharapkan seluruh warga dapat hadir tepat waktu.","priority":"medium","is_sticky":false,"published_at":"2026-01-11T15:27:06.000000Z","status":"unpublished"}]}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: '*'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -221,11 +221,109 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"success":true,"message":"Announcement details loaded successfully","data":{"id":1,"title":"Gotong Royong Mingguan","content":"Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di pos RT kemudian melakukan kerja bakti bersama.","priority":"high","is_sticky":true,"published_at":{"year":2026,"month":1,"day":8,"dayOfWeek":4,"dayOfYear":8,"hour":5,"minute":58,"second":0,"micro":0,"timestamp":1767851880,"formatted":"2026-01-08 05:58:00","timezone":{"timezone_type":3,"timezone":"UTC"}},"created_at":{"year":2026,"month":1,"day":9,"dayOfWeek":5,"dayOfYear":9,"hour":5,"minute":58,"second":0,"micro":0,"timestamp":1767938280,"formatted":"2026-01-09 05:58:00","timezone":{"timezone_type":3,"timezone":"UTC"}}}}'
+        content: '{"success":true,"message":"Announcement details loaded successfully","data":{"id":1,"title":"Gotong Royong Mingguan","content":"Mengundang seluruh warga RT 01 untuk mengikuti gotong royong setiap hari Minggu pagi mulai pukul 07.00 WIB. Mari bersama-sama menjaga kebersihan lingkungan kita. Acara akan dimulai dengan berkumpul di pos RT kemudian melakukan kerja bakti bersama.","priority":"high","is_sticky":true,"published_at":{"year":2026,"month":1,"day":11,"dayOfWeek":0,"dayOfYear":11,"hour":3,"minute":27,"second":6,"micro":0,"timestamp":1768102026,"formatted":"2026-01-11 03:27:06","timezone":{"timezone_type":3,"timezone":"UTC"}},"created_at":{"year":2026,"month":1,"day":12,"dayOfWeek":1,"dayOfYear":12,"hour":3,"minute":27,"second":6,"micro":0,"timestamp":1768188426,"formatted":"2026-01-12 03:27:06","timezone":{"timezone_type":3,"timezone":"UTC"}}}}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: '*'
+          vary: Origin
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/announcements/{announcement}/bookmark'
+    metadata:
+      custom: []
+      groupName: '📢 Announcements (Public)'
+      groupDescription: |-
+
+        Endpoints untuk melihat pengumuman. Tidak memerlukan autentikasi.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Toggle bookmark for an announcement'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      announcement:
+        custom: []
+        name: announcement
+        description: 'The announcement.'
+        required: true
+        example: gotong-royong-mingguan
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      announcement: gotong-royong-mingguan
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/announcements/bookmarked
+    metadata:
+      custom: []
+      groupName: '📢 Announcements (Public)'
+      groupDescription: |-
+
+        Endpoints untuk melihat pengumuman. Tidak memerlukan autentikasi.
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Get user's bookmarked announcements"
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+              "message": "No query results for model [App\\Models\\Announcement] bookmarked"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -270,6 +368,125 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       announcement: gotong-royong-mingguan
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/announcements/{announcement}/comments'
+    metadata:
+      custom: []
+      groupName: '📢 Announcements (Public)'
+      groupDescription: |-
+
+        Endpoints untuk melihat pengumuman. Tidak memerlukan autentikasi.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get comments for an announcement'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      announcement:
+        custom: []
+        name: announcement
+        description: 'The announcement.'
+        required: true
+        example: gotong-royong-mingguan
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      announcement: gotong-royong-mingguan
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/announcements/{announcement}/comments/{commentId}'
+    metadata:
+      custom: []
+      groupName: '📢 Announcements (Public)'
+      groupDescription: |-
+
+        Endpoints untuk melihat pengumuman. Tidak memerlukan autentikasi.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete a comment'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer Bearer {YOUR_TOKEN_HERE}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      announcement:
+        custom: []
+        name: announcement
+        description: 'The announcement.'
+        required: true
+        example: gotong-royong-mingguan
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      commentId:
+        custom: []
+        name: commentId
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      announcement: gotong-royong-mingguan
+      commentId: architecto
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []

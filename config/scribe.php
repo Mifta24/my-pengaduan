@@ -112,6 +112,7 @@ return [
         'base_url' => null,
 
         // [Laravel Sanctum] Fetch a CSRF token before each request, and add it as an X-XSRF-TOKEN header.
+        // For Bearer token authentication (API), set this to false
         'use_csrf' => false,
 
         // The URL to fetch the CSRF token from (if `use_csrf` is true).

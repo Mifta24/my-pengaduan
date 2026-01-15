@@ -3,7 +3,7 @@
 REST API untuk sistem pengaduan masyarakat RT/RW. API ini memungkinkan warga untuk melaporkan keluhan, melihat pengumuman, dan berinteraksi dengan admin.
 
 <aside>
-    <strong>Base URL</strong>: <code>http://localhost</code>
+    <strong>Base URL</strong>: <code>http://localhost:8000</code>
 </aside>
 
     ## Selamat Datang di MyPengaduan API

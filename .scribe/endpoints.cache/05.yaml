@@ -65,7 +65,7 @@ endpoints:
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: '*'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -197,7 +197,7 @@ endpoints:
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: '*'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -238,7 +238,7 @@ endpoints:
         name: complaint_created
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -260,7 +260,7 @@ endpoints:
         name: announcement_created
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -271,7 +271,7 @@ endpoints:
         name: admin_response
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -300,10 +300,10 @@ endpoints:
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      complaint_created: false
+      complaint_created: true
       complaint_status_changed: false
-      announcement_created: false
-      admin_response: false
+      announcement_created: true
+      admin_response: true
       comment_added: false
       push_enabled: true
     fileParameters: []
