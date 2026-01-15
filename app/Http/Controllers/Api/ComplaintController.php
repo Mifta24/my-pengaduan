@@ -37,7 +37,11 @@ class ComplaintController extends Controller
         try {
             $user = $request->user();
 
-            $query = Complaint::with(['category:id,name,icon,color,description', 'attachments'])
+            $query = Complaint::with([
+                'category:id,name,icon,color,description',
+                'attachments',
+                'user:id,name,email'
+            ])
                 ->where('user_id', $user->id);
 
             // Filter by status
@@ -92,6 +96,7 @@ class ComplaintController extends Controller
                     'report_date' => $complaint->report_date ? $complaint->report_date->format('Y-m-d\TH:i:s.u\Z') : null,
                     'created_at' => $complaint->created_at->format('Y-m-d\TH:i:s.u\Z'),
                     'updated_at' => $complaint->updated_at->format('Y-m-d\TH:i:s.u\Z'),
+                    'user' => $complaint->user,
                     'category' => $complaint->category,
                     'attachments' => $complaint->attachments,
                 ];
@@ -258,7 +263,7 @@ class ComplaintController extends Controller
             $complaint->load(['category:id,name,icon,color,description', 'attachments']);
 
             // Dispatch event to send notification to admins
-            event(new ComplaintCreated($complaint));
+            $complaint->load(['category:id,name,icon,color,description', 'attachments', 'user:id,name,email']);
 
             // Transform data to hide unnecessary fields
             $data = [
@@ -273,6 +278,7 @@ class ComplaintController extends Controller
                 'report_date' => $complaint->report_date ? $complaint->report_date->format('Y-m-d\TH:i:s.u\Z') : null,
                 'created_at' => $complaint->created_at->format('Y-m-d\TH:i:s.u\Z'),
                 'updated_at' => $complaint->updated_at->format('Y-m-d\TH:i:s.u\Z'),
+                'user' => $complaint->user,
                 'category' => $complaint->category,
                 'attachments' => $complaint->attachments,
             ];
@@ -300,6 +306,7 @@ class ComplaintController extends Controller
             $complaint->load([
                 'category:id,name,icon,color,description',
                 'attachments',
+                'user:id,name,email',
                 'responses' => function($query) {
                     $query->with(['user:id,name,email', 'attachments'])->latest();
                 }
@@ -320,6 +327,7 @@ class ComplaintController extends Controller
                 'report_date' => $complaint->report_date ? $complaint->report_date->format('Y-m-d\TH:i:s.u\Z') : null,
                 'created_at' => $complaint->created_at->format('Y-m-d\TH:i:s.u\Z'),
                 'updated_at' => $complaint->updated_at->format('Y-m-d\TH:i:s.u\Z'),
+                'user' => $complaint->user,
                 'category' => $complaint->category,
                 'attachments' => $complaint->attachments,
                 'responses' => $complaint->responses->map(function($response) {

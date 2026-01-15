@@ -221,6 +221,9 @@
                                                                                 <li class="tocify-item level-2" data-unique="admin-complaints-GETapi-admin-complaints-statistics">
                                 <a href="#admin-complaints-GETapi-admin-complaints-statistics">Get complaints statistics for admin</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="admin-complaints-GETapi-admin-complaints-trashed">
+                                <a href="#admin-complaints-GETapi-admin-complaints-trashed">Get Trashed Complaints</a>
+                            </li>
                                                                                 <li class="tocify-item level-2" data-unique="admin-complaints-GETapi-admin-complaints--id-">
                                 <a href="#admin-complaints-GETapi-admin-complaints--id-">Get specific complaint details</a>
                             </li>
@@ -229,6 +232,12 @@
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="admin-complaints-DELETEapi-admin-complaints--id-">
                                 <a href="#admin-complaints-DELETEapi-admin-complaints--id-">Delete complaint</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="admin-complaints-POSTapi-admin-complaints--id--restore">
+                                <a href="#admin-complaints-POSTapi-admin-complaints--id--restore">Restore Deleted Complaint</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="admin-complaints-DELETEapi-admin-complaints--id--force-delete">
+                                <a href="#admin-complaints-DELETEapi-admin-complaints--id--force-delete">Force Delete Complaint</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="admin-complaints-PATCHapi-admin-complaints--id--status">
                                 <a href="#admin-complaints-PATCHapi-admin-complaints--id--status">Update complaint status</a>
@@ -2113,8 +2122,8 @@ Foto akan otomatis dikompress untuk menghemat storage.</p>
     --form "location=Jl. Mawar No. 15, RT 01/RW 01"\
     --form "priority=high"\
     --form "report_date=2025-01-09"\
-    --form "photo=@C:\Users\62838\AppData\Local\Temp\php7F4D.tmp" \
-    --form "attachments[]=@C:\Users\62838\AppData\Local\Temp\php7F5E.tmp" </code></pre></div>
+    --form "photo=@C:\Users\62838\AppData\Local\Temp\phpC1D.tmp" \
+    --form "attachments[]=@C:\Users\62838\AppData\Local\Temp\phpC3D.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -2183,11 +2192,11 @@ $response = $client-&gt;post(
             ],
             [
                 'name' =&gt; 'photo',
-                'contents' =&gt; fopen('C:\Users\62838\AppData\Local\Temp\php7F4D.tmp', 'r')
+                'contents' =&gt; fopen('C:\Users\62838\AppData\Local\Temp\phpC1D.tmp', 'r')
             ],
             [
                 'name' =&gt; 'attachments[]',
-                'contents' =&gt; fopen('C:\Users\62838\AppData\Local\Temp\php7F5E.tmp', 'r')
+                'contents' =&gt; fopen('C:\Users\62838\AppData\Local\Temp\phpC3D.tmp', 'r')
             ],
         ],
     ]
@@ -2208,8 +2217,8 @@ files = {
   'location': (None, 'Jl. Mawar No. 15, RT 01/RW 01'),
   'priority': (None, 'high'),
   'report_date': (None, '2025-01-09'),
-  'photo': open('C:\Users\62838\AppData\Local\Temp\php7F4D.tmp', 'rb'),
-  'attachments[]': open('C:\Users\62838\AppData\Local\Temp\php7F5E.tmp', 'rb')}
+  'photo': open('C:\Users\62838\AppData\Local\Temp\phpC1D.tmp', 'rb'),
+  'attachments[]': open('C:\Users\62838\AppData\Local\Temp\phpC3D.tmp', 'rb')}
 payload = {
     "title": "Lampu Jalan Rusak",
     "description": "Lampu jalan di depan rumah no. 15 sudah mati sejak 3 hari lalu",
@@ -2431,7 +2440,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Foto pengaduan (jpeg,png,jpg,webp, max: 5MB). Example: <code>C:\Users\62838\AppData\Local\Temp\php7F4D.tmp</code></p>
+<p>Foto pengaduan (jpeg,png,jpg,webp, max: 5MB). Example: <code>C:\Users\62838\AppData\Local\Temp\phpC1D.tmp</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>attachments</code></b>&nbsp;&nbsp;
@@ -7321,6 +7330,219 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                         </form>
 
+                    <h2 id="admin-complaints-GETapi-admin-complaints-trashed">Get Trashed Complaints</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Mendapatkan daftar complaint yang telah dihapus (soft deleted).</p>
+
+<span id="example-requests-GETapi-admin-complaints-trashed">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/admin/complaints/trashed?page=1&amp;per_page=15" \
+    --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/admin/complaints/trashed"
+);
+
+const params = {
+    "page": "1",
+    "per_page": "15",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Authorization": "Bearer Bearer {YOUR_TOKEN_HERE}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/admin/complaints/trashed';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer Bearer {YOUR_TOKEN_HERE}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'query' =&gt; [
+            'page' =&gt; '1',
+            'per_page' =&gt; '15',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost:8000/api/admin/complaints/trashed'
+params = {
+  'page': '1',
+  'per_page': '15',
+}
+headers = {
+  'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('GET', url, headers=headers, params=params)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-admin-complaints-trashed">
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+vary: Origin
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-admin-complaints-trashed" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-admin-complaints-trashed"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-admin-complaints-trashed"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-admin-complaints-trashed" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-admin-complaints-trashed">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-admin-complaints-trashed" data-method="GET"
+      data-path="api/admin/complaints/trashed"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-admin-complaints-trashed', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-admin-complaints-trashed"
+                    onclick="tryItOut('GETapi-admin-complaints-trashed');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-admin-complaints-trashed"
+                    onclick="cancelTryOut('GETapi-admin-complaints-trashed');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-admin-complaints-trashed"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/admin/complaints/trashed</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-admin-complaints-trashed"
+               value="Bearer Bearer {YOUR_TOKEN_HERE}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer Bearer {YOUR_TOKEN_HERE}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-admin-complaints-trashed"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-admin-complaints-trashed"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>page</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="page"                data-endpoint="GETapi-admin-complaints-trashed"
+               value="1"
+               data-component="query">
+    <br>
+<p>Nomor halaman. Example: <code>1</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>per_page</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="per_page"                data-endpoint="GETapi-admin-complaints-trashed"
+               value="15"
+               data-component="query">
+    <br>
+<p>Item per halaman (max: 100). Example: <code>15</code></p>
+            </div>
+                </form>
+
                     <h2 id="admin-complaints-GETapi-admin-complaints--id-">Get specific complaint details</h2>
 
 <p>
@@ -7844,6 +8066,346 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>The ID of the complaint. Example: <code>1</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="admin-complaints-POSTapi-admin-complaints--id--restore">Restore Deleted Complaint</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Mengembalikan complaint yang sudah dihapus.</p>
+
+<span id="example-requests-POSTapi-admin-complaints--id--restore">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/admin/complaints/1/restore" \
+    --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/admin/complaints/1/restore"
+);
+
+const headers = {
+    "Authorization": "Bearer Bearer {YOUR_TOKEN_HERE}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/admin/complaints/1/restore';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer Bearer {YOUR_TOKEN_HERE}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost:8000/api/admin/complaints/1/restore'
+headers = {
+  'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('POST', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-admin-complaints--id--restore">
+</span>
+<span id="execution-results-POSTapi-admin-complaints--id--restore" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-admin-complaints--id--restore"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-admin-complaints--id--restore"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-admin-complaints--id--restore" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-admin-complaints--id--restore">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-admin-complaints--id--restore" data-method="POST"
+      data-path="api/admin/complaints/{id}/restore"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-admin-complaints--id--restore', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-admin-complaints--id--restore"
+                    onclick="tryItOut('POSTapi-admin-complaints--id--restore');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-admin-complaints--id--restore"
+                    onclick="cancelTryOut('POSTapi-admin-complaints--id--restore');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-admin-complaints--id--restore"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/admin/complaints/{id}/restore</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-admin-complaints--id--restore"
+               value="Bearer Bearer {YOUR_TOKEN_HERE}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer Bearer {YOUR_TOKEN_HERE}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-admin-complaints--id--restore"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-admin-complaints--id--restore"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="POSTapi-admin-complaints--id--restore"
+               value="1"
+               data-component="url">
+    <br>
+<p>ID complaint yang akan di-restore. Example: <code>1</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="admin-complaints-DELETEapi-admin-complaints--id--force-delete">Force Delete Complaint</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Menghapus complaint secara permanen dari database.</p>
+
+<span id="example-requests-DELETEapi-admin-complaints--id--force-delete">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request DELETE \
+    "http://localhost:8000/api/admin/complaints/1/force-delete" \
+    --header "Authorization: Bearer Bearer {YOUR_TOKEN_HERE}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/admin/complaints/1/force-delete"
+);
+
+const headers = {
+    "Authorization": "Bearer Bearer {YOUR_TOKEN_HERE}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "DELETE",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/admin/complaints/1/force-delete';
+$response = $client-&gt;delete(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer Bearer {YOUR_TOKEN_HERE}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://localhost:8000/api/admin/complaints/1/force-delete'
+headers = {
+  'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('DELETE', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-DELETEapi-admin-complaints--id--force-delete">
+</span>
+<span id="execution-results-DELETEapi-admin-complaints--id--force-delete" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-DELETEapi-admin-complaints--id--force-delete"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-DELETEapi-admin-complaints--id--force-delete"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-DELETEapi-admin-complaints--id--force-delete" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-DELETEapi-admin-complaints--id--force-delete">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-DELETEapi-admin-complaints--id--force-delete" data-method="DELETE"
+      data-path="api/admin/complaints/{id}/force-delete"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-admin-complaints--id--force-delete', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-DELETEapi-admin-complaints--id--force-delete"
+                    onclick="tryItOut('DELETEapi-admin-complaints--id--force-delete');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-DELETEapi-admin-complaints--id--force-delete"
+                    onclick="cancelTryOut('DELETEapi-admin-complaints--id--force-delete');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-DELETEapi-admin-complaints--id--force-delete"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-red">DELETE</small>
+            <b><code>api/admin/complaints/{id}/force-delete</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-admin-complaints--id--force-delete"
+               value="Bearer Bearer {YOUR_TOKEN_HERE}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer Bearer {YOUR_TOKEN_HERE}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="DELETEapi-admin-complaints--id--force-delete"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="DELETEapi-admin-complaints--id--force-delete"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="DELETEapi-admin-complaints--id--force-delete"
+               value="1"
+               data-component="url">
+    <br>
+<p>ID complaint yang akan dihapus permanen. Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -14433,11 +14995,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"complaint_created\": true,
-    \"complaint_status_changed\": false,
+    \"complaint_status_changed\": true,
     \"announcement_created\": true,
     \"admin_response\": true,
     \"comment_added\": false,
-    \"push_enabled\": true
+    \"push_enabled\": false
 }"
 </code></pre></div>
 
@@ -14455,11 +15017,11 @@ const headers = {
 
 let body = {
     "complaint_created": true,
-    "complaint_status_changed": false,
+    "complaint_status_changed": true,
     "announcement_created": true,
     "admin_response": true,
     "comment_added": false,
-    "push_enabled": true
+    "push_enabled": false
 };
 
 fetch(url, {
@@ -14482,11 +15044,11 @@ $response = $client-&gt;put(
         ],
         'json' =&gt; [
             'complaint_created' =&gt; true,
-            'complaint_status_changed' =&gt; false,
+            'complaint_status_changed' =&gt; true,
             'announcement_created' =&gt; true,
             'admin_response' =&gt; true,
             'comment_added' =&gt; false,
-            'push_enabled' =&gt; true,
+            'push_enabled' =&gt; false,
         ],
     ]
 );
@@ -14501,11 +15063,11 @@ import json
 url = 'http://localhost:8000/api/notification-settings'
 payload = {
     "complaint_created": true,
-    "complaint_status_changed": false,
+    "complaint_status_changed": true,
     "announcement_created": true,
     "admin_response": true,
     "comment_added": false,
-    "push_enabled": true
+    "push_enabled": false
 }
 headers = {
   'Authorization': 'Bearer Bearer {YOUR_TOKEN_HERE}',
@@ -14646,7 +15208,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>announcement_created</code></b>&nbsp;&nbsp;
@@ -14734,7 +15296,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>true</code></p>
+<p>Example: <code>false</code></p>
         </div>
         </form>
 

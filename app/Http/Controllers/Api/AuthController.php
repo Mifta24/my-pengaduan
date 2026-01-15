@@ -82,8 +82,21 @@ class AuthController extends Controller
             // Create token
             $token = $user->createToken('api_token')->plainTextToken;
 
+            // Refresh user to get roles
+            $user->refresh();
+
             $data = [
-                'user' => $user->only(['id', 'name', 'email', 'address', 'phone']),
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'address' => $user->address,
+                    'phone' => $user->phone,
+                    'role' => $user->getRoleNames()->first(),
+                    'email_verified_at' => $user->email_verified_at,
+                    'is_verified' => (bool) $user->is_verified,
+                    'created_at' => $user->created_at,
+                ],
                 'token' => $token,
                 'token_type' => 'Bearer'
             ];
@@ -144,7 +157,17 @@ class AuthController extends Controller
             $token = $user->createToken('api_token')->plainTextToken;
 
             $data = [
-                'user' => $user->only(['id', 'name', 'email', 'address', 'phone']),
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'address' => $user->address,
+                    'phone' => $user->phone,
+                    'role' => $user->getRoleNames()->first(),
+                    'email_verified_at' => $user->email_verified_at,
+                    'is_verified' => (bool) $user->is_verified,
+                    'created_at' => $user->created_at,
+                ],
                 'token' => $token,
                 'token_type' => 'Bearer'
             ];
@@ -167,7 +190,17 @@ class AuthController extends Controller
             $user = $request->user();
 
             $data = [
-                'user' => $user->only(['id', 'name', 'email', 'address', 'phone', 'email_verified_at'])
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'address' => $user->address,
+                    'phone' => $user->phone,
+                    'role' => $user->getRoleNames()->first(),
+                    'email_verified_at' => $user->email_verified_at,
+                    'is_verified' => (bool) $user->is_verified,
+                    'created_at' => $user->created_at,
+                ]
             ];
 
             return $this->success($data, 'Profile loaded successfully');

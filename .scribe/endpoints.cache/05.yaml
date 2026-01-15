@@ -249,7 +249,7 @@ endpoints:
         name: complaint_status_changed
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -293,7 +293,7 @@ endpoints:
         name: push_enabled
         description: ''
         required: false
-        example: true
+        example: false
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -301,11 +301,11 @@ endpoints:
         deprecated: false
     cleanBodyParameters:
       complaint_created: true
-      complaint_status_changed: false
+      complaint_status_changed: true
       announcement_created: true
       admin_response: true
       comment_added: false
-      push_enabled: true
+      push_enabled: false
     fileParameters: []
     responses: []
     responseFields: []

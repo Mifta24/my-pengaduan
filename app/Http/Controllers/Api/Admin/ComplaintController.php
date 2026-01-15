@@ -785,4 +785,92 @@ class ComplaintController extends Controller
             return $this->serverError('Failed to mark complaint as resolved', $e);
         }
     }
+
+    /**
+     * Get Trashed Complaints
+     *
+     * Mendapatkan daftar complaint yang telah dihapus (soft deleted).
+     *
+     * @authenticated
+     *
+     * @queryParam page integer Nomor halaman. Example: 1
+     * @queryParam per_page integer Item per halaman (max: 100). Example: 15
+     */
+    public function getTrashed(Request $request)
+    {
+        try {
+            $perPage = min($request->get('per_page', 15), 100);
+            
+            $complaints = Complaint::onlyTrashed()
+                ->with(['user:id,name,email', 'category:id,name,icon,color'])
+                ->latest('deleted_at')
+                ->paginate($perPage);
+
+            return $this->successWithPagination(
+                $complaints,
+                'Trashed complaints retrieved successfully'
+            );
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to retrieve trashed complaints', $e);
+        }
+    }
+
+    /**
+     * Restore Deleted Complaint
+     *
+     * Mengembalikan complaint yang sudah dihapus.
+     *
+     * @authenticated
+     *
+     * @urlParam id integer required ID complaint yang akan di-restore. Example: 1
+     */
+    public function restore($id)
+    {
+        try {
+            $complaint = Complaint::onlyTrashed()->findOrFail($id);
+            $complaint->restore();
+
+            return $this->success(
+                $complaint->load(['user:id,name,email', 'category:id,name,icon,color']),
+                'Complaint restored successfully'
+            );
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to restore complaint', $e);
+        }
+    }
+
+    /**
+     * Force Delete Complaint
+     *
+     * Menghapus complaint secara permanen dari database.
+     *
+     * @authenticated
+     *
+     * @urlParam id integer required ID complaint yang akan dihapus permanen. Example: 1
+     */
+    public function forceDelete($id)
+    {
+        try {
+            $complaint = Complaint::onlyTrashed()->findOrFail($id);
+            
+            // Delete associated files
+            if ($complaint->photo && \Storage::disk('public')->exists($complaint->photo)) {
+                \Storage::disk('public')->delete($complaint->photo);
+            }
+
+            // Delete attachments
+            foreach ($complaint->attachments as $attachment) {
+                if (\Storage::disk('public')->exists($attachment->file_path)) {
+                    \Storage::disk('public')->delete($attachment->file_path);
+                }
+                $attachment->delete();
+            }
+
+            $complaint->forceDelete();
+
+            return $this->success(null, 'Complaint permanently deleted');
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to force delete complaint', $e);
+        }
+    }
 }

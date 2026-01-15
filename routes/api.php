@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('auth')->group(function () {
+Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
 
@@ -58,7 +58,7 @@ Route::prefix('announcements')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
 
     // User info route
     Route::get('/user', function (Request $request) {
@@ -140,9 +140,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->name('api.ad
         Route::get('/', [AdminComplaintController::class, 'index']);
         Route::post('/', [AdminComplaintController::class, 'store']);
         Route::get('/statistics', [AdminComplaintController::class, 'statistics']);
+        Route::get('/trashed', [AdminComplaintController::class, 'getTrashed']);
         Route::get('/{id}', [AdminComplaintController::class, 'show']);
         Route::put('/{id}', [AdminComplaintController::class, 'update']);
         Route::delete('/{id}', [AdminComplaintController::class, 'destroy']);
+        Route::post('/{id}/restore', [AdminComplaintController::class, 'restore']);
+        Route::delete('/{id}/force-delete', [AdminComplaintController::class, 'forceDelete']);
         Route::patch('/{id}/status', [AdminComplaintController::class, 'updateStatus']);
         Route::post('/{id}/resolve', [AdminComplaintController::class, 'markAsResolved']);
         Route::post('/{id}/response', [AdminComplaintController::class, 'addResponse']);
