@@ -800,7 +800,7 @@ class ComplaintController extends Controller
     {
         try {
             $perPage = min($request->get('per_page', 15), 100);
-            
+
             $complaints = Complaint::onlyTrashed()
                 ->with(['user:id,name,email', 'category:id,name,icon,color'])
                 ->latest('deleted_at')
@@ -852,7 +852,7 @@ class ComplaintController extends Controller
     {
         try {
             $complaint = Complaint::onlyTrashed()->findOrFail($id);
-            
+
             // Delete associated files
             if ($complaint->photo && \Storage::disk('public')->exists($complaint->photo)) {
                 \Storage::disk('public')->delete($complaint->photo);
