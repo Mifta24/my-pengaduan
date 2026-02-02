@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Complaint;
 use App\Models\Category;
 use App\Models\Attachment;
+use App\Events\ComplaintCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -146,6 +147,12 @@ class ComplaintController extends Controller
                     ]);
                 }
             }
+
+            // Load relationships for notification
+            $complaint->load(['category', 'attachments', 'user']);
+
+            // Dispatch event to send notification to admins
+            event(new ComplaintCreated($complaint));
 
             return redirect()->route('complaints.show', $complaint)
                 ->with('success', 'Keluhan berhasil dikirim. Tim kami akan segera merespons.');
