@@ -1,5 +1,10 @@
 <?php
 
+// Early return if Scribe is not installed (production with --no-dev)
+if (!class_exists('Knuckles\Scribe\ScribeServiceProvider')) {
+    return [];
+}
+
 use Knuckles\Scribe\Extracting\Strategies;
 use Knuckles\Scribe\Config\Defaults;
 use Knuckles\Scribe\Config\AuthIn;
