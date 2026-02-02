@@ -141,6 +141,7 @@ class AnnouncementController extends Controller
             $data = $request->except('image');
             $data['slug'] = $request->slug ?? Str::slug($request->title);
             $data['published_at'] = $request->published_at ?? now();
+            $data['author_id'] = auth()->id();
 
             // Handle image upload
             if ($request->hasFile('image')) {
