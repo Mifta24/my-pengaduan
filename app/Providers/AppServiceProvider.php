@@ -12,7 +12,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Disable Scribe config in production if class doesn't exist (dev dependency)
+        if (!class_exists(\Knuckles\Scribe\ScribeServiceProvider::class)) {
+            $this->app->make('config')->set('scribe', []);
+        }
     }
 
     /**
