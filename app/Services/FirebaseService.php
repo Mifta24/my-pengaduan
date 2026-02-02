@@ -19,19 +19,19 @@ class FirebaseService
             // Check if using base64 encoded credentials (for Railway/Heroku deployment)
             if ($base64Creds = env('FIREBASE_CREDENTIALS_BASE64')) {
                 Log::info('Using base64 encoded Firebase credentials');
-                
+
                 $credentials = base64_decode($base64Creds);
                 if ($credentials === false) {
                     Log::error('Failed to decode base64 Firebase credentials');
                     $this->isConfigured = false;
                     return;
                 }
-                
+
                 // Create temporary file for credentials
                 $tempFile = tempnam(sys_get_temp_dir(), 'firebase_');
                 file_put_contents($tempFile, $credentials);
                 $credentialsPath = $tempFile;
-                
+
             } else {
                 // Use file-based credentials
                 $credentialsConfig = config('firebase.projects.app.credentials') ?? env('FIREBASE_CREDENTIALS');
