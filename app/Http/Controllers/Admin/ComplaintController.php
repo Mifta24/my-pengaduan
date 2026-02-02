@@ -306,11 +306,53 @@ class ComplaintController extends Controller
             'status' => ['nullable', Rule::in(['pending', 'in_progress', 'resolved', 'rejected'])]
         ]);
 
+        $oldStatus = $complaint->status;
+
         // Update complaint response
         $complaint->update([
             'response' => $validated['response'],
             'status' => $validated['status'] ?? $complaint->status
         ]);
+
+        // Send notification to user about new response (manual implementation like API)
+        try {
+            $firebaseService = app(\App\Services\FirebaseService::class);
+            $user = $complaint->user;
+
+            if ($user && $user->getActiveDeviceTokens()) {
+                $tokens = $user->getActiveDeviceTokens();
+                $notificationData = [
+                    'type' => 'complaint_response',
+                    'complaint_id' => (string) $complaint->id,
+                    'title' => $complaint->title,
+                    'click_action' => 'OPEN_COMPLAINT',
+                ];
+
+                $firebaseService->sendToMultipleDevices(
+                    $tokens,
+                    '💬 Tanggapan Admin',
+                    "Admin telah merespons keluhan Anda: {$complaint->title}",
+                    $notificationData
+                );
+
+                // Save notification to database
+                \App\Models\FcmNotification::create([
+                    'user_id' => $user->id,
+                    'type' => 'complaint_response',
+                    'title' => '💬 Tanggapan Admin',
+                    'body' => "Admin telah merespons keluhan Anda: {$complaint->title}",
+                    'data' => $notificationData,
+                    'is_read' => false,
+                ]);
+            }
+
+            // Dispatch status change event if status changed
+            if ($oldStatus !== $complaint->status) {
+                event(new ComplaintStatusChanged($complaint, $oldStatus, $complaint->status));
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send response notification: ' . $e->getMessage());
+        }
 
         return redirect()->back()
             ->with('success', 'Tanggapan berhasil ditambahkan.');
