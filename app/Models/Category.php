@@ -17,6 +17,8 @@ class Category extends Model
         'is_active',
     ];
 
+    // Note: slug field is sent from client but not stored in database
+
     protected $casts = [
         'is_active' => 'boolean',
     ];

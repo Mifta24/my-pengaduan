@@ -16,27 +16,45 @@ class FirebaseService
     public function __construct()
     {
         try {
-            // Get credentials path from config or env
-            $credentialsConfig = config('firebase.projects.app.credentials') ?? env('FIREBASE_CREDENTIALS');
+            // Check if using base64 encoded credentials (for Railway/Heroku deployment)
+            if ($base64Creds = env('FIREBASE_CREDENTIALS_BASE64')) {
+                Log::info('Using base64 encoded Firebase credentials');
+                
+                $credentials = base64_decode($base64Creds);
+                if ($credentials === false) {
+                    Log::error('Failed to decode base64 Firebase credentials');
+                    $this->isConfigured = false;
+                    return;
+                }
+                
+                // Create temporary file for credentials
+                $tempFile = tempnam(sys_get_temp_dir(), 'firebase_');
+                file_put_contents($tempFile, $credentials);
+                $credentialsPath = $tempFile;
+                
+            } else {
+                // Use file-based credentials
+                $credentialsConfig = config('firebase.projects.app.credentials') ?? env('FIREBASE_CREDENTIALS');
 
-            if (!$credentialsConfig) {
-                Log::warning('Firebase credentials not configured in .env');
-                $this->isConfigured = false;
-                return;
-            }
+                if (!$credentialsConfig) {
+                    Log::warning('Firebase credentials not configured in .env');
+                    $this->isConfigured = false;
+                    return;
+                }
 
-            // Build full path
-            $credentialsPath = storage_path('app/' . $credentialsConfig);
+                // Build full path
+                $credentialsPath = storage_path('app/' . $credentialsConfig);
 
-            // Check if credentials file exists and is not a directory
-            if (!file_exists($credentialsPath) || is_dir($credentialsPath)) {
-                Log::warning('Firebase credentials file not found or invalid', [
-                    'path' => $credentialsPath,
-                    'exists' => file_exists($credentialsPath),
-                    'is_dir' => is_dir($credentialsPath),
-                ]);
-                $this->isConfigured = false;
-                return;
+                // Check if credentials file exists and is not a directory
+                if (!file_exists($credentialsPath) || is_dir($credentialsPath)) {
+                    Log::warning('Firebase credentials file not found or invalid', [
+                        'path' => $credentialsPath,
+                        'exists' => file_exists($credentialsPath),
+                        'is_dir' => is_dir($credentialsPath),
+                    ]);
+                    $this->isConfigured = false;
+                    return;
+                }
             }
 
             $factory = (new Factory)
@@ -47,6 +65,7 @@ class FirebaseService
 
             Log::info('Firebase initialized successfully', [
                 'project_id' => config('firebase.projects.app.project_id') ?? env('FIREBASE_PROJECT_ID'),
+                'method' => env('FIREBASE_CREDENTIALS_BASE64') ? 'base64' : 'file',
             ]);
 
         } catch (\Exception $e) {

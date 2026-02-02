@@ -28,11 +28,15 @@ class AuthController extends Controller
      * @unauthenticated
      *
      * @bodyParam name string required Nama lengkap user. Example: John Doe
+     * @bodyParam nik string required NIK 16 digit. Example: 3201234567890001
+     * @bodyParam ktp_photo file required Foto KTP (JPG, JPEG, PNG, max 2MB).
      * @bodyParam email string required Email address yang valid. Example: john@example.com
+     * @bodyParam rt string Rukun Tetangga. Example: 001
+     * @bodyParam rw string Rukun Warga. Example: 001
+     * @bodyParam phone string Nomor telepon user. Example: 081234567890
+     * @bodyParam address string required Alamat lengkap user. Example: Jl. Mawar No. 10
      * @bodyParam password string required Password minimal 8 karakter. Example: password123
      * @bodyParam password_confirmation string required Konfirmasi password harus sama. Example: password123
-     * @bodyParam address string required Alamat lengkap user. Example: Jl. Mawar No. 10, RT 01/RW 01
-     * @bodyParam phone string Nomor telepon user. Example: 081234567890
      *
      * @response 201 {
      *   "status": true,
@@ -41,9 +45,13 @@ class AuthController extends Controller
      *     "user": {
      *       "id": 1,
      *       "name": "John Doe",
+     *       "nik": "3201234567890001",
      *       "email": "john@example.com",
      *       "address": "Jl. Mawar No. 10",
-     *       "phone": "081234567890"
+     *       "rt": "001",
+     *       "rw": "001",
+     *       "phone": "081234567890",
+     *       "ktp_photo": "ktp/abc123.jpg"
      *     },
      *     "token": "1|abc123def456..."
      *   }
@@ -62,18 +70,32 @@ class AuthController extends Controller
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
+                'nik' => 'required|string|size:16|unique:users',
+                'ktp_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8|confirmed',
                 'address' => 'required|string|max:500',
+                'rt' => 'nullable|string|max:10',
+                'rw' => 'nullable|string|max:10',
                 'phone' => 'nullable|string|max:20'
             ]);
 
+            // Handle KTP photo upload
+            $ktpPhotoPath = null;
+            if ($request->hasFile('ktp_photo')) {
+                $ktpPhotoPath = $request->file('ktp_photo')->store('ktp', 'public');
+            }
+
             $user = User::create([
                 'name' => $validated['name'],
+                'nik' => $validated['nik'],
+                'ktp_photo' => $ktpPhotoPath,
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 'address' => $validated['address'],
-                'phone' => $validated['phone'],
+                'rt' => $validated['rt'] ?? null,
+                'rw' => $validated['rw'] ?? null,
+                'phone' => $validated['phone'] ?? null,
             ]);
 
             // Assign user role
@@ -89,8 +111,12 @@ class AuthController extends Controller
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
+                    'nik' => $user->nik,
+                    'ktp_photo' => $user->ktp_photo ? asset('storage/' . $user->ktp_photo) : null,
                     'email' => $user->email,
                     'address' => $user->address,
+                    'rt' => $user->rt,
+                    'rw' => $user->rw,
                     'phone' => $user->phone,
                     'role' => $user->getRoleNames()->first(),
                     'email_verified_at' => $user->email_verified_at,
@@ -102,7 +128,6 @@ class AuthController extends Controller
             ];
 
             return $this->created($data, 'Registration successful');
-
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         } catch (\Exception $e) {
@@ -160,8 +185,12 @@ class AuthController extends Controller
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
+                    'nik' => $user->nik,
+                    'ktp_photo' => $user->ktp_photo ? asset('storage/' . $user->ktp_photo) : null,
                     'email' => $user->email,
                     'address' => $user->address,
+                    'rt' => $user->rt,
+                    'rw' => $user->rw,
                     'phone' => $user->phone,
                     'role' => $user->getRoleNames()->first(),
                     'email_verified_at' => $user->email_verified_at,
@@ -173,7 +202,6 @@ class AuthController extends Controller
             ];
 
             return $this->success($data, 'Login successful');
-
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         } catch (\Exception $e) {
@@ -190,21 +218,24 @@ class AuthController extends Controller
             $user = $request->user();
 
             $data = [
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'address' => $user->address,
-                    'phone' => $user->phone,
-                    'role' => $user->getRoleNames()->first(),
-                    'email_verified_at' => $user->email_verified_at,
-                    'is_verified' => (bool) $user->is_verified,
-                    'created_at' => $user->created_at,
-                ]
+                'nik' => $user->nik,
+                'ktp_photo' => $user->ktp_photo ? asset('storage/' . $user->ktp_photo) : null,
+                'email' => $user->email,
+                'address' => $user->address,
+                'rt' => $user->rt,
+                'rw' => $user->rw,
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'address' => $user->address,
+                'phone' => $user->phone,
+                'role' => $user->getRoleNames()->first(),
+                'email_verified_at' => $user->email_verified_at,
+                'is_verified' => (bool) $user->is_verified,
+                'created_at' => $user->created_at,
             ];
 
             return $this->success($data, 'Profile loaded successfully');
-
         } catch (\Exception $e) {
             return $this->serverError('Failed to load profile', $e);
         }
@@ -217,13 +248,28 @@ class AuthController extends Controller
     {
         try {
             $user = $request->user();
-
             $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'address' => 'required|string|max:500',
+                'address' => 'nullable|string|max:255',
+                'rt' => 'nullable|string|max:10',
+                'rw' => 'nullable|string|max:10',
                 'phone' => 'nullable|string|max:20'
             ]);
 
+            $user->update($validated);
+
+            $data = [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'nik' => $user->nik,
+                    'ktp_photo' => $user->ktp_photo ? asset('storage/' . $user->ktp_photo) : null,
+                    'email' => $user->email,
+                    'address' => $user->address,
+                    'rt' => $user->rt,
+                    'rw' => $user->rw,
+                    'phone' => $user->phone,
+                ],
+            ];
             $user->update($validated);
 
             $data = [
@@ -231,7 +277,6 @@ class AuthController extends Controller
             ];
 
             return $this->success($data, 'Profile updated successfully');
-
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         } catch (\Exception $e) {
@@ -261,7 +306,6 @@ class AuthController extends Controller
             ]);
 
             return $this->success(null, 'Password changed successfully');
-
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         } catch (\Exception $e) {
@@ -278,7 +322,6 @@ class AuthController extends Controller
             $request->user()->currentAccessToken()->delete();
 
             return $this->success(null, 'Logged out successfully');
-
         } catch (\Exception $e) {
             return $this->serverError('Logout failed', $e);
         }
@@ -293,7 +336,6 @@ class AuthController extends Controller
             $request->user()->tokens()->delete();
 
             return $this->success(null, 'Logged out from all devices successfully');
-
         } catch (\Exception $e) {
             return $this->serverError('Logout failed', $e);
         }

@@ -119,7 +119,7 @@ class CategoryController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:100|unique:categories,name',
-                'slug' => 'nullable|string|max:150|unique:categories,slug',
+                'slug' => 'nullable|string|max:150', // slug not stored in DB, just validated
                 'icon' => 'nullable|string|max:50',
                 'color' => 'nullable|string|max:20',
                 'description' => 'nullable|string',
@@ -130,8 +130,8 @@ class CategoryController extends Controller
                 return $this->validationError($validator->errors());
             }
 
-            $data = $request->all();
-            $data['slug'] = $request->slug ?? Str::slug($request->name);
+            // Only include fields that exist in database
+            $data = $request->only(['name', 'description', 'icon', 'color', 'is_active']);
 
             $category = Category::create($data);
 
@@ -151,7 +151,7 @@ class CategoryController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:100|unique:categories,name,' . $id,
-                'slug' => 'nullable|string|max:150|unique:categories,slug,' . $id,
+                'slug' => 'nullable|string|max:150', // slug not stored in DB, just validated
                 'icon' => 'nullable|string|max:50',
                 'color' => 'nullable|string|max:20',
                 'description' => 'nullable|string',
@@ -162,10 +162,8 @@ class CategoryController extends Controller
                 return $this->validationError($validator->errors());
             }
 
-            $data = $request->all();
-            if ($request->has('name') && !$request->has('slug')) {
-                $data['slug'] = Str::slug($request->name);
-            }
+            // Only include fields that exist in database
+            $data = $request->only(['name', 'description', 'icon', 'color', 'is_active']);
 
             $category->update($data);
 

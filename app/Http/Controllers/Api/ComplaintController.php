@@ -260,10 +260,10 @@ class ComplaintController extends Controller
                 }
             }
 
-            $complaint->load(['category:id,name,icon,color,description', 'attachments']);
+            $complaint->load(['category:id,name,icon,color,description', 'attachments', 'user:id,name,email']);
 
             // Dispatch event to send notification to admins
-            $complaint->load(['category:id,name,icon,color,description', 'attachments', 'user:id,name,email']);
+            event(new ComplaintCreated($complaint));
 
             // Transform data to hide unnecessary fields
             $data = [
