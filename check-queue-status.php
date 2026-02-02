@@ -3,7 +3,7 @@
 
 /**
  * Check Queue Status
- * 
+ *
  * Script untuk cek status queue jobs dan notifications
  */
 
@@ -37,13 +37,13 @@ echo "Pending Jobs: " . $pendingJobs . "\n";
 if ($pendingJobs > 0) {
     echo "⚠️  WARNING: Ada {$pendingJobs} jobs yang belum diproses!\n";
     echo "   Jalankan: php artisan queue:work\n\n";
-    
+
     // Show last 5 pending jobs
     $jobs = DB::table('jobs')
         ->orderBy('created_at', 'desc')
         ->limit(5)
         ->get();
-    
+
     echo "Last 5 Pending Jobs:\n";
     foreach ($jobs as $job) {
         $payload = json_decode($job->payload, true);
@@ -62,13 +62,13 @@ echo "Failed Jobs: " . $failedJobs . "\n";
 if ($failedJobs > 0) {
     echo "❌ WARNING: Ada {$failedJobs} jobs yang gagal!\n";
     echo "   Jalankan: php artisan queue:retry all\n\n";
-    
+
     // Show last 5 failed jobs
     $failed = DB::table('failed_jobs')
         ->orderBy('failed_at', 'desc')
         ->limit(5)
         ->get();
-    
+
     echo "Last 5 Failed Jobs:\n";
     foreach ($failed as $job) {
         $payload = json_decode($job->payload, true);
@@ -97,7 +97,7 @@ if ($notifications->isEmpty()) {
     foreach ($notifications as $notif) {
         $user = DB::table('users')->where('id', $notif->user_id)->first();
         $userName = $user ? $user->name : 'Unknown';
-        
+
         echo "\n";
         echo "Type: {$notif->type}\n";
         echo "User: {$userName}\n";
