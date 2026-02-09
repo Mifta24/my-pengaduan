@@ -10,15 +10,24 @@ Foto yang di-upload tidak tampil di aplikasi yang sudah di-deploy di Railway.
 
 ## Solusi yang Diterapkan
 
-### 1. Update Environment Variable di Railway
+### 1. Update Environment Variables di Railway
+
+**WAJIB set 2 variables ini di Railway:**
+
 ```bash
 FILESYSTEM_DISK=public
+APP_URL=https://your-app-name.up.railway.app
 ```
 
 **Cara set di Railway Dashboard:**
 1. Buka project Railway > Variables
-2. Tambah/Edit variable: `FILESYSTEM_DISK` = `public`
-3. Redeploy aplikasi
+2. Tambah/Edit variables:
+   - `FILESYSTEM_DISK` = `public`
+   - `APP_URL` = `https://your-app-name.up.railway.app` (ganti dengan domain Railway Anda)
+3. **PENTING:** Setelah menambahkan `APP_URL`, Railway akan auto-redeploy
+4. Tunggu deployment selesai (~2-3 menit)
+
+**⚠️ TANPA `APP_URL`, foto akan error routing!** (error: `invalid input syntax for type bigint`)
 
 ### 2. Update Procfile
 Tambahkan `php artisan storage:link` di awal web command:
@@ -84,28 +93,89 @@ Config::get('filesystems.default'); // harus return "public"
 
 ### Deploy ke Railway:
 ```bash
-# 1. Commit semua perubahan
+# 1. Commit semua perubahan (termasuk fix-photo-paths.php)
 git add .
 git commit -m "Fix: Photo upload with Storage facade for Railway deployment"
 
 # 2. Push ke Railway
 git push origin main
 
-# 3. Set environment variable di Railway Dashboard
-FILESYSTEM_DISK=public
+# 3. Set environment variables di Railway Dashboard (sudah di-set)
+# ✅ FILESYSTEM_DISK=public
+# ✅ APP_URL=https://mypengaduan.miftahaldi.my.id/
 
-# 4. Redeploy (otomatis atau manual)
+# 4. Tunggu deployment selesai (~2-3 menit)
+
+# 5. FIX DATA LAMA - PENTING! Via Railway Shell
+# Buka Railway Dashboard > Shell, lalu jalankan:
+php fix-photo-paths.php
+
+# Script ini akan:
+# - Scan complaints dengan path foto yang salah
+# - Move file ke lokasi yang benar: complaints/photos/
+# - Update database dengan path yang benar
+
+# 6. Verify
+# Test akses foto: https://mypengaduan.miftahaldi.my.id/storage/complaints/photos/xxx.jpg
 ```
+
+### 🔧 Fix Data Lama di Database
+
+**Masalah:** Foto yang di-upload sebelum fix ini tersimpan dengan path salah:
+- ❌ Database: `fMpjsaiW...png` (tanpa folder)
+- ✅ Seharusnya: `complaints/photos/fMpjsaiW...png`
+
+**Solusi:** Jalankan script `fix-photo-paths.php` di Railway Shell:
+
+```bash
+# Via Railway Dashboard > Shell
+php fix-photo-paths.php
+```
+
+Output yang diharapkan:
+```
+🔍 Checking complaints with wrong photo paths...
+
+Found 3 complaints with wrong photo paths:
+
+Complaint ID: 11
+  Old path: eWsIMDcOJfIvAddt2D5AzUmMECRq8LnwMfjkE0ZY.jpg
+  ✅ Moved: eWsIMDcOJfIvAddt2D5AzUmMECRq8LnwMfjkE0ZY.jpg → complaints/photos/eWsIMDcOJfIvAddt2D5AzUmMECRq8LnwMfjkE0ZY.jpg
+  ✅ Database updated: complaints/photos/eWsIMDcOJfIvAddt2D5AzUmMECRq8LnwMfjkE0ZY.jpg
+
+═══════════════════════════════════════
+Summary:
+  Fixed: 3
+  Not found: 0
+  Total: 3
+═══════════════════════════════════════
+
+✅ Photo paths fixed successfully!
+```
+
+### ⚠️ Error Jika APP_URL Tidak Di-Set:
+
+```
+SQLSTATE[22P02]: Invalid text representation: 7 ERROR: 
+invalid input syntax for type bigint: "filename.jpg"
+```
+
+**Penyebab:** URL foto salah, mobile app akses `/complaints/photo.jpg` instead of `/storage/complaints/photos/photo.jpg`
+
+**Solusi:** Set `APP_URL` di Railway Variables!
 
 ## Troubleshooting
 
 ### Foto masih tidak tampil?
 
-**1. Cek Environment Variable**
+**1. Cek Environment Variables - YANG PALING PENTING!**
 ```bash
 # Via Railway shell
 echo $FILESYSTEM_DISK
 # Harus output: public
+
+echo $APP_URL
+# Harus output: https://your-app-name.up.railway.app
 ```
 
 **2. Cek Storage Link**
@@ -156,12 +226,13 @@ Kemungkinan:
 
 ## Production Checklist
 
-- [x] `FILESYSTEM_DISK=public` di Railway
+- [x] `FILESYSTEM_DISK=public` di Railway ✅
+- [x] `APP_URL=https://your-app.up.railway.app` di Railway ✅ **WAJIB!**
 - [x] Procfile include `php artisan storage:link`
 - [x] Controllers menggunakan `Storage::disk('public')`
-- [x] `APP_URL` sesuai dengan domain Railway
-- [x] Test upload foto baru
-- [x] Verify foto bisa diakses via URL
+- [ ] Test upload foto baru
+- [ ] Verify foto bisa diakses via URL `/storage/complaints/photos/xxx.jpg`
+- [ ] Cek Railway logs untuk error
 
 ## Notes
 
