@@ -177,14 +177,10 @@ class ComplaintController extends Controller
             if ($request->hasFile('photo')) {
                 $photo = $request->file('photo');
                 $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
-                $storagePath = storage_path('app/public/complaints/photos');
 
-                // Create directory if not exists
-                if (!file_exists($storagePath)) {
-                    mkdir($storagePath, 0755, true);
-                }
-
-                $fullPath = $storagePath . '/' . $fileName;
+                // Use Laravel Storage facade for better compatibility
+                $disk = config('filesystems.default');
+                $photoPath = 'complaints/photos/' . $fileName;
 
                 // Compress and save image
                 $image = Image::read($photo->getRealPath());
@@ -196,15 +192,27 @@ class ComplaintController extends Controller
 
                 // Save with 85% quality for JPEG/WebP
                 $extension = strtolower($photo->getClientOriginalExtension());
+
+                // Encode image
                 if (in_array($extension, ['jpg', 'jpeg'])) {
-                    $image->toJpeg(quality: 85)->save($fullPath);
+                    $encodedImage = $image->toJpeg(quality: 85);
                 } elseif ($extension === 'webp') {
-                    $image->toWebp(quality: 85)->save($fullPath);
+                    $encodedImage = $image->toWebp(quality: 85);
                 } else {
-                    $image->toPng()->save($fullPath);
+                    $encodedImage = $image->toPng();
                 }
 
-                $photoPath = 'complaints/photos/' . $fileName;
+                // Store using Storage facade
+                Storage::disk('public')->put($photoPath, (string) $encodedImage);
+
+                // Log for debugging
+                \Log::info('Photo uploaded', [
+                    'path' => $photoPath,
+                    'disk' => $disk,
+                    'exists' => Storage::disk('public')->exists($photoPath),
+                    'url' => Storage::disk('public')->url($photoPath)
+                ]);
+
                 $complaint->update(['photo' => $photoPath]);
             }
 
@@ -213,12 +221,7 @@ class ComplaintController extends Controller
                 foreach ($request->file('attachments') as $file) {
                     $mimeType = $file->getMimeType();
                     $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
-                    $storagePath = storage_path('app/public/complaints/attachments');
-
-                    // Create directory if not exists
-                    if (!file_exists($storagePath)) {
-                        mkdir($storagePath, 0755, true);
-                    }
+                    $path = 'complaints/attachments/' . $fileName;
 
                     // Check if file is an image and compress it
                     if (in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])) {
@@ -229,25 +232,25 @@ class ComplaintController extends Controller
                             $image->scale(width: 1920);
                         }
 
-                        $fullPath = $storagePath . '/' . $fileName;
                         $extension = strtolower($file->getClientOriginalExtension());
 
+                        // Encode image
                         if (in_array($extension, ['jpg', 'jpeg'])) {
-                            $image->toJpeg(quality: 85)->save($fullPath);
+                            $encodedImage = $image->toJpeg(quality: 85);
                         } elseif ($extension === 'webp') {
-                            $image->toWebp(quality: 85)->save($fullPath);
+                            $encodedImage = $image->toWebp(quality: 85);
                         } else {
-                            $image->toPng()->save($fullPath);
+                            $encodedImage = $image->toPng();
                         }
 
-                        $fileSize = filesize($fullPath);
+                        // Store using Storage facade
+                        Storage::disk('public')->put($path, (string) $encodedImage);
+                        $fileSize = Storage::disk('public')->size($path);
                     } else {
                         // Non-image files, store normally
-                        $file->storeAs('complaints/attachments', $fileName, 'public');
+                        Storage::disk('public')->putFileAs('complaints/attachments', $file, basename($fileName));
                         $fileSize = $file->getSize();
                     }
-
-                    $path = 'complaints/attachments/' . $fileName;
 
                     Attachment::create([
                         'attachable_type' => Complaint::class,
@@ -406,14 +409,7 @@ class ComplaintController extends Controller
 
                 $photo = $request->file('photo');
                 $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
-                $storagePath = storage_path('app/public/complaints/photos');
-
-                // Create directory if not exists
-                if (!file_exists($storagePath)) {
-                    mkdir($storagePath, 0755, true);
-                }
-
-                $fullPath = $storagePath . '/' . $fileName;
+                $photoPath = 'complaints/photos/' . $fileName;
 
                 // Compress and save image
                 $image = Image::read($photo->getRealPath());
@@ -425,15 +421,19 @@ class ComplaintController extends Controller
 
                 // Save with 85% quality for JPEG/WebP
                 $extension = strtolower($photo->getClientOriginalExtension());
+
+                // Encode image
                 if (in_array($extension, ['jpg', 'jpeg'])) {
-                    $image->toJpeg(quality: 85)->save($fullPath);
+                    $encodedImage = $image->toJpeg(quality: 85);
                 } elseif ($extension === 'webp') {
-                    $image->toWebp(quality: 85)->save($fullPath);
+                    $encodedImage = $image->toWebp(quality: 85);
                 } else {
-                    $image->toPng()->save($fullPath);
+                    $encodedImage = $image->toPng();
                 }
 
-                $photoPath = 'complaints/photos/' . $fileName;
+                // Store using Storage facade
+                Storage::disk('public')->put($photoPath, (string) $encodedImage);
+
                 $complaint->update(['photo' => $photoPath]);
             }
 
@@ -442,12 +442,7 @@ class ComplaintController extends Controller
                 foreach ($request->file('attachments') as $file) {
                     $mimeType = $file->getMimeType();
                     $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
-                    $storagePath = storage_path('app/public/complaints/attachments');
-
-                    // Create directory if not exists
-                    if (!file_exists($storagePath)) {
-                        mkdir($storagePath, 0755, true);
-                    }
+                    $path = 'complaints/attachments/' . $fileName;
 
                     // Check if file is an image and compress it
                     if (in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])) {
@@ -458,25 +453,25 @@ class ComplaintController extends Controller
                             $image->scale(width: 1920);
                         }
 
-                        $fullPath = $storagePath . '/' . $fileName;
                         $extension = strtolower($file->getClientOriginalExtension());
 
+                        // Encode image
                         if (in_array($extension, ['jpg', 'jpeg'])) {
-                            $image->toJpeg(quality: 85)->save($fullPath);
+                            $encodedImage = $image->toJpeg(quality: 85);
                         } elseif ($extension === 'webp') {
-                            $image->toWebp(quality: 85)->save($fullPath);
+                            $encodedImage = $image->toWebp(quality: 85);
                         } else {
-                            $image->toPng()->save($fullPath);
+                            $encodedImage = $image->toPng();
                         }
 
-                        $fileSize = filesize($fullPath);
+                        // Store using Storage facade
+                        Storage::disk('public')->put($path, (string) $encodedImage);
+                        $fileSize = Storage::disk('public')->size($path);
                     } else {
                         // Non-image files, store normally
-                        $file->storeAs('complaints/attachments', $fileName, 'public');
+                        Storage::disk('public')->putFileAs('complaints/attachments', $file, basename($fileName));
                         $fileSize = $file->getSize();
                     }
-
-                    $path = 'complaints/attachments/' . $fileName;
 
                     Attachment::create([
                         'attachable_type' => Complaint::class,
