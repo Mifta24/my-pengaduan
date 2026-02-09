@@ -2,10 +2,10 @@
 
 /**
  * Script to fix photo paths in Railway PostgreSQL database
- * 
+ *
  * Problem: Old photos stored with wrong path (just filename.jpg)
  * Solution: Add complaints/photos/ prefix to existing photos
- * 
+ *
  * Usage: php fix-photo-paths.php
  */
 
@@ -37,22 +37,22 @@ $notFound = 0;
 
 foreach ($complaints as $complaint) {
     $oldPath = $complaint->photo;
-    
+
     // Skip if already has proper path
     if (strpos($oldPath, 'complaints/photos/') === 0) {
         continue;
     }
-    
+
     echo "Complaint ID: {$complaint->id}\n";
     echo "  Old path: {$oldPath}\n";
-    
+
     // Try to find the file in different locations
     $possiblePaths = [
         "complaints/photos/{$oldPath}",
         "complaints/{$oldPath}",
         $oldPath
     ];
-    
+
     $foundPath = null;
     foreach ($possiblePaths as $path) {
         if (Storage::disk('public')->exists($path)) {
@@ -60,31 +60,31 @@ foreach ($complaints as $complaint) {
             break;
         }
     }
-    
+
     if ($foundPath) {
         // If file found but not in correct location, move it
         $correctPath = "complaints/photos/" . basename($oldPath);
-        
+
         if ($foundPath !== $correctPath) {
             // Move file to correct location
             $fileContents = Storage::disk('public')->get($foundPath);
             Storage::disk('public')->put($correctPath, $fileContents);
-            
+
             // Delete old file if different location
             if ($foundPath !== $oldPath) {
                 Storage::disk('public')->delete($foundPath);
             }
-            
+
             echo "  ✅ Moved: {$foundPath} → {$correctPath}\n";
         } else {
             echo "  ✅ File already in correct location\n";
         }
-        
+
         // Update database
         DB::table('complaints')
             ->where('id', $complaint->id)
             ->update(['photo' => $correctPath]);
-        
+
         echo "  ✅ Database updated: {$correctPath}\n\n";
         $fixed++;
     } else {
