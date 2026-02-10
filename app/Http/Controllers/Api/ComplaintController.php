@@ -185,9 +185,9 @@ class ComplaintController extends Controller
                         1920,
                         85
                     );
-                    
+
                     $complaint->update(['photo' => $upload['url']]);
-                    
+
                     \Log::info('Photo uploaded to Cloudinary', $upload);
                 } else {
                     // Fallback to local storage
@@ -213,7 +213,7 @@ class ComplaintController extends Controller
 
                     Storage::disk('public')->put($photoPath, (string) $encodedImage);
                     $complaint->update(['photo' => $photoPath]);
-                    
+
                     \Log::info('Photo uploaded to local storage', ['path' => $photoPath]);
                 }
             }
@@ -233,7 +233,7 @@ class ComplaintController extends Controller
                             1920,
                             85
                         );
-                        
+
                         Attachment::create([
                             'attachable_type' => Complaint::class,
                             'attachable_id' => $complaint->id,

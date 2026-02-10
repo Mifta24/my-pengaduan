@@ -6,6 +6,7 @@ use App\Models\Complaint;
 use App\Models\Category;
 use App\Models\Attachment;
 use App\Events\ComplaintCreated;
+use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +14,8 @@ use Illuminate\Validation\ValidationException;
 
 class ComplaintController extends Controller
 {
+    use HandlesCloudinaryUpload;
+
     public function __construct()
     {
         $this->middleware('auth');

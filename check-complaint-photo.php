@@ -14,7 +14,7 @@ if ($complaint) {
     echo "Complaint ID: {$complaint->id}\n";
     echo "Photo in DB: {$complaint->photo}\n";
     echo "Created at: {$complaint->created_at}\n";
-    
+
     if (strpos($complaint->photo, 'complaints/photos/') === 0) {
         echo "✅ Path CORRECT\n";
         echo "Expected URL: " . config('app.url') . "/storage/{$complaint->photo}\n";

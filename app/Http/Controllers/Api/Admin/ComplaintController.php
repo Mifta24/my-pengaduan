@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Models\Complaint;
 use App\Models\Attachment;
 use App\Traits\ApiResponse;
+use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -22,6 +23,7 @@ use Intervention\Image\Laravel\Facades\Image;
 class ComplaintController extends Controller
 {
     use ApiResponse;
+    use HandlesCloudinaryUpload;
 
     /**
      * Get All Complaints (Admin)

@@ -2,7 +2,7 @@
 
 /**
  * Diagnostic script to check photo upload issue in Railway
- * 
+ *
  * Usage: php check-photo-issue.php
  */
 
@@ -51,7 +51,7 @@ if ($complaint) {
     echo "   Complaint ID: {$complaint->id}\n";
     echo "   Photo path in DB: {$complaint->photo}\n";
     echo "   Created at: {$complaint->created_at}\n";
-    
+
     // Check if path is correct
     if (strpos($complaint->photo, 'complaints/photos/') === 0) {
         echo "   ✅ Path format is CORRECT\n";
@@ -59,11 +59,11 @@ if ($complaint) {
         echo "   ❌ Path format is WRONG (missing complaints/photos/)\n";
         echo "   Should be: complaints/photos/{$complaint->photo}\n";
     }
-    
+
     // Check if file exists
     $fileExists = Storage::disk('public')->exists($complaint->photo);
     echo "   File exists: " . ($fileExists ? "✅ YES" : "❌ NO") . "\n";
-    
+
     if ($fileExists) {
         $url = Storage::disk('public')->url($complaint->photo);
         echo "   Generated URL: {$url}\n";
@@ -75,7 +75,7 @@ if ($complaint) {
             "complaints/{$fileName}",
             $fileName
         ];
-        
+
         echo "   Searching file in other locations...\n";
         foreach ($possiblePaths as $path) {
             if (Storage::disk('public')->exists($path)) {
@@ -84,12 +84,12 @@ if ($complaint) {
             }
         }
     }
-    
+
     // Generate what the URL should be
-    $correctPath = strpos($complaint->photo, 'complaints/photos/') === 0 
-        ? $complaint->photo 
+    $correctPath = strpos($complaint->photo, 'complaints/photos/') === 0
+        ? $complaint->photo
         : 'complaints/photos/' . basename($complaint->photo);
-    
+
     $correctUrl = config('app.url') . '/storage/' . $correctPath;
     echo "\n   ✅ CORRECT URL SHOULD BE:\n";
     echo "   {$correctUrl}\n";
@@ -120,7 +120,7 @@ echo "5️⃣  STORAGE WRITE TEST:\n";
 try {
     $testPath = 'test-upload-' . time() . '.txt';
     Storage::disk('public')->put($testPath, 'Test upload from diagnostic script');
-    
+
     if (Storage::disk('public')->exists($testPath)) {
         echo "   ✅ Write test SUCCESS\n";
         echo "   Test file: {$testPath}\n";

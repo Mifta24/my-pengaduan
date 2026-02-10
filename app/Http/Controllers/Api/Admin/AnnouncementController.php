@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Events\AnnouncementCreated;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponse;
+use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Validator;
 class AnnouncementController extends Controller
 {
     use ApiResponse;
+    use HandlesCloudinaryUpload;
 
     /**
      * Get All Announcements (Admin)

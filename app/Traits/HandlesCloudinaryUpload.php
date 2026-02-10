@@ -11,7 +11,7 @@ trait HandlesCloudinaryUpload
 {
     /**
      * Upload photo to Cloudinary with compression
-     * 
+     *
      * @param UploadedFile $file
      * @param string $folder Folder in Cloudinary (e.g., 'complaints/photos')
      * @param int $maxWidth Maximum width for resizing
@@ -50,7 +50,7 @@ trait HandlesCloudinaryUpload
             // Create temporary file for Cloudinary upload
             $tempPath = sys_get_temp_dir() . '/' . uniqid() . '.' . $extension;
             file_put_contents($tempPath, (string) $encodedImage);
-            
+
             try {
                 // Upload to Cloudinary
                 $uploadedFile = Cloudinary::upload($tempPath, [
@@ -82,7 +82,7 @@ trait HandlesCloudinaryUpload
 
     /**
      * Delete file from Cloudinary
-     * 
+     *
      * @param string $publicId Cloudinary public ID
      * @return bool
      */
@@ -101,18 +101,18 @@ trait HandlesCloudinaryUpload
 
     /**
      * Check if Cloudinary is configured and enabled
-     * 
+     *
      * @return bool
      */
     protected function isCloudinaryEnabled(): bool
     {
-        return config('filesystems.default') === 'cloudinary' 
+        return config('filesystems.default') === 'cloudinary'
             && !empty(config('cloudinary.cloud_name'));
     }
 
     /**
      * Get storage method (cloudinary or local)
-     * 
+     *
      * @return string
      */
     protected function getStorageDriver(): string
