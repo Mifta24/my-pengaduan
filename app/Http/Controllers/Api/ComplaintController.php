@@ -9,6 +9,7 @@ use App\Models\Attachment;
 use App\Models\Announcement;
 use App\Events\ComplaintCreated;
 use App\Traits\ApiResponse;
+use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -23,6 +24,7 @@ use Intervention\Image\Laravel\Facades\Image;
 class ComplaintController extends Controller
 {
     use ApiResponse;
+    use HandlesCloudinaryUpload;
 
     public function __construct()
     {
@@ -175,45 +177,45 @@ class ComplaintController extends Controller
 
             // Handle photo upload with compression
             if ($request->hasFile('photo')) {
-                $photo = $request->file('photo');
-                $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
-
-                // Use Laravel Storage facade for better compatibility
-                $disk = config('filesystems.default');
-                $photoPath = 'complaints/photos/' . $fileName;
-
-                // Compress and save image
-                $image = Image::read($photo->getRealPath());
-
-                // Resize if larger than 1920px width, maintaining aspect ratio
-                if ($image->width() > 1920) {
-                    $image->scale(width: 1920);
-                }
-
-                // Save with 85% quality for JPEG/WebP
-                $extension = strtolower($photo->getClientOriginalExtension());
-
-                // Encode image
-                if (in_array($extension, ['jpg', 'jpeg'])) {
-                    $encodedImage = $image->toJpeg(quality: 85);
-                } elseif ($extension === 'webp') {
-                    $encodedImage = $image->toWebp(quality: 85);
+                if ($this->isCloudinaryEnabled()) {
+                    // Upload to Cloudinary
+                    $upload = $this->uploadToCloudinary(
+                        $request->file('photo'),
+                        'complaints/photos',
+                        1920,
+                        85
+                    );
+                    
+                    $complaint->update(['photo' => $upload['url']]);
+                    
+                    \Log::info('Photo uploaded to Cloudinary', $upload);
                 } else {
-                    $encodedImage = $image->toPng();
+                    // Fallback to local storage
+                    $photo = $request->file('photo');
+                    $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+                    $photoPath = 'complaints/photos/' . $fileName;
+
+                    $image = Image::read($photo->getRealPath());
+
+                    if ($image->width() > 1920) {
+                        $image->scale(width: 1920);
+                    }
+
+                    $extension = strtolower($photo->getClientOriginalExtension());
+
+                    if (in_array($extension, ['jpg', 'jpeg'])) {
+                        $encodedImage = $image->toJpeg(quality: 85);
+                    } elseif ($extension === 'webp') {
+                        $encodedImage = $image->toWebp(quality: 85);
+                    } else {
+                        $encodedImage = $image->toPng();
+                    }
+
+                    Storage::disk('public')->put($photoPath, (string) $encodedImage);
+                    $complaint->update(['photo' => $photoPath]);
+                    
+                    \Log::info('Photo uploaded to local storage', ['path' => $photoPath]);
                 }
-
-                // Store using Storage facade
-                Storage::disk('public')->put($photoPath, (string) $encodedImage);
-
-                // Log for debugging
-                \Log::info('Photo uploaded', [
-                    'path' => $photoPath,
-                    'disk' => $disk,
-                    'exists' => Storage::disk('public')->exists($photoPath),
-                    'url' => Storage::disk('public')->url($photoPath)
-                ]);
-
-                $complaint->update(['photo' => $photoPath]);
             }
 
             // Handle attachments with validation and compression for images
@@ -221,45 +223,62 @@ class ComplaintController extends Controller
                 foreach ($request->file('attachments') as $file) {
                     $mimeType = $file->getMimeType();
                     $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
-                    $path = 'complaints/attachments/' . $fileName;
+                    $isImage = in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']);
 
-                    // Check if file is an image and compress it
-                    if (in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])) {
-                        $image = Image::read($file->getRealPath());
-
-                        // Resize if larger than 1920px width
-                        if ($image->width() > 1920) {
-                            $image->scale(width: 1920);
-                        }
-
-                        $extension = strtolower($file->getClientOriginalExtension());
-
-                        // Encode image
-                        if (in_array($extension, ['jpg', 'jpeg'])) {
-                            $encodedImage = $image->toJpeg(quality: 85);
-                        } elseif ($extension === 'webp') {
-                            $encodedImage = $image->toWebp(quality: 85);
-                        } else {
-                            $encodedImage = $image->toPng();
-                        }
-
-                        // Store using Storage facade
-                        Storage::disk('public')->put($path, (string) $encodedImage);
-                        $fileSize = Storage::disk('public')->size($path);
+                    if ($this->isCloudinaryEnabled()) {
+                        // Upload to Cloudinary
+                        $upload = $this->uploadToCloudinary(
+                            $file,
+                            'complaints/attachments',
+                            1920,
+                            85
+                        );
+                        
+                        Attachment::create([
+                            'attachable_type' => Complaint::class,
+                            'attachable_id' => $complaint->id,
+                            'file_name' => $file->getClientOriginalName(),
+                            'file_path' => $upload['url'],
+                            'file_size' => $file->getSize(),
+                            'mime_type' => $mimeType,
+                        ]);
                     } else {
-                        // Non-image files, store normally
-                        Storage::disk('public')->putFileAs('complaints/attachments', $file, basename($fileName));
-                        $fileSize = $file->getSize();
-                    }
+                        // Local storage
+                        $path = 'complaints/attachments/' . $fileName;
 
-                    Attachment::create([
-                        'attachable_type' => Complaint::class,
-                        'attachable_id' => $complaint->id,
-                        'file_name' => $file->getClientOriginalName(),
-                        'file_path' => $path,
-                        'file_size' => $fileSize,
-                        'mime_type' => $mimeType,
-                    ]);
+                        if ($isImage) {
+                            $image = Image::read($file->getRealPath());
+
+                            if ($image->width() > 1920) {
+                                $image->scale(width: 1920);
+                            }
+
+                            $extension = strtolower($file->getClientOriginalExtension());
+
+                            if (in_array($extension, ['jpg', 'jpeg'])) {
+                                $encodedImage = $image->toJpeg(quality: 85);
+                            } elseif ($extension === 'webp') {
+                                $encodedImage = $image->toWebp(quality: 85);
+                            } else {
+                                $encodedImage = $image->toPng();
+                            }
+
+                            Storage::disk('public')->put($path, (string) $encodedImage);
+                            $fileSize = Storage::disk('public')->size($path);
+                        } else {
+                            Storage::disk('public')->putFileAs('complaints/attachments', $file, basename($fileName));
+                            $fileSize = $file->getSize();
+                        }
+
+                        Attachment::create([
+                            'attachable_type' => Complaint::class,
+                            'attachable_id' => $complaint->id,
+                            'file_name' => $file->getClientOriginalName(),
+                            'file_path' => $path,
+                            'file_size' => $fileSize,
+                            'mime_type' => $mimeType,
+                        ]);
+                    }
                 }
             }
 
