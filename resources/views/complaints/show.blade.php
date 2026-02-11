@@ -147,10 +147,10 @@
                             @foreach($complaint->attachments as $attachment)
                                 <div class="relative group">
                                     <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
-                                        <img src="{{ Storage::url($attachment->file_path) }}"
+                                        <img src="{{ $attachment->file_url }}"
                                              alt="Foto keluhan"
                                              class="h-full w-full object-cover cursor-pointer hover:opacity-75 transition-opacity"
-                                             onclick="openImageModal('{{ Storage::url($attachment->file_path) }}', '{{ $attachment->file_name }}')">
+                                             onclick="openImageModal('{{ $attachment->file_url }}', '{{ $attachment->file_name }}')">
                                     </div>
                                     <div class="absolute inset-0 rounded-lg ring-1 ring-inset ring-gray-900/10"></div>
 

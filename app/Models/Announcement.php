@@ -159,4 +159,25 @@ class Announcement extends Model
         }
         return 'unpublished';
     }
+
+    /**
+     * Get attachment URL - handles both Cloudinary and local storage
+     *
+     * @param string $path
+     * @return string
+     */
+    public function getAttachmentUrl($path)
+    {
+        if (!$path) {
+            return null;
+        }
+
+        // If already a full URL (Cloudinary), return as is
+        if (filter_var($path, FILTER_VALIDATE_URL)) {
+            return $path;
+        }
+
+        // For local storage, return full URL with storage path
+        return asset('storage/' . $path);
+    }
 }

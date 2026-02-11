@@ -182,10 +182,10 @@
                                     @foreach($complaint->attachments as $attachment)
                                         <div class="relative group" id="image-{{ $attachment->id }}">
                                             <div class="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                                                <img src="{{ Storage::url($attachment->file_path) }}"
+                                                <img src="{{ $attachment->file_url }}"
                                                      alt="Attachment"
                                                      class="w-full h-full object-cover cursor-pointer hover:opacity-75 transition-opacity"
-                                                     onclick="openImageModal('{{ Storage::url($attachment->file_path) }}')">
+                                                     onclick="openImageModal('{{ $attachment->file_url }}')">
                                             </div>
                                             <button type="button"
                                                     onclick="deleteExistingImage({{ $attachment->id }})"

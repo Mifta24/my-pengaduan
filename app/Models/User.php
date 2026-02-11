@@ -66,7 +66,25 @@ class User extends Authenticatable
     /**
      * Append custom attributes
      */
-    protected $appends = ['ktp_url'];
+    protected $appends = ['ktp_url', 'avatar_url'];
+
+    /**
+     * Get avatar URL accessor
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if (!$this->avatar) {
+            return null;
+        }
+
+        // If already a full URL, return as is
+        if (filter_var($this->avatar, FILTER_VALIDATE_URL)) {
+            return $this->avatar;
+        }
+
+        // Return full URL with storage path
+        return url('storage/' . $this->avatar);
+    }
 
     /**
      * Get KTP URL accessor

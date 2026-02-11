@@ -314,7 +314,7 @@
         <div class="images-grid">
             @foreach($complaint->complaintAttachments as $index => $attachment)
             <div class="image-container">
-                <img src="{{ asset('storage/' . $attachment->file_path) }}"
+                <img src="{{ $attachment->file_url }}"
                      alt="Foto keluhan {{ $index + 1 }}"
                      onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23ddd\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'sans-serif\' font-size=\'14\' fill=\'%23999\'%3EGambar tidak tersedia%3C/text%3E%3C/svg%3E';">
                 <div class="image-label">Foto {{ $index + 1 }}</div>
@@ -346,7 +346,7 @@
         <div class="images-grid">
             @foreach($complaint->resolutionAttachments as $index => $attachment)
             <div class="image-container resolution-image">
-                <img src="{{ asset('storage/' . $attachment->file_path) }}"
+                <img src="{{ $attachment->file_url }}"
                      alt="Foto penyelesaian {{ $index + 1 }}"
                      onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23d1fae5\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'sans-serif\' font-size=\'14\' fill=\'%23059669\'%3EGambar tidak tersedia%3C/text%3E%3C/svg%3E';">
                 <div class="image-label" style="background: #D1FAE5; color: #065F46;">Penyelesaian {{ $index + 1 }}</div>

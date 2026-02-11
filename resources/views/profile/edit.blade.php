@@ -63,7 +63,7 @@
                         <div class="shrink-0">
                             @if($user->avatar)
                                 <img class="h-16 w-16 object-cover rounded-full"
-                                     src="{{ Storage::url($user->avatar) }}"
+                                     src="{{ $user->avatar_url }}"
                                      alt="{{ $user->name }}">
                             @else
                                 <div class="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center">
@@ -134,7 +134,7 @@
                         <div class="relative rounded-lg border-2 border-gray-200 p-4 bg-gray-50">
                             <div class="flex items-start space-x-4">
                                 <div class="flex-shrink-0">
-                                    <img src="{{ Storage::url($user->ktp_path) }}"
+                                    <img src="{{ $user->ktp_url }}"
                                          alt="KTP {{ $user->name }}"
                                          class="h-32 w-auto rounded-lg border border-gray-300 object-contain cursor-pointer hover:opacity-75 transition"
                                          onclick="openKTPModal()">
@@ -526,7 +526,7 @@
             <!-- KTP Image -->
             <div class="p-4">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Foto KTP - {{ $user->name }}</h3>
-                <img src="{{ Storage::url($user->ktp_path) }}"
+                <img src="{{ $user->ktp_url }}"
                      alt="KTP {{ $user->name }}"
                      class="w-full h-auto rounded-lg"
                      onclick="event.stopPropagation()">

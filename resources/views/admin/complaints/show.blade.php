@@ -153,10 +153,10 @@
                         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
                             @foreach($complaint->complaintAttachments as $attachment)
                                 <div class="relative">
-                                    <img src="{{ Storage::url($attachment->file_path) }}"
+                                    <img src="{{ $attachment->file_url }}"
                                          alt="Foto keluhan"
                                          class="h-24 w-full object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
-                                         onclick="openImageModal('{{ Storage::url($attachment->file_path) }}')">
+                                         onclick="openImageModal('{{ $attachment->file_url }}')">
                                     <div class="absolute inset-0 rounded-lg ring-1 ring-inset ring-gray-900/10"></div>
                                 </div>
                             @endforeach
@@ -180,10 +180,10 @@
                         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
                             @foreach($complaint->resolutionAttachments as $attachment)
                                 <div class="relative">
-                                    <img src="{{ Storage::url($attachment->file_path) }}"
+                                    <img src="{{ $attachment->file_url }}"
                                          alt="Foto penyelesaian"
                                          class="h-24 w-full object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity border-2 border-green-200"
-                                         onclick="openImageModal('{{ Storage::url($attachment->file_path) }}')">
+                                         onclick="openImageModal('{{ $attachment->file_url }}')">
                                     <div class="absolute inset-0 rounded-lg ring-1 ring-inset ring-green-500/20"></div>
                                     <div class="absolute bottom-1 right-1 bg-green-500 text-white text-xs px-1 rounded">
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">

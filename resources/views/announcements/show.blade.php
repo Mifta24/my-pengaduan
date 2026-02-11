@@ -198,9 +198,9 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 @foreach($images as $index => $image)
                                     <div class="relative group cursor-pointer overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300"
-                                         onclick="openImageModal('{{ asset('storage/' . $image['path']) }}', '{{ $image['original_name'] ?? $image['name'] ?? 'Foto ' . ($index + 1) }}')">
+                                         onclick="openImageModal('{{ $announcement->getAttachmentUrl($image['path']) }}', '{{ $image['original_name'] ?? $image['name'] ?? 'Foto ' . ($index + 1) }}')">
                                         <div class="aspect-w-16 aspect-h-12 bg-gray-200">
-                                            <img src="{{ asset('storage/' . $image['path']) }}"
+                                            <img src="{{ $announcement->getAttachmentUrl($image['path']) }}"
                                                  alt="{{ $image['original_name'] ?? $image['name'] ?? 'Foto' }}"
                                                  class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
                                                  onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23ddd\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'sans-serif\' font-size=\'14\' fill=\'%23999\'%3EGambar tidak tersedia%3C/text%3E%3C/svg%3E';">
@@ -233,7 +233,7 @@
                                     @php
                                         $extension = pathinfo($file['original_name'] ?? $file['name'] ?? '', PATHINFO_EXTENSION);
                                     @endphp
-                                    <a href="{{ asset('storage/' . $file['path']) }}"
+                                    <a href="{{ $announcement->getAttachmentUrl($file['path']) }}"
                                        target="_blank"
                                        download
                                        class="flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-indigo-300 hover:shadow-md transition-all duration-200 group">

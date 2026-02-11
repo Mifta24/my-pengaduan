@@ -135,7 +135,7 @@
                         @foreach($complaint->attachments as $attachment)
                             <div class="relative group">
                                 <div class="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                                    <img src="{{ Storage::url($attachment->file_path) }}"
+                                    <img src="{{ $attachment->file_url }}"
                                          alt="Foto keluhan"
                                          class="w-full h-full object-cover">
                                 </div>

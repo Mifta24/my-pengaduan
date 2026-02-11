@@ -251,9 +251,9 @@
                                 <h4 class="text-sm font-medium text-gray-700 mb-3">Foto ({{ count($images) }})</h4>
                                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                                     @foreach($images as $index => $image)
-                                        <div class="relative group cursor-pointer" onclick="openImageModal('{{ asset('storage/' . $image['path']) }}')">
+                                        <div class="relative group cursor-pointer" onclick="openImageModal('{{ $announcement->getAttachmentUrl($image['path']) }}')">
                                             <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200">
-                                                <img src="{{ asset('storage/' . $image['path']) }}"
+                                                <img src="{{ $announcement->getAttachmentUrl($image['path']) }}"
                                                      alt="{{ $image['original_name'] ?? $image['name'] ?? 'Foto' }}"
                                                      class="h-48 w-full object-cover group-hover:opacity-75 transition-opacity"
                                                      onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23ddd\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'sans-serif\' font-size=\'14\' fill=\'%23999\'%3EGambar tidak tersedia%3C/text%3E%3C/svg%3E';">
@@ -298,7 +298,7 @@
                                                 </p>
                                             </div>
                                             <div class="ml-3">
-                                                <a href="{{ asset('storage/' . $file['path']) }}"
+                                                <a href="{{ $announcement->getAttachmentUrl($file['path']) }}"
                                                    target="_blank"
                                                    download
                                                    class="inline-flex items-center p-2 border border-transparent text-sm font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200">
