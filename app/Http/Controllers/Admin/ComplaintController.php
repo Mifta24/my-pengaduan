@@ -90,24 +90,37 @@ class ComplaintController extends Controller
 
         $complaint = Complaint::create($validated);
 
-        // Handle main photo upload
+        // Handle main photo upload via Cloudinary
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('complaints/photos', 'public');
-            $complaint->update(['photo' => $photoPath]);
+            $upload = app(\App\Traits\HandlesCloudinaryUpload::class)->uploadToCloudinary(
+                $request->file('photo'),
+                'complaints/photos',
+                1920,
+                85
+            );
+
+            $complaint->update(['photo' => $upload['url']]);
         }
 
-        // Handle additional attachments
+        // Handle additional attachments via Cloudinary
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                $path = $file->store('complaints', 'public');
+                $mimeType = $file->getMimeType();
+
+                $upload = app(\App\Traits\HandlesCloudinaryUpload::class)->uploadToCloudinary(
+                    $file,
+                    'complaints/attachments',
+                    1920,
+                    85
+                );
 
                 Attachment::create([
                     'attachable_type' => Complaint::class,
                     'attachable_id' => $complaint->id,
                     'file_name' => $file->getClientOriginalName(),
-                    'file_path' => $path,
+                    'file_path' => $upload['url'],
                     'file_size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
+                    'mime_type' => $mimeType,
                     'attachment_type' => 'complaint', // Set attachment type
                 ]);
             }

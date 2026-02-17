@@ -42,10 +42,17 @@ class RegisteredUserController extends Controller
             'terms' => ['required', 'accepted'],
         ]);
 
-        // Handle KTP upload
+        // Handle KTP upload via Cloudinary
         $ktpPath = null;
         if ($request->hasFile('ktp_file')) {
-            $ktpPath = $request->file('ktp_file')->store('ktp', 'public');
+            $upload = app(\App\Traits\HandlesCloudinaryUpload::class)->uploadToCloudinary(
+                $request->file('ktp_file'),
+                'ktp/photos',
+                1920,
+                85
+            );
+
+            $ktpPath = $upload['url'];
         }
 
         $user = User::create([

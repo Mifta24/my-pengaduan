@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Events\AnnouncementCreated;
+use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class AnnouncementController extends Controller
 {
+    use HandlesCloudinaryUpload;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -105,13 +108,14 @@ class AnnouncementController extends Controller
         $validated['published_at'] = $validated['published_at'] ?? now();
         $validated['author_id'] = Auth::id();
 
-        // Handle file attachments
+        // Handle file attachments (upload to Cloudinary)
         if ($request->hasFile('attachments')) {
             $attachments = [];
             foreach ($request->file('attachments') as $file) {
-                $path = $file->store('announcements', 'public');
+                $upload = $this->uploadToCloudinary($file, 'announcements/attachments', 1920, 85);
+
                 $attachments[] = [
-                    'path' => $path,
+                    'path' => $upload['url'],
                     'original_name' => $file->getClientOriginalName(),
                     'size' => $file->getSize(),
                 ];
@@ -174,9 +178,18 @@ class AnnouncementController extends Controller
         if ($request->has('remove_attachments')) {
             foreach ($request->remove_attachments as $index) {
                 if (isset($existingAttachments[$index])) {
-                    // Delete file from storage if exists
+                    // Delete file from Cloudinary or local storage if exists
                     if (is_array($existingAttachments[$index]) && isset($existingAttachments[$index]['path'])) {
-                        Storage::disk('public')->delete($existingAttachments[$index]['path']);
+                        $path = $existingAttachments[$index]['path'];
+
+                        if ($path && filter_var($path, FILTER_VALIDATE_URL)) {
+                            if (preg_match('/\/v\d+\/(.+)$/', $path, $matches)) {
+                                $publicId = pathinfo($matches[1], PATHINFO_DIRNAME) . '/' . pathinfo($matches[1], PATHINFO_FILENAME);
+                                $this->deleteFromCloudinary($publicId);
+                            }
+                        } else {
+                            Storage::disk('public')->delete($path);
+                        }
                     }
                     unset($existingAttachments[$index]);
                 }
@@ -184,13 +197,14 @@ class AnnouncementController extends Controller
             $existingAttachments = array_values($existingAttachments); // Re-index array
         }
 
-        // Handle new file attachments
+        // Handle new file attachments (upload to Cloudinary)
         if ($request->hasFile('attachments')) {
             $newAttachments = [];
             foreach ($request->file('attachments') as $file) {
-                $path = $file->store('announcements', 'public');
+                $upload = $this->uploadToCloudinary($file, 'announcements/attachments', 1920, 85);
+
                 $newAttachments[] = [
-                    'path' => $path,
+                    'path' => $upload['url'],
                     'original_name' => $file->getClientOriginalName(),
                     'size' => $file->getSize(),
                 ];

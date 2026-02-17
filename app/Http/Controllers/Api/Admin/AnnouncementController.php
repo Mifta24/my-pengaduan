@@ -129,7 +129,6 @@ class AnnouncementController extends Controller
                 'slug' => 'nullable|string|max:255|unique:announcements,slug',
                 'content' => 'required|string',
                 'excerpt' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 'priority' => 'required|in:low,medium,high,urgent',
                 'is_sticky' => 'boolean',
                 'is_active' => 'boolean',
@@ -140,16 +139,12 @@ class AnnouncementController extends Controller
                 return $this->validationError($validator->errors());
             }
 
-            $data = $request->except('image');
+            $data = $request->all();
             $data['slug'] = $request->slug ?? Str::slug($request->title);
             $data['published_at'] = $request->published_at ?? now();
             $data['author_id'] = auth()->id();
 
-            // Handle image upload
-            if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('announcements', 'public');
-                $data['image'] = $imagePath;
-            }
+            // Note: API admin announcements currently do not manage attachments or images directly.
 
             $announcement = Announcement::create($data);
 
@@ -175,7 +170,6 @@ class AnnouncementController extends Controller
                 'slug' => 'nullable|string|max:255|unique:announcements,slug,' . $id,
                 'content' => 'required|string',
                 'excerpt' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 'priority' => 'required|in:low,medium,high,urgent',
                 'is_sticky' => 'boolean',
                 'is_active' => 'boolean',
@@ -186,21 +180,12 @@ class AnnouncementController extends Controller
                 return $this->validationError($validator->errors());
             }
 
-            $data = $request->except('image');
+            $data = $request->all();
             if ($request->has('title') && !$request->has('slug')) {
                 $data['slug'] = Str::slug($request->title);
             }
 
-            // Handle image upload
-            if ($request->hasFile('image')) {
-                // Delete old image if exists
-                if ($announcement->image && Storage::disk('public')->exists($announcement->image)) {
-                    Storage::disk('public')->delete($announcement->image);
-                }
-
-                $imagePath = $request->file('image')->store('announcements', 'public');
-                $data['image'] = $imagePath;
-            }
+            // Note: API admin announcements currently do not manage attachments or images directly.
 
             $announcement->update($data);
 
@@ -218,10 +203,7 @@ class AnnouncementController extends Controller
         try {
             $announcement = Announcement::findOrFail($id);
 
-            // Delete image if exists
-            if ($announcement->image && Storage::disk('public')->exists($announcement->image)) {
-                Storage::disk('public')->delete($announcement->image);
-            }
+            // Note: Attachments cleanup (including Cloudinary) is handled via the web admin controller logic.
 
             $announcement->delete();
 

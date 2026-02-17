@@ -80,10 +80,17 @@ class AuthController extends Controller
                 'phone' => 'nullable|string|max:20'
             ]);
 
-            // Handle KTP photo upload
+            // Handle KTP photo upload via Cloudinary
             $ktpPhotoPath = null;
             if ($request->hasFile('ktp_photo')) {
-                $ktpPhotoPath = $request->file('ktp_photo')->store('ktp', 'public');
+                $upload = app(\App\Traits\HandlesCloudinaryUpload::class)->uploadToCloudinary(
+                    $request->file('ktp_photo'),
+                    'ktp/photos',
+                    1920,
+                    85
+                );
+
+                $ktpPhotoPath = $upload['url'];
             }
 
             $user = User::create([
@@ -112,7 +119,7 @@ class AuthController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'nik' => $user->nik,
-                    'ktp_photo' => $user->ktp_photo ? asset('storage/' . $user->ktp_photo) : null,
+                    'ktp_photo' => $user->ktp_photo,
                     'email' => $user->email,
                     'address' => $user->address,
                     'rt' => $user->rt,
