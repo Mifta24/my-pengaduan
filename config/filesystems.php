@@ -62,12 +62,10 @@ return [
 
         'cloudinary' => [
             'driver' => 'cloudinary',
-            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-            'api_key' => env('CLOUDINARY_API_KEY'),
-            'api_secret' => env('CLOUDINARY_API_SECRET'),
-            'url' => [
-                'secure' => env('CLOUDINARY_SECURE_URL', true),
-            ],
+            // Cloudinary Laravel v3 expects either a URL string or
+            // separate credentials (cloud, key, secret, secure).
+            // We keep it simple and pass the full CLOUDINARY_URL.
+            'url' => env('CLOUDINARY_URL'),
         ],
 
     ],

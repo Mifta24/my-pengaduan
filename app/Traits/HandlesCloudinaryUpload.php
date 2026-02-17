@@ -107,7 +107,7 @@ trait HandlesCloudinaryUpload
     protected function isCloudinaryEnabled(): bool
     {
         return config('filesystems.default') === 'cloudinary'
-            && !empty(config('cloudinary.cloud_name'));
+            && !empty(config('filesystems.disks.cloudinary.url'));
     }
 
     /**
