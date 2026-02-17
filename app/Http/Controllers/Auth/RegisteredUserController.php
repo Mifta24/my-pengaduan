@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,8 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
+    use HandlesCloudinaryUpload;
+
     /**
      * Display the registration view.
      */
@@ -45,7 +48,7 @@ class RegisteredUserController extends Controller
         // Handle KTP upload via Cloudinary
         $ktpPath = null;
         if ($request->hasFile('ktp_file')) {
-            $upload = app(\App\Traits\HandlesCloudinaryUpload::class)->uploadToCloudinary(
+            $upload = $this->uploadToCloudinary(
                 $request->file('ktp_file'),
                 'ktp/photos',
                 1920,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Traits\ApiResponse;
+use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ use Illuminate\Validation\ValidationException;
  */
 class AuthController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, HandlesCloudinaryUpload;
 
     /**
      * Register User
@@ -83,7 +84,7 @@ class AuthController extends Controller
             // Handle KTP photo upload via Cloudinary
             $ktpPhotoPath = null;
             if ($request->hasFile('ktp_photo')) {
-                $upload = app(\App\Traits\HandlesCloudinaryUpload::class)->uploadToCloudinary(
+                $upload = $this->uploadToCloudinary(
                     $request->file('ktp_photo'),
                     'ktp/photos',
                     1920,

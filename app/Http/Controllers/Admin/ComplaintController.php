@@ -92,7 +92,7 @@ class ComplaintController extends Controller
 
         // Handle main photo upload via Cloudinary
         if ($request->hasFile('photo')) {
-            $upload = app(\App\Traits\HandlesCloudinaryUpload::class)->uploadToCloudinary(
+            $upload = $this->uploadToCloudinary(
                 $request->file('photo'),
                 'complaints/photos',
                 1920,
@@ -107,7 +107,7 @@ class ComplaintController extends Controller
             foreach ($request->file('attachments') as $file) {
                 $mimeType = $file->getMimeType();
 
-                $upload = app(\App\Traits\HandlesCloudinaryUpload::class)->uploadToCloudinary(
+                $upload = $this->uploadToCloudinary(
                     $file,
                     'complaints/attachments',
                     1920,
