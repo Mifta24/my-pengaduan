@@ -52,14 +52,14 @@ trait HandlesCloudinaryUpload
             file_put_contents($tempPath, (string) $encodedImage);
 
             try {
-                // Upload to Cloudinary
-                $uploadedFile = Cloudinary::upload($tempPath, [
+                // Upload to Cloudinary (v3 SDK via uploadApi)
+                $uploadedFile = Cloudinary::uploadApi()->upload($tempPath, [
                     'folder' => $folder,
                     'resource_type' => 'image',
                     'transformation' => [
                         'quality' => 'auto:good',
                         'fetch_format' => 'auto',
-                    ]
+                    ],
                 ]);
             } finally {
                 // Clean up temp file
@@ -67,16 +67,16 @@ trait HandlesCloudinaryUpload
             }
         } else {
             // Upload non-image files directly
-            $uploadedFile = Cloudinary::upload($file->getRealPath(), [
+            $uploadedFile = Cloudinary::uploadApi()->upload($file->getRealPath(), [
                 'folder' => $folder,
                 'resource_type' => 'raw',
             ]);
         }
 
         return [
-            'path' => $uploadedFile->getPublicId(),
-            'url' => $uploadedFile->getSecurePath(),
-            'size' => $uploadedFile->getReadableSize(),
+            'path' => $uploadedFile['public_id'] ?? null,
+            'url' => $uploadedFile['secure_url'] ?? null,
+            'size' => $uploadedFile['bytes'] ?? $file->getSize(),
         ];
     }
 
