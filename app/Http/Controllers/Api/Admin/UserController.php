@@ -225,6 +225,22 @@ class UserController extends Controller
     }
 
     /**
+     * Unverify user email
+     */
+    public function unverifyEmail($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->email_verified_at = null;
+            $user->save();
+
+            return $this->success($user, 'User email verification revoked successfully');
+        } catch (\Exception $e) {
+            return $this->notFound('User not found');
+        }
+    }
+
+    /**
      * Verify user identity
      */
     public function verifyUser($id)
@@ -236,6 +252,23 @@ class UserController extends Controller
             $user->save();
 
             return $this->success($user, 'User verified successfully');
+        } catch (\Exception $e) {
+            return $this->notFound('User not found');
+        }
+    }
+
+    /**
+     * Reject user verification
+     */
+    public function rejectVerification($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->is_verified = false;
+            $user->verified_at = null;
+            $user->save();
+
+            return $this->success($user, 'User verification rejected successfully');
         } catch (\Exception $e) {
             return $this->notFound('User not found');
         }

@@ -173,7 +173,9 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->name('api.ad
         Route::put('/{id}', [AdminUserController::class, 'update']);
         Route::delete('/{id}', [AdminUserController::class, 'destroy']);
         Route::patch('/{id}/verify-email', [AdminUserController::class, 'verifyEmail']);
+        Route::patch('/{id}/unverify-email', [AdminUserController::class, 'unverifyEmail']);
         Route::patch('/{id}/verify-user', [AdminUserController::class, 'verifyUser']);
+        Route::patch('/{id}/reject-verification', [AdminUserController::class, 'rejectVerification']);
         Route::patch('/{id}/change-role', [AdminUserController::class, 'changeRole']);
         Route::patch('/{id}/reset-password', [AdminUserController::class, 'resetPassword']);
     });
