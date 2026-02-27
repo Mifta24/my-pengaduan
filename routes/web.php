@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\AppIdentityController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\HomeController;
@@ -93,6 +94,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('announcements/{announcement}/duplicate', [AdminAnnouncementController::class, 'duplicate'])->name('announcements.duplicate');
     Route::post('announcements/bulk-action', [AdminAnnouncementController::class, 'bulkAction'])->name('announcements.bulk-action');
     Route::get('announcements/export', [AdminAnnouncementController::class, 'export'])->name('announcements.export');
+
+    // Web Identity Settings
+    Route::get('settings/identity', [AppIdentityController::class, 'edit'])->name('settings.identity.edit');
+    Route::put('settings/identity', [AppIdentityController::class, 'update'])->name('settings.identity.update');
 });
 
 /*

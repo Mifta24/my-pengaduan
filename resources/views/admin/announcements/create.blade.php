@@ -42,7 +42,7 @@
                 Buat Pengumuman Baru
             </h1>
             <p class="mt-1 text-sm text-gray-500">
-                Buat pengumuman baru untuk warga Lurah/RW
+                Buat pengumuman baru untuk warga Gang Annur 2 RT 05
             </p>
         </div>
 
@@ -251,7 +251,7 @@
                                             {{ in_array('pengurus_rt', old('target_audience', [])) ? 'checked' : '' }}
                                             class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
                                         <label for="target_rt" class="ml-3 text-sm leading-6 text-gray-900">
-                                            Pengurus Lurah
+                                            Admin RT
                                         </label>
                                     </div>
                                 </div>

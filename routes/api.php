@@ -210,7 +210,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->name('api.ad
 
 Route::get('/', function () {
     return response()->json([
-        'message' => 'Lurah/RW Complaint Management System API',
+        'message' => 'API MyPengaduan',
         'version' => '1.0.0',
         'documentation' => url('/api/docs'),
         'endpoints' => [

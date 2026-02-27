@@ -5,8 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ isset($title) ? $title . ' - ' : '' }}{{ config('app.name', 'MyPengaduan') }}</title>
-        <meta name="description" content="Sistem Pengaduan Lurah/RW - Platform digital untuk melaporkan keluhan dan mendapatkan respon cepat dari pengurus Lurah/RW">
+        <title>{{ isset($title) ? $title . ' - ' : '' }}{{ $appIdentity['site_name'] ?? config('app.name') }}</title>
+        <meta name="description" content="{{ $appIdentity['site_name'] ?? config('app.name') }} - Platform digital untuk warga melaporkan keluhan ke admin RT.">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -29,8 +29,8 @@
                             </div>
                         </div>
                         <div>
-                            <h1 class="text-2xl font-bold text-white">MyPengaduan</h1>
-                            <p class="text-indigo-200 text-sm">Sistem Pengaduan /RW</p>
+                            <h1 class="text-2xl font-bold text-white">{{ $appIdentity['short_name'] ?? ($appIdentity['site_name'] ?? config('app.name')) }}</h1>
+                            <p class="text-indigo-200 text-sm">{{ $appIdentity['area_name'] ?? 'Gang Annur 2 RT 05' }}</p>
                         </div>
                     </div>
 
@@ -39,7 +39,7 @@
                             Platform Digital untuk Pengaduan Warga
                         </h2>
                         <p class="text-lg text-indigo-100">
-                            Laporkan keluhan dengan mudah dan dapatkan respon cepat dari pengurus Lurah/RW Anda.
+                            Laporkan keluhan dengan mudah dan dapatkan respon cepat dari admin RT.
                         </p>
 
                         <div class="space-y-4">
@@ -90,8 +90,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h1 class="text-xl font-bold text-gray-900">MyPengaduan</h1>
-                                <p class="text-sm text-gray-500">Sistem Pengaduan Lurah/RW</p>
+                                <h1 class="text-xl font-bold text-gray-900">{{ $appIdentity['short_name'] ?? ($appIdentity['site_name'] ?? config('app.name')) }}</h1>
+                                <p class="text-sm text-gray-500">{{ $appIdentity['area_name'] ?? 'Gang Annur 2 RT 05' }}</p>
                             </div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                     <!-- Footer -->
                     <div class="mt-8 text-center">
                         <p class="text-sm text-gray-500">
-                            © {{ date('Y') }} MyPengaduan. Dikembangkan untuk Lurah/RW Indonesia.
+                            © {{ date('Y') }} {{ $appIdentity['footer_text'] ?? ($appIdentity['site_name'] ?? config('app.name')) }}.
                         </p>
                         <div class="mt-2 flex justify-center space-x-4 text-sm text-gray-400">
                             <a href="#" class="hover:text-gray-600">Bantuan</a>

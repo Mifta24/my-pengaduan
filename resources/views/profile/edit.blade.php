@@ -175,7 +175,7 @@
                     </div>
                     @endif
 
-                    <!-- Phone and Lurah/RW -->
+                    <!-- Phone and RT/RW -->
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                         <div>
                             <label for="phone" class="block text-sm font-medium leading-6 text-gray-900">
@@ -194,7 +194,7 @@
 
                         <div>
                             <label for="rt_number" class="block text-sm font-medium leading-6 text-gray-900">
-                                Lurah (Rukun Tetangga)
+                                RT (Rukun Tetangga)
                             </label>
                             <div class="mt-2">
                                 <input type="text" name="rt_number" id="rt_number"

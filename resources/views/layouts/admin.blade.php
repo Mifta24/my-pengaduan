@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Admin Dashboard') - {{ config('app.name', 'MyPengaduan') }}</title>
+    <title>@yield('title', 'Admin Dashboard') - {{ $appIdentity['site_name'] ?? config('app.name') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -54,7 +54,7 @@
                     <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
                         <!-- Logo -->
                         <div class="flex h-16 shrink-0 items-center">
-                            <h2 class="text-xl font-bold text-indigo-600">MyPengaduan</h2>
+                            <h2 class="text-xl font-bold text-indigo-600">{{ $appIdentity['short_name'] ?? ($appIdentity['site_name'] ?? config('app.name')) }}</h2>
                             <span class="ml-2 rounded-full bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-700">Admin</span>
                         </div>
 
@@ -206,7 +206,7 @@
             <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 shadow-xl ring-1 ring-gray-900/10">
                 <!-- Logo -->
                 <div class="flex h-16 shrink-0 items-center">
-                    <h2 class="text-2xl font-bold text-indigo-600">MyPengaduan</h2>
+                    <h2 class="text-2xl font-bold text-indigo-600">{{ $appIdentity['short_name'] ?? ($appIdentity['site_name'] ?? config('app.name')) }}</h2>
                     <span class="ml-2 rounded-full bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-700">Admin</span>
                 </div>
 
@@ -318,6 +318,15 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                         Profil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.settings.identity.edit') }}"
+                                       class="group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold {{ request()->routeIs('admin.settings.identity.*') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50' }}">
+                                        <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 0115 0m-15 0H3m16.5 0H21m-9-7.5v15" />
+                                        </svg>
+                                        Identitas Web
                                     </a>
                                 </li>
                                 <li>

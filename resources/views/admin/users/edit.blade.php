@@ -225,20 +225,14 @@
                         <select name="role" id="role" required
                                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 @error('role') ring-red-500 @enderror">
                             <option value="">Pilih peran</option>
-                            <option value="user" {{ old('role', $userRole) === 'user' ? 'selected' : '' }}>User</option>
-                            <option value="admin" {{ old('role', $userRole) === 'admin' ? 'selected' : '' }}>Admin</option>
-                            @can('manage super admin')
-                                <option value="super_admin" {{ old('role', $userRole) === 'super_admin' ? 'selected' : '' }}>Super Admin</option>
-                            @endcan
+                            <option value="user" {{ old('role', $userRole) === 'user' ? 'selected' : '' }}>Warga</option>
+                            <option value="admin" {{ old('role', $userRole) === 'admin' ? 'selected' : '' }}>Admin RT</option>
                         </select>
                     </div>
                     <div class="mt-2 text-sm text-gray-500">
                         <ul class="space-y-1">
-                            <li><strong>User:</strong> Pengguna biasa yang dapat mengajukan keluhan</li>
-                            <li><strong>Admin:</strong> Dapat mengelola keluhan dan data sistem</li>
-                            @can('manage super admin')
-                                <li><strong>Super Admin:</strong> Akses penuh ke semua fitur sistem</li>
-                            @endcan
+                            <li><strong>Warga:</strong> Dapat mengajukan dan memantau keluhan</li>
+                            <li><strong>Admin RT:</strong> Dapat mengelola keluhan dan data sistem</li>
                         </ul>
                     </div>
                     @error('role')

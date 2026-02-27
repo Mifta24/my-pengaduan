@@ -101,11 +101,11 @@
             @enderror
         </div>
 
-        <!-- Lurah/RW Information -->
+        <!-- RT/RW Information -->
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <label for="rt_number" class="block text-sm font-medium leading-6 text-gray-900">
-                    Lurah (Rukun Tetangga)
+                    RT (Rukun Tetangga)
                 </label>
                 <div class="mt-2">
                     <input id="rt_number"

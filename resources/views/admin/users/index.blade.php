@@ -59,8 +59,8 @@
                 <select name="role"
                         class="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                     <option value="">Semua Peran</option>
-                    <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="user" {{ request('role') === 'user' ? 'selected' : '' }}>User</option>
+                    <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin RT</option>
+                    <option value="user" {{ request('role') === 'user' ? 'selected' : '' }}>Warga</option>
                 </select>
             </div>
             <div>
@@ -116,12 +116,10 @@
                                             @if($user->roles->count() > 0)
                                                 @foreach($user->roles as $role)
                                                     <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium
-                                                        @if($role->name === 'super_admin') bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-700/10
-                                                        @elseif($role->name === 'admin') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10
+                                                        @if($role->name === 'admin') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10
                                                         @else bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10 @endif">
-                                                        @if($role->name === 'super_admin') Super Admin
-                                                        @elseif($role->name === 'admin') Admin
-                                                        @else User @endif
+                                                        @if($role->name === 'admin') Admin RT
+                                                        @else Warga @endif
                                                     </span>
                                                 @endforeach
                                             @endif
@@ -215,17 +213,15 @@
                                         @if($user->roles->count() > 0)
                                             @foreach($user->roles as $role)
                                                 <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium mr-1
-                                                    @if($role->name === 'super_admin') bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-700/10
-                                                    @elseif($role->name === 'admin') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10
+                                                    @if($role->name === 'admin') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10
                                                     @else bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10 @endif">
-                                                    @if($role->name === 'super_admin') Super Admin
-                                                    @elseif($role->name === 'admin') Admin
-                                                    @else User @endif
+                                                    @if($role->name === 'admin') Admin RT
+                                                    @else Warga @endif
                                                 </span>
                                             @endforeach
                                         @else
                                             <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
-                                                User
+                                                Warga
                                             </span>
                                         @endif
                                     </td>

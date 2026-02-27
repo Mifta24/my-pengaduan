@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Sistem Pengaduan RT/RW')</title>
+    <title>@yield('title', $appIdentity['site_name'] ?? config('app.name'))</title>
 
     <!-- Tailwind CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -23,7 +23,7 @@
                             <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2-2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 3v18m3 0h4M9 7h3m-3 4h3m-3 4h3" />
                             </svg>
-                            <span class="ml-2 text-xl font-bold text-gray-900">MyPengaduan</span>
+                            <span class="ml-2 text-xl font-bold text-gray-900">{{ $appIdentity['short_name'] ?? ($appIdentity['site_name'] ?? config('app.name')) }}</span>
                         </a>
                     </div>
                     <div class="hidden md:ml-6 md:flex md:space-x-8">
@@ -168,10 +168,10 @@
                         <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2-2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 3v18m3 0h4M9 7h3m-3 4h3m-3 4h3" />
                         </svg>
-                        <span class="ml-2 text-xl font-bold text-gray-900">MyPengaduan</span>
+                        <span class="ml-2 text-xl font-bold text-gray-900">{{ $appIdentity['short_name'] ?? ($appIdentity['site_name'] ?? config('app.name')) }}</span>
                     </div>
                     <p class="mt-4 text-gray-600">
-                        Sistem Pengaduan RT/RW untuk memudahkan warga dalam menyampaikan keluhan dan aspirasi kepada pengurus RT/RW.
+                        {{ $appIdentity['site_name'] ?? config('app.name') }} untuk memudahkan warga menyampaikan keluhan kepada admin RT.
                     </p>
                 </div>
                 <div>
@@ -185,15 +185,15 @@
                 <div>
                     <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Kontak</h3>
                     <ul class="mt-4 space-y-2">
-                        <li class="text-gray-600">RT 005/RW 001</li>
-                        <li class="text-gray-600">Gang Annur 2</li>
-                        <li class="text-gray-600">Phone: (021) 12345678</li>
-                        <li class="text-gray-600">Email: info@anuur2rt005rw001.id</li>
+                        <li class="text-gray-600">{{ $appIdentity['area_name'] ?? 'Gang Annur 2 RT 05' }}</li>
+                        <li class="text-gray-600">Admin RT 05</li>
+                        <li class="text-gray-600">Phone: {{ $appIdentity['contact_phone'] ?? '-' }}</li>
+                        <li class="text-gray-600">Email: {{ $appIdentity['contact_email'] ?? '-' }}</li>
                     </ul>
                 </div>
             </div>
             <div class="mt-8 border-t border-gray-200 pt-8">
-                <p class="text-center text-gray-400">&copy; {{ date('Y') }} Sistem Pengaduan RT/RW. All rights reserved.</p>
+                <p class="text-center text-gray-400">&copy; {{ date('Y') }} {{ $appIdentity['footer_text'] ?? ($appIdentity['site_name'] ?? config('app.name')) }}.</p>
             </div>
         </div>
     </footer>

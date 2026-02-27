@@ -48,7 +48,7 @@ class UserController extends Controller
         }
 
         $users = $query->orderBy('created_at', 'desc')->paginate(15);
-        $roles = Role::all();
+        $roles = Role::whereIn('name', ['admin', 'user'])->get();
 
         return view('admin.users.index', compact('users', 'roles'));
     }
@@ -58,7 +58,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = Role::all();
+        $roles = Role::whereIn('name', ['admin', 'user'])->get();
         return view('admin.users.create', compact('roles'));
     }
 
@@ -73,7 +73,7 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'address' => 'nullable|string|max:500',
             'phone' => 'nullable|string|max:20',
-            'role' => 'required|exists:roles,name'
+            'role' => 'required|in:admin,user'
         ]);
 
         $user = User::create([
@@ -116,7 +116,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $roles = Role::all();
+        $roles = Role::whereIn('name', ['admin', 'user'])->get();
         $user->load(['roles', 'complaints', 'comments']);
         return view('admin.users.edit', compact('user', 'roles'));
     }
@@ -132,7 +132,7 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'address' => 'nullable|string|max:500',
             'phone' => 'nullable|string|max:20',
-            'role' => 'required|exists:roles,name'
+            'role' => 'required|in:admin,user'
         ]);
 
         // Update user data
@@ -210,7 +210,7 @@ class UserController extends Controller
     public function changeRole(Request $request, User $user)
     {
         $validated = $request->validate([
-            'role' => 'required|exists:roles,name'
+            'role' => 'required|in:admin,user'
         ]);
 
         // Prevent changing own role
@@ -251,7 +251,7 @@ class UserController extends Controller
             'action' => 'required|in:verify,unverify,delete,change_role',
             'user_ids' => 'required|array',
             'user_ids.*' => 'exists:users,id',
-            'role' => 'required_if:action,change_role|exists:roles,name'
+            'role' => 'required_if:action,change_role|in:admin,user'
         ]);
 
         $users = User::whereIn('id', $validated['user_ids']);
@@ -332,7 +332,7 @@ class UserController extends Controller
         ]);
 
         return redirect()->back()
-            ->with('success', "Pengguna {$user->name} berhasil diverifikasi sebagai warga Lurah/RW.");
+            ->with('success', "Pengguna {$user->name} berhasil diverifikasi sebagai warga Gang Annur 2 RT 05.");
     }
 
     /**

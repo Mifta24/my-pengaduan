@@ -77,12 +77,10 @@
                             @endphp
                             @if($userRole)
                                 <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium
-                                    @if($userRole === 'super_admin') bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-600/20
-                                    @elseif($userRole === 'admin') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20
+                                    @if($userRole === 'admin') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20
                                     @else bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10 @endif">
-                                    @if($userRole === 'super_admin') Super Admin
-                                    @elseif($userRole === 'admin') Admin
-                                    @else User @endif
+                                    @if($userRole === 'admin') Admin RT
+                                    @else Warga @endif
                                 </span>
                             @endif
 
@@ -365,7 +363,7 @@
                         <div class="grid grid-cols-2 gap-4">
                             @if($user->rt_number)
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500">Lurah</dt>
+                                    <dt class="text-sm font-medium text-gray-500">RT</dt>
                                     <dd class="mt-1 text-sm text-gray-900">{{ $user->rt_number }}</dd>
                                 </div>
                             @endif
@@ -488,12 +486,10 @@
                         <dd class="mt-1">
                             @if($userRole)
                                 <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium
-                                    @if($userRole === 'super_admin') bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-600/20
-                                    @elseif($userRole === 'admin') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20
+                                    @if($userRole === 'admin') bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20
                                     @else bg-gray-50 text-gray-600 ring-1 ring-inset ring-gray-500/10 @endif">
-                                    @if($userRole === 'super_admin') Super Admin
-                                    @elseif($userRole === 'admin') Admin
-                                    @else User @endif
+                                    @if($userRole === 'admin') Admin RT
+                                    @else Warga @endif
                                 </span>
                             @else
                                 <span class="text-sm text-gray-500">Tidak ada peran</span>
@@ -642,7 +638,7 @@
                         <p><strong>Alamat:</strong> {{ $user->address }}</p>
                     @endif
                     @if($user->rt_number || $user->rw_number)
-                        <p><strong>Lurah/RW:</strong> {{ $user->rt_number }}/{{ $user->rw_number }}</p>
+                        <p><strong>RT/RW:</strong> {{ $user->rt_number }}/{{ $user->rw_number }}</p>
                     @endif
                     @if($user->verified_at)
                         <p class="text-green-600 mt-2 flex items-center">

@@ -11,7 +11,7 @@
                 Kelola Pengumuman
             </h1>
             <p class="mt-1 text-sm text-gray-500">
-                Kelola pengumuman untuk warga Lurah/RW
+                Kelola pengumuman untuk warga Gang Annur 2 RT 05
             </p>
         </div>
         <div class="mt-4 flex md:ml-4 md:mt-0">

@@ -34,7 +34,7 @@ class RolePermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Create roles - RT sebagai admin, warga sebagai user
+        // Create roles - Admin RT dan Warga
         $rtRole = Role::firstOrCreate(['name' => 'admin']);
         $wargaRole = Role::firstOrCreate(['name' => 'user']);
 
@@ -55,7 +55,7 @@ class RolePermissionSeeder extends Seeder
                 'name' => 'Ketua RT',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
-                'address' => 'Kantor RT 01/RW 01'
+                'address' => 'Pos RT 05, Gang Annur 2'
             ]
         );
 
@@ -68,7 +68,7 @@ class RolePermissionSeeder extends Seeder
                 'name' => 'Budi Santoso',
                 'password' => Hash::make('password'),
                 'role' => 'user',
-                'address' => 'Jl. Mawar No. 15, RT 01/RW 01'
+                'address' => 'Gang Annur 2 RT 05'
             ]
         );
         $warga1->assignRole('user');
@@ -79,7 +79,7 @@ class RolePermissionSeeder extends Seeder
                 'name' => 'Siti Nurhaliza',
                 'password' => Hash::make('password'),
                 'role' => 'user',
-                'address' => 'Jl. Melati No. 8, RT 01/RW 01'
+                'address' => 'Gang Annur 2 RT 05'
             ]
         );
         $warga2->assignRole('user');
@@ -90,7 +90,7 @@ class RolePermissionSeeder extends Seeder
                 'name' => 'Ahmad Fauzi',
                 'password' => Hash::make('password'),
                 'role' => 'user',
-                'address' => 'Jl. Kenanga No. 23, RT 01/RW 01'
+                'address' => 'Gang Annur 2 RT 05'
             ]
         );
         $warga3->assignRole('user');

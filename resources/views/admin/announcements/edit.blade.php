@@ -213,7 +213,7 @@
                                 <input id="target_rt" name="target_audience[]" type="checkbox" value="pengurus_rt"
                                        {{ in_array('pengurus_rt', $targetAudience) ? 'checked' : '' }}
                                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-                                <label for="target_rt" class="ml-3 text-sm leading-6 text-gray-600">Pengurus Lurah</label>
+                                <label for="target_rt" class="ml-3 text-sm leading-6 text-gray-600">Admin RT</label>
                             </div>
                         </div>
                     </div>

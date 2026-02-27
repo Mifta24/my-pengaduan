@@ -47,14 +47,14 @@
     </span>
 </a>
 <div class="tocify-wrapper">
-    
+
             <div class="lang-selector">
                                             <button type="button" class="lang-button" data-language-name="bash">bash</button>
                                             <button type="button" class="lang-button" data-language-name="javascript">javascript</button>
                                             <button type="button" class="lang-button" data-language-name="php">php</button>
                                             <button type="button" class="lang-button" data-language-name="python">python</button>
                     </div>
-    
+
     <div class="search">
         <input type="text" class="search" id="input-search" placeholder="Search">
     </div>
@@ -411,13 +411,13 @@
     <div class="dark-box"></div>
     <div class="content">
         <h1 id="introduction">Introduction</h1>
-<p>REST API untuk sistem pengaduan masyarakat RT/RW. API ini memungkinkan warga untuk melaporkan keluhan, melihat pengumuman, dan berinteraksi dengan admin.</p>
+<p>REST API untuk MyPengaduan warga Gang Annur 2 RT 05. API ini memungkinkan warga untuk melaporkan keluhan, melihat pengumuman, dan berinteraksi dengan admin RT.</p>
 <aside>
     <strong>Base URL</strong>: <code>http://localhost:8000</code>
 </aside>
 <pre><code>## Selamat Datang di MyPengaduan API
 
-API ini menyediakan akses penuh ke sistem pengaduan masyarakat untuk aplikasi mobile Flutter.
+API ini menyediakan akses penuh ke sistem pengaduan warga untuk aplikasi mobile Flutter.
 
 ### Base URL
 Semua endpoint dapat diakses melalui: `{base_url}/api`
@@ -452,7 +452,7 @@ Semua response menggunakan format JSON dengan struktur:
 <p>
 </p>
 
-<p>Mendaftarkan user baru ke sistem MyPengaduan.
+<p>Mendaftarkan user baru ke sistem MyPengaduan warga Gang Annur 2 RT 05.
 Setelah registrasi berhasil, user akan mendapat token untuk autentikasi.</p>
 
 <span id="example-requests-POSTapi-auth-register">
@@ -3518,7 +3518,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                 <h1 id="endpoints">Endpoints</h1>
 
-    
+
 
                                 <h2 id="endpoints-GETapi-user">GET api/user</h2>
 
@@ -15300,9 +15300,9 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
         </form>
 
-            
 
-        
+
+
     </div>
     <div class="dark-box">
                     <div class="lang-selector">

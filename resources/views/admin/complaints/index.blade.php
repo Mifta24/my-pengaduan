@@ -32,7 +32,7 @@
                     Manajemen Keluhan
                 </h1>
                 <p class="mt-1 text-sm text-gray-500">
-                    Kelola semua keluhan yang diterima dari warga Lurah/RW.
+                    Kelola semua keluhan yang diterima dari warga Gang Annur 2 RT 05.
                 </p>
             </div>
             <div class="flex space-x-3">

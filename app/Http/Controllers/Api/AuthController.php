@@ -23,7 +23,7 @@ class AuthController extends Controller
     /**
      * Register User
      *
-     * Mendaftarkan user baru ke sistem MyPengaduan.
+    * Mendaftarkan user baru ke sistem MyPengaduan warga Gang Annur 2 RT 05.
      * Setelah registrasi berhasil, user akan mendapat token untuk autentikasi.
      *
      * @unauthenticated

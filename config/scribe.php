@@ -17,13 +17,13 @@ return [
     'title' => 'MyPengaduan API Documentation',
 
     // A short description of your API. Will be included in the docs webpage, Postman collection and OpenAPI spec.
-    'description' => 'REST API untuk sistem pengaduan masyarakat RT/RW. API ini memungkinkan warga untuk melaporkan keluhan, melihat pengumuman, dan berinteraksi dengan admin.',
+    'description' => 'REST API untuk MyPengaduan warga Gang Annur 2 RT 05. API ini memungkinkan warga melaporkan keluhan, melihat pengumuman, dan berinteraksi dengan admin RT.',
 
     // Text to place in the "Introduction" section, right after the `description`. Markdown and HTML are supported.
     'intro_text' => <<<INTRO
         ## Selamat Datang di MyPengaduan API
 
-        API ini menyediakan akses penuh ke sistem pengaduan masyarakat untuk aplikasi mobile Flutter.
+        API ini menyediakan akses penuh ke sistem pengaduan warga untuk aplikasi mobile Flutter.
 
         ### Base URL
         Semua endpoint dapat diakses melalui: `{base_url}/api`

@@ -227,7 +227,7 @@
     <!-- Header -->
     <div class="header">
         <h1>DETAIL LAPORAN KELUHAN</h1>
-        <p>Sistem Pengaduan Warga Lurah/RW</p>
+        <p>MyPengaduan</p>
     </div>
 
     <div class="complaint-id">
@@ -387,7 +387,7 @@
             </div>
         </div>
         <div class="signature-box">
-            <p>Admin Lurah/RW,</p>
+            <p>Admin RT,</p>
             <div class="signature-line">
                 (.................................)
             </div>
@@ -397,7 +397,7 @@
     <!-- Footer -->
     <div class="footer">
         <p>Dokumen ini dicetak pada {{ now()->format('d F Y, H:i') }} WIB</p>
-        <p>Sistem Pengaduan Warga Lurah/RW - {{ config('app.name') }}</p>
+        <p>MyPengaduan - {{ config('app.name') }}</p>
     </div>
 
     <script>
