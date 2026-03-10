@@ -288,6 +288,8 @@ class ComplaintController extends Controller
             event(new ComplaintCreated($complaint));
 
             // Transform data to hide unnecessary fields
+            $attachments = $complaint->attachments;
+
             $data = [
                 'id' => $complaint->id,
                 'title' => $complaint->title,
@@ -335,6 +337,8 @@ class ComplaintController extends Controller
             ]);
 
             // Transform data to hide unnecessary fields
+            $attachments = $complaint->attachments;
+
             $data = [
                 'id' => $complaint->id,
                 'title' => $complaint->title,
@@ -351,7 +355,9 @@ class ComplaintController extends Controller
                 'updated_at' => $complaint->updated_at->format('Y-m-d\TH:i:s.u\Z'),
                 'user' => $complaint->user,
                 'category' => $complaint->category,
-                'attachments' => $complaint->attachments,
+                'attachments' => $attachments,
+                'complaint_attachments' => $attachments->where('attachment_type', 'complaint')->values(),
+                'resolution_attachments' => $attachments->where('attachment_type', 'resolution')->values(),
                 'responses' => $complaint->responses->map(function($response) {
                     return [
                         'id' => $response->id,

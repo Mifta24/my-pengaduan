@@ -112,7 +112,18 @@ class ComplaintController extends Controller
                 'responses.user:id,name,email'
             ])->findOrFail($id);
 
-            return $this->success($complaint, 'Complaint details loaded successfully');
+            $attachments = $complaint->attachments;
+
+            $data = $complaint->toArray();
+            $data['attachments'] = $attachments->values();
+            $data['complaint_attachments'] = $attachments
+                ->where('attachment_type', 'complaint')
+                ->values();
+            $data['resolution_attachments'] = $attachments
+                ->where('attachment_type', 'resolution')
+                ->values();
+
+            return $this->success($data, 'Complaint details loaded successfully');
         } catch (\Exception $e) {
             return $this->notFound('Complaint not found');
         }
