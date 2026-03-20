@@ -15,11 +15,20 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('nik', 16)->nullable();
+            $table->string('ktp_path')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'user'])->default('user');
             $table->text('address')->nullable();
+            $table->string('phone', 20)->nullable();
+            $table->string('rt_number', 3)->nullable();
+            $table->string('rw_number', 3)->nullable();
+            $table->boolean('is_verified')->default(false);
+            $table->timestamp('verified_at')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
+            $table->json('notification_preferences')->nullable();
             $table->timestamps();
         });
 

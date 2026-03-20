@@ -16,13 +16,17 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description');
-            $table->string('category');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('restrict');
             $table->string('photo')->nullable();
             $table->string('location');
-            $table->enum('status', ['pending', 'processing', 'completed'])->default('pending');
+            $table->enum('status', ['pending', 'in_progress', 'resolved', 'rejected'])->default('pending');
+            $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
             $table->text('response')->nullable();
+            $table->text('admin_response')->nullable();
+            $table->date('estimated_resolution')->nullable();
             $table->date('report_date');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

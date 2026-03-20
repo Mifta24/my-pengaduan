@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('file_path');
             $table->integer('file_size'); // in bytes
             $table->string('mime_type');
+            $table->string('attachment_type')->default('complaint');
             $table->timestamps();
         });
     }
