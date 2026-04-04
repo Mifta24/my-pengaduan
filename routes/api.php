@@ -79,6 +79,8 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::get('/categories', [ComplaintController::class, 'categories']);
         Route::get('/{complaint}', [ComplaintController::class, 'show']);
         Route::get('/{complaint}/track', [ComplaintController::class, 'track']);
+        Route::post('/{complaint}/responses', [ComplaintController::class, 'addResponse']);
+        Route::post('/{complaint}/confirm-resolution', [ComplaintController::class, 'confirmResolution']);
         Route::put('/{complaint}', [ComplaintController::class, 'update']);
         Route::delete('/{complaint}', [ComplaintController::class, 'destroy']);
     });
@@ -198,7 +200,6 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->name('api.ad
         Route::get('/overview', [AdminReportController::class, 'overview']);
         Route::get('/complaints', [AdminReportController::class, 'complaints']);
         Route::get('/users', [AdminReportController::class, 'users']);
-        Route::post('/export', [AdminReportController::class, 'export']);
     });
 });
 
