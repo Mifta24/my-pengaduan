@@ -79,7 +79,7 @@ class ProfileController extends Controller
         $user = $request->user();
 
         // Load user with related data
-        $userData = $user->load(['complaints.category', 'complaints.responses', 'complaints.attachments']);
+        $userData = $user->load(['complaints.category', 'complaints.responses.user', 'complaints.attachments']);
 
         // Prepare export data
         $exportData = [
@@ -105,15 +105,15 @@ class ProfileController extends Controller
                     'updated_at' => $complaint->updated_at,
                     'responses' => $complaint->responses->map(function($response) {
                         return [
-                            'message' => $response->message,
+                            'message' => $response->content,
                             'created_at' => $response->created_at,
                             'user' => $response->user->name ?? 'N/A',
                         ];
                     }),
                     'attachments' => $complaint->attachments->map(function($attachment) {
                         return [
-                            'filename' => $attachment->filename,
-                            'file_type' => $attachment->file_type,
+                            'filename' => $attachment->file_name,
+                            'file_type' => $attachment->mime_type,
                             'file_size' => $attachment->file_size,
                             'created_at' => $attachment->created_at,
                         ];
