@@ -149,9 +149,8 @@ Authorization: Bearer {token}
 
 - **Reports**
   - `GET /api/admin/reports/overview` - Report overview
-  - `GET /api/admin/reports/complaints` - Complaint reports
-  - `GET /api/admin/reports/users` - User reports
-  - `POST /api/admin/reports/export` - Export report (Excel)
+  - `GET /api/admin/reports/complaints` - Complaint reports (support query: `date_from`, `date_to`, `status`, `category_id`, `user_id`, `priority`, `per_page`)
+  - `GET /api/admin/reports/users` - User reports (support query: `date_from`, `date_to`, `role`, `is_active`, `search`, `per_page`; response: paginated users + statistics `total`, `active`, `inactive`, `this_month` + `complaints_count` per user)
 
 ---
 
@@ -169,20 +168,20 @@ php artisan scribe:generate
    ```php
    /**
     * @group Nama Group
-    * 
+    *
     * Deskripsi group endpoint
     */
    class MyController extends Controller
    {
        /**
         * Judul Endpoint
-        * 
+        *
         * Deskripsi detail endpoint ini.
-        * 
+        *
         * @authenticated
-        * 
+        *
         * @bodyParam field_name type required Deskripsi field. Example: contoh value
-        * 
+        *
         * @response 200 {
         *   "status": true,
         *   "data": {}
@@ -301,6 +300,6 @@ Sebelum deploy ke production:
 
 ---
 
-**Generated with:** Scribe v5.6.0  
-**Last Updated:** 2025-01-09  
+**Generated with:** Scribe v5.6.0
+**Last Updated:** 2025-01-09
 **API Version:** 1.0
