@@ -292,7 +292,7 @@ class AnnouncementController extends Controller
             $comment = Comment::findOrFail($commentId);
 
             // Check if comment belongs to the announcement
-            if ($comment->commentable_id != $announcementId || $comment->commentable_type != 'App\Models\Announcement') {
+            if ((int) $comment->announcement_id !== (int) $announcementId) {
                 return $this->notFound('Comment not found for this announcement');
             }
 
