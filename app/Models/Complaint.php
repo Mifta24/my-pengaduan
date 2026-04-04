@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 class Complaint extends Model
 {
@@ -19,8 +20,11 @@ class Complaint extends Model
         'location',
         'priority',
         'status',
-        'response',
-        'admin_response',
+        'admin_resolved_at',
+        'user_resolved_at',
+        'auto_resolve_at',
+        'resolved_at',
+        'resolved_by',
         'estimated_resolution',
         'report_date',
     ];
@@ -28,6 +32,10 @@ class Complaint extends Model
     protected $casts = [
         'report_date' => 'datetime',
         'estimated_resolution' => 'datetime',
+        'admin_resolved_at' => 'datetime',
+        'user_resolved_at' => 'datetime',
+        'auto_resolve_at' => 'datetime',
+        'resolved_at' => 'datetime',
     ];
 
     /**
@@ -68,6 +76,38 @@ class Complaint extends Model
         return $this->hasMany(Response::class);
     }
 
+    /**
+     * Compatibility accessor to keep existing views/API payload stable.
+     */
+    public function getAdminResponseAttribute()
+    {
+        return $this->responses()
+            ->where('user_id', '!=', $this->user_id)
+            ->latest('created_at')
+            ->value('content');
+    }
+
+    /**
+     * Legacy alias for old `response` column.
+     */
+    public function getResponseAttribute()
+    {
+        return $this->admin_response;
+    }
+
+    /**
+     * Legacy timestamp alias for old `responded_at` field usage in views.
+     */
+    public function getRespondedAtAttribute()
+    {
+        $respondedAt = $this->responses()
+            ->where('user_id', '!=', $this->user_id)
+            ->latest('created_at')
+            ->value('created_at');
+
+        return $respondedAt ? Carbon::parse($respondedAt) : null;
+    }
+
     public function attachments()
     {
         return $this->morphMany(Attachment::class, 'attachable');
@@ -90,6 +130,7 @@ class Complaint extends Model
         return match($this->status) {
             'pending' => 'yellow',
             'in_progress' => 'blue',
+            'waiting_user_confirmation' => 'orange',
             'resolved' => 'green',
             'rejected' => 'red',
             default => 'gray'
