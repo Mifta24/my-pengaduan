@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Complaint;
 use App\Models\User;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -20,19 +21,35 @@ class AdminController extends Controller
         $totalUsers = User::count();
 
         // Calculate completion rate
-        $completedComplaints = Complaint::where('status', 'completed')->count();
+        $completedComplaints = Complaint::where('status', 'resolved')->count();
         $completionRate = $totalComplaints > 0 ? round(($completedComplaints / $totalComplaints) * 100, 1) : 0;
 
-        // Calculate average response time (in days)
-        $avgResponseTime = Complaint::whereNotNull('responded_at')
-            ->selectRaw('AVG(JULIANDAY(responded_at) - JULIANDAY(created_at)) as avg_days')
-            ->value('avg_days') ?? 0;
+        // Calculate average response time (in days) from first response per complaint.
+        $firstResponseRows = DB::table('complaints')
+            ->joinSub(
+                DB::table('responses')
+                    ->select('complaint_id', DB::raw('MIN(created_at) as first_response_at'))
+                    ->groupBy('complaint_id'),
+                'first_responses',
+                function ($join) {
+                    $join->on('complaints.id', '=', 'first_responses.complaint_id');
+                }
+            )
+            ->select('complaints.created_at', 'first_responses.first_response_at')
+            ->get();
+
+        $avgResponseTime = $firstResponseRows->isNotEmpty()
+            ? round($firstResponseRows->avg(function ($row) {
+                return Carbon::parse($row->created_at)
+                    ->diffInSeconds(Carbon::parse($row->first_response_at)) / 86400;
+            }), 1)
+            : 0;
 
         // Get complaints by status
         $complaintsByStatus = [
             'pending' => Complaint::where('status', 'pending')->count(),
             'in_progress' => Complaint::where('status', 'in_progress')->count(),
-            'completed' => Complaint::where('status', 'completed')->count(),
+            'resolved' => Complaint::where('status', 'resolved')->count(),
             'rejected' => Complaint::where('status', 'rejected')->count(),
         ];
 
