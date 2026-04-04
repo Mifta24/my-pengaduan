@@ -94,6 +94,7 @@ class SendStatusChangeNotificationToUser implements ShouldQueue
         return match($status) {
             'pending' => 'Menunggu',
             'in_progress' => 'Diproses',
+            'waiting_user_confirmation' => 'Menunggu konfirmasi Anda',
             'resolved' => 'Selesai',
             'rejected' => 'Ditolak',
             default => ucfirst($status),
@@ -108,6 +109,7 @@ class SendStatusChangeNotificationToUser implements ShouldQueue
         return match($status) {
             'pending' => '⏳',
             'in_progress' => '🔄',
+            'waiting_user_confirmation' => '🕒',
             'resolved' => '✅',
             'rejected' => '❌',
             default => '📋',
