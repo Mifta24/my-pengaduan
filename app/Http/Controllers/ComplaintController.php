@@ -33,7 +33,7 @@ class ComplaintController extends Controller
             'total' => $user->complaints()->count(),
             'pending' => $user->complaints()->where('status', 'pending')->count(),
             'in_progress' => $user->complaints()->where('status', 'in_progress')->count(),
-            'completed' => $user->complaints()->where('status', 'completed')->count(),
+            'resolved' => $user->complaints()->where('status', 'resolved')->count(),
             'rejected' => $user->complaints()->where('status', 'rejected')->count(),
         ];
 
@@ -326,7 +326,7 @@ class ComplaintController extends Controller
             ];
         }
 
-        if ($complaint->status === 'completed') {
+        if ($complaint->status === 'resolved') {
             $timeline[] = [
                 'title' => 'Sedang Diproses',
                 'description' => 'Keluhan sedang ditindaklanjuti oleh tim terkait',
