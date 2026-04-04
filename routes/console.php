@@ -1,9 +1,12 @@
 <?php
 
+use App\Events\ComplaintStatusChanged;
 use App\Models\Attachment;
+use App\Models\Complaint;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Storage;
 
 Artisan::command('inspire', function () {
@@ -92,3 +95,47 @@ Artisan::command('attachments:migrate-resolution-to-cloudinary {--dry-run : Prev
     $this->newLine();
     $this->info("Done. migrated={$migrated}, skipped={$skipped}, failed={$failed}");
 })->purpose('Migrate old local resolution attachments to Cloudinary URLs');
+
+Artisan::command('complaints:auto-resolve {--dry-run : Preview affected complaints without updating status}', function () {
+    $dryRun = (bool) $this->option('dry-run');
+
+    $complaints = Complaint::query()
+        ->where('status', 'waiting_user_confirmation')
+        ->whereNotNull('auto_resolve_at')
+        ->where('auto_resolve_at', '<=', now())
+        ->get();
+
+    if ($complaints->isEmpty()) {
+        $this->info('No complaints require auto resolution.');
+        return;
+    }
+
+    if ($dryRun) {
+        $this->info('Complaints pending auto resolution: ' . $complaints->count());
+        foreach ($complaints as $complaint) {
+            $this->line("#{$complaint->id} auto_resolve_at={$complaint->auto_resolve_at}");
+        }
+        return;
+    }
+
+    $resolvedCount = 0;
+
+    foreach ($complaints as $complaint) {
+        $oldStatus = $complaint->status;
+
+        $complaint->update([
+            'status' => 'resolved',
+            'resolved_by' => 'system',
+            'resolved_at' => now(),
+            'auto_resolve_at' => null,
+        ]);
+
+        event(new ComplaintStatusChanged($complaint, $oldStatus, 'resolved'));
+
+        $resolvedCount++;
+    }
+
+    $this->info("Auto resolved complaints: {$resolvedCount}");
+})->purpose('Auto resolve complaints after 3 days waiting for user confirmation');
+
+Schedule::command('complaints:auto-resolve')->hourly();
