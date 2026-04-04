@@ -7,12 +7,14 @@ use App\Models\Complaint;
 use App\Models\Category;
 use App\Models\Attachment;
 use App\Models\Announcement;
+use App\Models\Response as ComplaintResponse;
 use App\Events\ComplaintCreated;
+use App\Events\ComplaintStatusChanged;
 use App\Traits\ApiResponse;
 use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Intervention\Image\Laravel\Facades\Image;
 
@@ -94,6 +96,11 @@ class ComplaintController extends Controller
                     'photo' => $complaint->photo,
                     'photo_url' => $complaint->photo_url,
                     'admin_response' => $complaint->admin_response,
+                    'admin_resolved_at' => $complaint->admin_resolved_at ? $complaint->admin_resolved_at->format('Y-m-d\TH:i:s.u\Z') : null,
+                    'user_resolved_at' => $complaint->user_resolved_at ? $complaint->user_resolved_at->format('Y-m-d\TH:i:s.u\Z') : null,
+                    'auto_resolve_at' => $complaint->auto_resolve_at ? $complaint->auto_resolve_at->format('Y-m-d\TH:i:s.u\Z') : null,
+                    'resolved_at' => $complaint->resolved_at ? $complaint->resolved_at->format('Y-m-d\TH:i:s.u\Z') : null,
+                    'resolved_by' => $complaint->resolved_by,
                     'estimated_resolution' => $complaint->estimated_resolution ? $complaint->estimated_resolution->format('Y-m-d\TH:i:s.u\Z') : null,
                     'report_date' => $complaint->report_date ? $complaint->report_date->format('Y-m-d\TH:i:s.u\Z') : null,
                     'created_at' => $complaint->created_at->format('Y-m-d\TH:i:s.u\Z'),
@@ -188,7 +195,7 @@ class ComplaintController extends Controller
 
                     $complaint->update(['photo' => $upload['url']]);
 
-                    \Log::info('Photo uploaded to Cloudinary', $upload);
+                    Log::info('Photo uploaded to Cloudinary', $upload);
                 } else {
                     // Fallback to local storage
                     $photo = $request->file('photo');
@@ -214,7 +221,7 @@ class ComplaintController extends Controller
                     Storage::disk('public')->put($photoPath, (string) $encodedImage);
                     $complaint->update(['photo' => $photoPath]);
 
-                    \Log::info('Photo uploaded to local storage', ['path' => $photoPath]);
+                    Log::info('Photo uploaded to local storage', ['path' => $photoPath]);
                 }
             }
 
@@ -336,6 +343,8 @@ class ComplaintController extends Controller
                 }
             ]);
 
+            $complaintUserId = $complaint->user_id;
+
             // Transform data to hide unnecessary fields
             $attachments = $complaint->attachments;
 
@@ -349,6 +358,11 @@ class ComplaintController extends Controller
                 'photo' => $complaint->photo,
                 'photo_url' => $complaint->photo_url,
                 'admin_response' => $complaint->admin_response,
+                'admin_resolved_at' => $complaint->admin_resolved_at ? $complaint->admin_resolved_at->format('Y-m-d\TH:i:s.u\Z') : null,
+                'user_resolved_at' => $complaint->user_resolved_at ? $complaint->user_resolved_at->format('Y-m-d\TH:i:s.u\Z') : null,
+                'auto_resolve_at' => $complaint->auto_resolve_at ? $complaint->auto_resolve_at->format('Y-m-d\TH:i:s.u\Z') : null,
+                'resolved_at' => $complaint->resolved_at ? $complaint->resolved_at->format('Y-m-d\TH:i:s.u\Z') : null,
+                'resolved_by' => $complaint->resolved_by,
                 'estimated_resolution' => $complaint->estimated_resolution ? $complaint->estimated_resolution->format('Y-m-d\TH:i:s.u\Z') : null,
                 'report_date' => $complaint->report_date ? $complaint->report_date->format('Y-m-d\TH:i:s.u\Z') : null,
                 'created_at' => $complaint->created_at->format('Y-m-d\TH:i:s.u\Z'),
@@ -358,12 +372,13 @@ class ComplaintController extends Controller
                 'attachments' => $attachments,
                 'complaint_attachments' => $attachments->where('attachment_type', 'complaint')->values(),
                 'resolution_attachments' => $attachments->where('attachment_type', 'resolution')->values(),
-                'responses' => $complaint->responses->map(function($response) {
+                'responses' => $complaint->responses->map(function($response) use ($complaintUserId) {
                     return [
                         'id' => $response->id,
                         'content' => $response->content,
                         'photo' => $response->photo,
                         'photo_url' => $response->photo_url,
+                        'sender_role' => $response->user_id === $complaintUserId ? 'user' : 'admin',
                         'created_at' => $response->created_at->format('Y-m-d\TH:i:s.u\Z'),
                         'user' => $response->user,
                         'attachments' => $response->attachments,
@@ -604,6 +619,7 @@ class ComplaintController extends Controller
                 'total' => $user->complaints()->count(),
                 'pending' => $user->complaints()->where('status', 'pending')->count(),
                 'in_progress' => $user->complaints()->where('status', 'in_progress')->count(),
+                'waiting_user_confirmation' => $user->complaints()->where('status', 'waiting_user_confirmation')->count(),
                 'resolved' => $user->complaints()->where('status', 'resolved')->count(),
                 'rejected' => $user->complaints()->where('status', 'rejected')->count(),
             ];
@@ -628,6 +644,7 @@ class ComplaintController extends Controller
                 'total' => Complaint::where('user_id', $user->id)->count(),
                 'pending' => Complaint::where('user_id', $user->id)->where('status', 'pending')->count(),
                 'in_progress' => Complaint::where('user_id', $user->id)->where('status', 'in_progress')->count(),
+                'waiting_user_confirmation' => Complaint::where('user_id', $user->id)->where('status', 'waiting_user_confirmation')->count(),
                 'resolved' => Complaint::where('user_id', $user->id)->where('status', 'resolved')->count(),
                 'rejected' => Complaint::where('user_id', $user->id)->where('status', 'rejected')->count(),
             ];
@@ -701,6 +718,7 @@ class ComplaintController extends Controller
             if ($complaint->status !== 'pending') {
                 $statusLabels = [
                     'in_progress' => 'In Progress',
+                    'waiting_user_confirmation' => 'Waiting User Confirmation',
                     'resolved' => 'Resolved',
                     'rejected' => 'Rejected',
                 ];
@@ -719,7 +737,7 @@ class ComplaintController extends Controller
                 $timeline[] = [
                     'type' => 'response',
                     'status' => $complaint->status,
-                    'title' => 'Response from Admin',
+                    'title' => $response->user_id === $complaint->user_id ? 'Response from User' : 'Response from Admin',
                     'description' => $response->content,
                     'photo' => $response->photo,
                     'created_at' => $response->created_at->format('Y-m-d\TH:i:s.u\Z'),
@@ -742,6 +760,148 @@ class ComplaintController extends Controller
             return $this->notFound('Complaint not found');
         } catch (\Exception $e) {
             return $this->serverError('Failed to track complaint', $e);
+        }
+    }
+
+    /**
+     * User add response to complaint thread
+     */
+    public function addResponse(Request $request, Complaint $complaint)
+    {
+        try {
+            if ($complaint->user_id !== $request->user()->id) {
+                return $this->unauthorized('You do not have access to this complaint');
+            }
+
+            if (in_array($complaint->status, ['resolved', 'rejected'], true)) {
+                return $this->error('Resolved or rejected complaints cannot receive new responses');
+            }
+
+            $validated = $request->validate([
+                'message' => 'required|string|max:2000',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+                'attachments' => 'nullable|array|max:5',
+                'attachments.*' => 'file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240',
+            ]);
+
+            $response = ComplaintResponse::create([
+                'complaint_id' => $complaint->id,
+                'user_id' => $request->user()->id,
+                'content' => $validated['message'],
+            ]);
+
+            if ($request->hasFile('photo')) {
+                if ($this->isCloudinaryEnabled()) {
+                    $upload = $this->uploadToCloudinary(
+                        $request->file('photo'),
+                        'responses/photos',
+                        1920,
+                        85
+                    );
+
+                    $response->update(['photo' => $upload['url']]);
+                } else {
+                    $photoPath = $request->file('photo')->store('responses/photos', 'public');
+                    $response->update(['photo' => $photoPath]);
+                }
+            }
+
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    if ($this->isCloudinaryEnabled()) {
+                        $upload = $this->uploadToCloudinary(
+                            $file,
+                            'responses/attachments',
+                            1920,
+                            85
+                        );
+
+                        Attachment::create([
+                            'attachable_type' => ComplaintResponse::class,
+                            'attachable_id' => $response->id,
+                            'file_name' => $file->getClientOriginalName(),
+                            'file_path' => $upload['url'],
+                            'file_size' => $upload['size'] ?? $file->getSize(),
+                            'mime_type' => $file->getMimeType(),
+                            'attachment_type' => 'response',
+                        ]);
+                    } else {
+                        $path = $file->store('responses/attachments', 'public');
+
+                        Attachment::create([
+                            'attachable_type' => ComplaintResponse::class,
+                            'attachable_id' => $response->id,
+                            'file_name' => $file->getClientOriginalName(),
+                            'file_path' => $path,
+                            'file_size' => $file->getSize(),
+                            'mime_type' => $file->getMimeType(),
+                            'attachment_type' => 'response',
+                        ]);
+                    }
+                }
+            }
+
+            if ($complaint->status === 'pending') {
+                $complaint->update(['status' => 'in_progress']);
+            }
+
+            return $this->created(
+                $response->load(['user:id,name,email', 'attachments']),
+                'Response added successfully'
+            );
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to add response', $e);
+        }
+    }
+
+    /**
+     * User confirms complaint resolution after admin resolution
+     */
+    public function confirmResolution(Request $request, Complaint $complaint)
+    {
+        try {
+            if ($complaint->user_id !== $request->user()->id) {
+                return $this->unauthorized('You do not have access to this complaint');
+            }
+
+            if ($complaint->status !== 'waiting_user_confirmation') {
+                return $this->error('Complaint is not waiting for user confirmation');
+            }
+
+            $validated = $request->validate([
+                'message' => 'nullable|string|max:2000',
+            ]);
+
+            $oldStatus = $complaint->status;
+
+            $complaint->update([
+                'status' => 'resolved',
+                'user_resolved_at' => now(),
+                'resolved_at' => now(),
+                'resolved_by' => 'user',
+                'auto_resolve_at' => null,
+            ]);
+
+            if (!empty($validated['message'])) {
+                ComplaintResponse::create([
+                    'complaint_id' => $complaint->id,
+                    'user_id' => $request->user()->id,
+                    'content' => $validated['message'],
+                ]);
+            }
+
+            event(new ComplaintStatusChanged($complaint, $oldStatus, 'resolved'));
+
+            return $this->success(
+                $complaint->fresh(['category:id,name,icon,color,description', 'attachments', 'responses.user:id,name,email']),
+                'Complaint confirmed as resolved'
+            );
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to confirm complaint resolution', $e);
         }
     }
 }
