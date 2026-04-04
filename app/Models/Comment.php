@@ -12,8 +12,7 @@ class Comment extends Model
 
     protected $fillable = [
         'user_id',
-        'commentable_id',
-        'commentable_type',
+        'announcement_id',
         'content',
         'is_approved',
         'parent_id'
@@ -23,12 +22,9 @@ class Comment extends Model
         'is_approved' => 'boolean'
     ];
 
-    /**
-     * Get the commentable model (announcement, complaint, etc.)
-     */
-    public function commentable()
+    public function announcement()
     {
-        return $this->morphTo();
+        return $this->belongsTo(Announcement::class);
     }
 
     /**
