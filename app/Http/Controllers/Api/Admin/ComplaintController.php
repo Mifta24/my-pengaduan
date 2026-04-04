@@ -32,7 +32,7 @@ class ComplaintController extends Controller
      *
      * @authenticated
      *
-     * @queryParam status string Filter by status (pending, in_progress, resolved, rejected). Example: pending
+    * @queryParam status string Filter by status (pending, in_progress, waiting_user_confirmation, resolved, rejected). Example: pending
      * @queryParam priority string Filter by priority (low, medium, high, urgent). Example: high
      * @queryParam category_id integer Filter by category. Example: 1
      * @queryParam user_id integer Filter by user. Example: 5
@@ -142,7 +142,7 @@ class ComplaintController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'location' => 'required|string|max:255',
                 'priority' => 'nullable|in:low,medium,high,urgent',
-                'status' => 'nullable|in:pending,in_progress,resolved,rejected',
+                'status' => 'nullable|in:pending,in_progress,waiting_user_confirmation,resolved,rejected',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
                 'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240',
                 'report_date' => 'nullable|date',
@@ -223,7 +223,7 @@ class ComplaintController extends Controller
                 'category_id' => 'sometimes|required|exists:categories,id',
                 'location' => 'sometimes|required|string|max:255',
                 'priority' => 'sometimes|required|in:low,medium,high,urgent',
-                'status' => 'sometimes|required|in:pending,in_progress,resolved,rejected',
+                'status' => 'sometimes|required|in:pending,in_progress,waiting_user_confirmation,resolved,rejected',
                 'admin_response' => 'nullable|string',
                 'estimated_resolution' => 'nullable|date',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -244,9 +244,16 @@ class ComplaintController extends Controller
                 'location',
                 'priority',
                 'status',
-                'admin_response',
                 'estimated_resolution',
             ]));
+
+            if ($request->filled('admin_response')) {
+                ComplaintResponse::create([
+                    'complaint_id' => $complaint->id,
+                    'user_id' => $request->user()->id,
+                    'content' => $request->admin_response,
+                ]);
+            }
 
             // Handle photo update via Cloudinary
             if ($request->hasFile('photo')) {
@@ -364,9 +371,18 @@ class ComplaintController extends Controller
             $complaint = Complaint::findOrFail($id);
             $oldStatus = $complaint->status;
 
-            // Update status
-            $complaint->status = $request->status;
-            $complaint->save();
+            if ($request->status === 'resolved') {
+                $this->startUserConfirmationWorkflow($complaint);
+            } else {
+                $complaint->update([
+                    'status' => $request->status,
+                    'admin_resolved_at' => null,
+                    'user_resolved_at' => null,
+                    'auto_resolve_at' => null,
+                    'resolved_at' => null,
+                    'resolved_by' => null,
+                ]);
+            }
 
             // Add response if notes provided
             if ($request->filled('notes')) {
@@ -378,8 +394,8 @@ class ComplaintController extends Controller
             }
 
             // Dispatch event for notification (only if status changed)
-            if ($oldStatus !== $request->status) {
-                event(new ComplaintStatusChanged($complaint, $oldStatus, $request->status));
+            if ($oldStatus !== $complaint->status) {
+                event(new ComplaintStatusChanged($complaint, $oldStatus, $complaint->status));
             }
 
             return $this->success($complaint->fresh(['user', 'category']), 'Complaint status updated successfully');
@@ -407,12 +423,20 @@ class ComplaintController extends Controller
 
             $complaint = Complaint::findOrFail($id);
 
+            if (in_array($complaint->status, ['resolved', 'rejected'], true)) {
+                return $this->error('Resolved or rejected complaints cannot receive new responses');
+            }
+
             // Create response record
             $response = ComplaintResponse::create([
                 'complaint_id' => $complaint->id,
                 'user_id' => $request->user()->id,
                 'content' => $request->message,
             ]);
+
+            if ($complaint->status === 'pending') {
+                $complaint->update(['status' => 'in_progress']);
+            }
 
             // Handle response photo upload via Cloudinary
             if ($request->hasFile('photo')) {
@@ -457,11 +481,6 @@ class ComplaintController extends Controller
                     ];
                 }
             }
-
-            // Update complaint's admin_response field with latest response
-            $complaint->update([
-                'admin_response' => $request->message,
-            ]);
 
             // Send notification to user about new response
             try {
@@ -541,6 +560,7 @@ class ComplaintController extends Controller
                 'by_status' => [
                     'pending' => Complaint::where('status', 'pending')->count(),
                     'in_progress' => Complaint::where('status', 'in_progress')->count(),
+                    'waiting_user_confirmation' => Complaint::where('status', 'waiting_user_confirmation')->count(),
                     'resolved' => Complaint::where('status', 'resolved')->count(),
                     'rejected' => Complaint::where('status', 'rejected')->count(),
                 ],
@@ -577,7 +597,7 @@ class ComplaintController extends Controller
                 'complaint_ids' => 'required|array',
                 'complaint_ids.*' => 'exists:complaints,id',
                 'action' => 'required|in:update_status,delete',
-                'status' => 'required_if:action,update_status|in:pending,in_progress,resolved,rejected',
+                'status' => 'required_if:action,update_status|in:pending,in_progress,waiting_user_confirmation,resolved,rejected',
             ]);
 
             if ($validator->fails()) {
@@ -588,7 +608,21 @@ class ComplaintController extends Controller
             $action = $request->action;
 
             if ($action === 'update_status') {
-                Complaint::whereIn('id', $complaintIds)->update(['status' => $request->status]);
+                if ($request->status === 'resolved') {
+                    $complaints = Complaint::whereIn('id', $complaintIds)->get();
+                    foreach ($complaints as $complaint) {
+                        $this->startUserConfirmationWorkflow($complaint);
+                    }
+                } else {
+                    Complaint::whereIn('id', $complaintIds)->update([
+                        'status' => $request->status,
+                        'admin_resolved_at' => null,
+                        'user_resolved_at' => null,
+                        'auto_resolve_at' => null,
+                        'resolved_at' => null,
+                        'resolved_by' => null,
+                    ]);
+                }
                 $message = 'Complaints status updated successfully';
             } elseif ($action === 'delete') {
                 Complaint::whereIn('id', $complaintIds)->delete();
@@ -621,11 +655,8 @@ class ComplaintController extends Controller
             $complaint = Complaint::findOrFail($id);
             $oldStatus = $complaint->status;
 
-            // Update complaint status to resolved with admin response
-            $complaint->update([
-                'status' => 'resolved',
-                'admin_response' => $request->resolution_response,
-            ]);
+            // Start admin resolved flow and wait for user confirmation for up to 3 days.
+            $this->startUserConfirmationWorkflow($complaint);
 
             // Add resolution response as a complaint response
             ComplaintResponse::create([
@@ -665,14 +696,15 @@ class ComplaintController extends Controller
             }
 
             // Dispatch event for notification (only if status changed)
-            if ($oldStatus !== 'resolved') {
-                event(new ComplaintStatusChanged($complaint, $oldStatus, 'resolved'));
+            if ($oldStatus !== $complaint->status) {
+                event(new ComplaintStatusChanged($complaint, $oldStatus, $complaint->status));
             }
 
             $meta = [
                 'previous_status' => $oldStatus,
-                'current_status' => 'resolved',
+                'current_status' => $complaint->status,
                 'resolution_photos_count' => count($uploadedPhotos),
+                'auto_resolve_at' => optional($complaint->auto_resolve_at)->format('Y-m-d H:i:s'),
             ];
 
             $data = [
@@ -680,10 +712,24 @@ class ComplaintController extends Controller
                 'resolution_photos' => $uploadedPhotos,
             ];
 
-            return $this->success($data, 'Complaint marked as resolved successfully', $meta);
+            return $this->success($data, 'Complaint marked by admin and waiting for user confirmation', $meta);
         } catch (\Exception $e) {
             return $this->serverError('Failed to mark complaint as resolved', $e);
         }
+    }
+
+    private function startUserConfirmationWorkflow(Complaint $complaint): void
+    {
+        $payload = [
+            'status' => 'waiting_user_confirmation',
+            'admin_resolved_at' => now(),
+            'auto_resolve_at' => now()->addDays(3),
+            'user_resolved_at' => null,
+            'resolved_at' => null,
+            'resolved_by' => null,
+        ];
+
+        $complaint->update($payload);
     }
 
     /**
@@ -754,14 +800,14 @@ class ComplaintController extends Controller
             $complaint = Complaint::onlyTrashed()->findOrFail($id);
 
             // Delete associated files
-            if ($complaint->photo && \Storage::disk('public')->exists($complaint->photo)) {
-                \Storage::disk('public')->delete($complaint->photo);
+            if ($complaint->photo && Storage::disk('public')->exists($complaint->photo)) {
+                Storage::disk('public')->delete($complaint->photo);
             }
 
             // Delete attachments
             foreach ($complaint->attachments as $attachment) {
-                if (\Storage::disk('public')->exists($attachment->file_path)) {
-                    \Storage::disk('public')->delete($attachment->file_path);
+                if (Storage::disk('public')->exists($attachment->file_path)) {
+                    Storage::disk('public')->delete($attachment->file_path);
                 }
                 $attachment->delete();
             }
