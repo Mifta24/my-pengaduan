@@ -7,7 +7,9 @@ use App\Models\Complaint;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Attachment;
+use App\Models\Response as ComplaintResponse;
 use App\Events\ComplaintStatusChanged;
+use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +17,8 @@ use Illuminate\Validation\Rule;
 
 class ComplaintController extends Controller
 {
+    use HandlesCloudinaryUpload;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -198,9 +202,16 @@ class ComplaintController extends Controller
             'category_id' => $validated['category_id'],
             'status' => $validated['status'],
             'priority' => $validated['priority'],
-            'admin_response' => $validated['admin_response'],
             'estimated_resolution' => $validated['estimated_resolution'] ? \Carbon\Carbon::parse($validated['estimated_resolution']) : null,
         ]);
+
+        if (!empty($validated['admin_response'])) {
+            ComplaintResponse::create([
+                'complaint_id' => $complaint->id,
+                'user_id' => Auth::id(),
+                'content' => $validated['admin_response'],
+            ]);
+        }
 
         // Handle deleted images
         if ($request->has('deleted_images')) {
@@ -273,8 +284,15 @@ class ComplaintController extends Controller
         // Update complaint status and response
         $complaint->update([
             'status' => $validated['status'],
-            'admin_response' => $validated['admin_response'] ?? $complaint->admin_response,
         ]);
+
+        if (!empty($validated['admin_response'])) {
+            ComplaintResponse::create([
+                'complaint_id' => $complaint->id,
+                'user_id' => Auth::id(),
+                'content' => $validated['admin_response'],
+            ]);
+        }
 
         // Dispatch event to send notification to user
         if ($oldStatus !== $validated['status']) {
@@ -321,10 +339,15 @@ class ComplaintController extends Controller
 
         $oldStatus = $complaint->status;
 
-        // Update complaint response
+        // Store response as a thread message
         $complaint->update([
-            'response' => $validated['response'],
             'status' => $validated['status'] ?? $complaint->status
+        ]);
+
+        ComplaintResponse::create([
+            'complaint_id' => $complaint->id,
+            'user_id' => Auth::id(),
+            'content' => $validated['response'],
         ]);
 
         // Send notification to user about new response (manual implementation like API)
