@@ -150,6 +150,7 @@ class ReportController extends Controller
                 'date_to' => 'nullable|date|after_or_equal:date_from',
                 'status' => 'nullable|in:pending,in_progress,resolved,rejected',
                 'category_id' => 'nullable|exists:categories,id',
+                'user_id' => 'nullable|exists:users,id',
                 'priority' => 'nullable|in:low,medium,high,urgent',
                 'per_page' => 'nullable|integer|min:1|max:100',
             ]);
@@ -167,6 +168,10 @@ class ReportController extends Controller
 
             if ($request->filled('category_id')) {
                 $query->where('category_id', $request->category_id);
+            }
+
+            if ($request->filled('user_id')) {
+                $query->where('user_id', $request->user_id);
             }
 
             if ($request->filled('priority')) {
@@ -206,6 +211,9 @@ class ReportController extends Controller
             }
             if ($request->has('category_id')) {
                 $activeFilters['category_id'] = (int) $request->category_id;
+            }
+            if ($request->has('user_id')) {
+                $activeFilters['user_id'] = (int) $request->user_id;
             }
             if ($request->has('priority')) {
                 $activeFilters['priority'] = $request->priority;
