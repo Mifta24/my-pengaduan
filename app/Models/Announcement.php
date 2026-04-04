@@ -85,7 +85,7 @@ class Announcement extends Model
      */
     public function comments()
     {
-        return $this->morphMany(Comment::class, 'commentable')
+        return $this->hasMany(Comment::class)
                     ->where('is_approved', true)
                     ->whereNull('parent_id')
                     ->latest();
@@ -96,7 +96,7 @@ class Announcement extends Model
      */
     public function allComments()
     {
-        return $this->morphMany(Comment::class, 'commentable');
+        return $this->hasMany(Comment::class);
     }
 
     /**
