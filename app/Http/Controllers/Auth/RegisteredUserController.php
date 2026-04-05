@@ -10,8 +10,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -48,14 +50,18 @@ class RegisteredUserController extends Controller
         // Handle KTP upload via Cloudinary
         $ktpPath = null;
         if ($request->hasFile('ktp_file')) {
-            $upload = $this->uploadToCloudinary(
-                $request->file('ktp_file'),
-                'ktp/photos',
-                1920,
-                85
-            );
+            if ($this->isCloudinaryEnabled()) {
+                $upload = $this->uploadToCloudinary(
+                    $request->file('ktp_file'),
+                    'ktp/photos',
+                    1920,
+                    85
+                );
 
-            $ktpPath = $upload['url'];
+                $ktpPath = $upload['url'];
+            } else {
+                $ktpPath = $request->file('ktp_file')->store('ktp/photos', 'public');
+            }
         }
 
         $user = User::create([
@@ -71,8 +77,17 @@ class RegisteredUserController extends Controller
             'is_verified' => false, // Admin needs to verify
         ]);
 
-        // Assign user role
-        $user->assignRole('user');
+        // Assign role when role data exists; keep registration flow resilient.
+        try {
+            if (Role::query()->where('name', 'user')->exists()) {
+                $user->assignRole('user');
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Skipping role assignment during registration', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         event(new Registered($user));
 
