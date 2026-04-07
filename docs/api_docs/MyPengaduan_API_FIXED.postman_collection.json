@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "mypengaduan-api-2025-fixed",
 		"name": "MyPengaduan API (Fixed)",
-		"description": "Complete API Collection for MyPengaduan Application - 71 Endpoints (All URLs Fixed)",
+		"description": "Complete API Collection for MyPengaduan Application - 84 Endpoints (Synced with current routes)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -16,6 +16,31 @@
 		]
 	},
 	"item": [
+		{
+			"name": "System",
+			"item": [
+				{
+					"name": "API Info",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "Authentication",
 			"item": [
@@ -247,6 +272,24 @@
 						"description": "Get user dashboard with stats, recent complaints, and announcements"
 					},
 					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -392,6 +435,55 @@
 					"response": []
 				},
 				{
+					"name": "Add Complaint Response",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Mohon segera ditindaklanjuti karena kondisinya semakin parah\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/complaints/{{complaint_id}}/responses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"complaints",
+								"{{complaint_id}}",
+								"responses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Resolution",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/complaints/{{complaint_id}}/confirm-resolution",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"complaints",
+								"{{complaint_id}}",
+								"confirm-resolution"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Update Complaint",
 					"request": {
 						"method": "PUT",
@@ -468,12 +560,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/categories",
+							"raw": "{{base_url}}/api/complaints/categories",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
+								"complaints",
 								"categories"
 							]
 						}
@@ -577,6 +670,65 @@
 					"response": []
 				},
 				{
+					"name": "Get Bookmarked Announcements",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/announcements/bookmarked",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"announcements",
+								"bookmarked"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Bookmark",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/announcements/{{announcement_id}}/bookmark",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"announcements",
+								"{{announcement_id}}",
+								"bookmark"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Comments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/announcements/{{announcement_id}}/comments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"announcements",
+								"{{announcement_id}}",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Add Comment",
 					"request": {
 						"method": "POST",
@@ -600,6 +752,203 @@
 								"announcements",
 								"{{announcement_id}}",
 								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Comment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/announcements/{{announcement_id}}/comments/{{comment_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"announcements",
+								"{{announcement_id}}",
+								"comments",
+								"{{comment_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - Device Tokens",
+			"item": [
+				{
+					"name": "Register Device Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"device_token\": \"fcm_device_token_example\",\n    \"device_type\": \"android\",\n    \"device_model\": \"Pixel 8\",\n    \"os_version\": \"14\",\n    \"app_version\": \"1.0.0\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/device-tokens",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"device-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Device Tokens",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/device-tokens",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"device-tokens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Device Token",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/device-tokens/{{device_token_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"device-tokens",
+								"{{device_token_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User - Notifications",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/{{notification_id}}/read",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"{{notification_id}}",
+								"read"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark All Notifications as Read",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/read-all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"read-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notification Settings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notification-settings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notification-settings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Notification Settings",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"complaint_created\": true,\n    \"complaint_status_changed\": true,\n    \"announcement_created\": true,\n    \"admin_response\": true,\n    \"comment_added\": true,\n    \"push_enabled\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/notification-settings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notification-settings"
 							]
 						}
 					},
@@ -654,6 +1003,71 @@
 			]
 		},
 		{
+			"name": "Admin - Reports",
+			"item": [
+				{
+					"name": "Get Reports Overview",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/reports/overview",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"reports",
+								"overview"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Complaints Report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/reports/complaints",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"reports",
+								"complaints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users Report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/reports/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"reports",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Admin - Complaints",
 			"item": [
 				{
@@ -697,9 +1111,106 @@
 					"response": []
 				},
 				{
+					"name": "Get Trashed Complaints",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/complaints/trashed",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"complaints",
+								"trashed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Complaint Detail",
 					"request": {
 						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/complaints/{{complaint_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"complaints",
+								"{{complaint_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Complaint (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Lampu Jalan Mati\",\n    \"description\": \"Lampu jalan mati total di RT 03\",\n    \"category_id\": 1,\n    \"location\": \"Jl. Melati RT 03\",\n    \"user_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/complaints",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"complaints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Complaint (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Lampu Jalan Mati - Updated\",\n    \"description\": \"Update deskripsi laporan\",\n    \"location\": \"Jl. Melati RT 03 RW 05\",\n    \"priority\": \"high\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/complaints/{{complaint_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"complaints",
+								"{{complaint_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Complaint (Admin)",
+					"request": {
+						"method": "DELETE",
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/api/admin/complaints/{{complaint_id}}",
@@ -741,6 +1252,78 @@
 								"complaints",
 								"{{complaint_id}}",
 								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark as Resolved",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"admin_note\": \"Laporan telah diselesaikan oleh tim lapangan\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/complaints/{{complaint_id}}/resolve",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"complaints",
+								"{{complaint_id}}",
+								"resolve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restore Complaint",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/complaints/{{complaint_id}}/restore",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"complaints",
+								"{{complaint_id}}",
+								"restore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Force Delete Complaint",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/complaints/{{complaint_id}}/force-delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"complaints",
+								"{{complaint_id}}",
+								"force-delete"
 							]
 						}
 					},
@@ -1227,6 +1810,27 @@
 					"response": []
 				},
 				{
+					"name": "Unverify Email",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/users/{{user_id}}/unverify-email",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"{{user_id}}",
+								"unverify-email"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Verify User Identity",
 					"request": {
 						"method": "PATCH",
@@ -1242,6 +1846,36 @@
 								"users",
 								"{{user_id}}",
 								"verify-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Verification",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Dokumen verifikasi tidak valid\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/users/{{user_id}}/reject-verification",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"{{user_id}}",
+								"reject-verification"
 							]
 						}
 					},
@@ -1449,16 +2083,11 @@
 				{
 					"name": "Update Announcement",
 					"request": {
-						"method": "POST",
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
-								{
-									"key": "_method",
-									"value": "PUT",
-									"type": "text"
-								},
 								{
 									"key": "title",
 									"value": "Pemeliharaan Website - Updated",
@@ -1631,6 +2260,18 @@
 		},
 		{
 			"key": "attachment_id",
+			"value": ""
+		},
+		{
+			"key": "comment_id",
+			"value": ""
+		},
+		{
+			"key": "device_token_id",
+			"value": ""
+		},
+		{
+			"key": "notification_id",
 			"value": ""
 		}
 	]

@@ -90,7 +90,8 @@
                 "knuckleswtf/scribe",
                 "laravel/sail",
                 "laravel/breeze",
-                "nunomaduro/collision"
+                "nunomaduro/collision",
+                "laravel/pail"
             ]
         }
     },
