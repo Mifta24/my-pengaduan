@@ -52,10 +52,9 @@ class SendStatusChangeNotificationToUser implements ShouldQueue
 
         // Prepare notification data
         $statusLabel = $this->getStatusLabel($event->newStatus);
-        $icon = $this->getStatusIcon($event->newStatus);
 
-        $title = $icon . ' Status Keluhan Diperbarui';
-        $body = 'Keluhan #' . $complaint->id . ' - ' . $complaint->title . ' sekarang berstatus: ' . $statusLabel;
+        $title = 'Status Pengaduan Diperbarui';
+        $body = 'Pengaduan #' . $complaint->id . ' - ' . $complaint->title . ' sekarang berstatus: ' . $statusLabel;
         $data = [
             'type' => 'complaint_status_changed',
             'complaint_id' => (string) $complaint->id,
@@ -101,18 +100,4 @@ class SendStatusChangeNotificationToUser implements ShouldQueue
         };
     }
 
-    /**
-     * Get status icon
-     */
-    private function getStatusIcon(string $status): string
-    {
-        return match($status) {
-            'pending' => '⏳',
-            'in_progress' => '🔄',
-            'waiting_user_confirmation' => '🕒',
-            'resolved' => '✅',
-            'rejected' => '❌',
-            default => '📋',
-        };
-    }
 }

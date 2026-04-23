@@ -487,29 +487,53 @@ class ComplaintController extends Controller
                 $firebaseService = app(\App\Services\FirebaseService::class);
                 $user = $complaint->user;
 
-                if ($user && $user->fcm_token) {
-                    $notificationData = [
-                        'type' => 'complaint_response',
-                        'complaint_id' => $complaint->id,
-                        'response_id' => $response->id,
-                        'title' => $complaint->title,
-                    ];
+                if ($user) {
+                    $settings = $user->notificationSettings;
 
-                    $firebaseService->sendToDevice(
-                        $user->fcm_token,
-                        'Admin Response',
-                        "Admin telah merespons pengaduan Anda: {$complaint->title}",
-                        $notificationData
-                    );
+                    if ($settings && !$settings->admin_response) {
+                        \Illuminate\Support\Facades\Log::info('User has disabled admin response notifications', [
+                            'user_id' => $user->id,
+                            'complaint_id' => $complaint->id,
+                        ]);
+                    } else {
+                        $notificationData = [
+                            'type' => 'complaint_response',
+                            'complaint_id' => (string) $complaint->id,
+                            'response_id' => (string) $response->id,
+                            'title' => $complaint->title,
+                            'click_action' => 'OPEN_COMPLAINT',
+                        ];
 
-                    // Save notification to database
-                    \App\Models\FcmNotification::create([
-                        'user_id' => $user->id,
-                        'type' => 'complaint_response',
-                        'title' => 'Admin Response',
-                        'body' => "Admin telah merespons pengaduan Anda: {$complaint->title}",
-                        'data' => json_encode($notificationData),
-                    ]);
+                        // Save notification to database
+                        \App\Models\FcmNotification::create([
+                            'user_id' => $user->id,
+                            'type' => 'complaint_response',
+                            'title' => 'Admin Menanggapi Pengaduan',
+                            'body' => "Admin telah merespons pengaduan Anda: {$complaint->title}",
+                            'data' => $notificationData,
+                            'is_read' => false,
+                        ]);
+
+                        // Send push notification to all active devices if push is enabled
+                        $pushEnabled = !$settings || $settings->push_enabled;
+                        if ($pushEnabled) {
+                            $tokens = $user->getActiveDeviceTokens();
+
+                            if (!empty($tokens)) {
+                                $firebaseService->sendToMultipleDevices(
+                                    $tokens,
+                                    'Admin Menanggapi Pengaduan',
+                                    "Admin telah merespons pengaduan Anda: {$complaint->title}",
+                                    $notificationData
+                                );
+                            } else {
+                                \Illuminate\Support\Facades\Log::info('User has no active device tokens for admin response notification', [
+                                    'user_id' => $user->id,
+                                    'complaint_id' => $complaint->id,
+                                ]);
+                            }
+                        }
+                    }
                 }
             } catch (\Exception $e) {
                 // Log but don't fail the response creation

@@ -366,7 +366,7 @@ class ComplaintController extends Controller
 
                 $firebaseService->sendToMultipleDevices(
                     $tokens,
-                    '💬 Tanggapan Admin',
+                    'Admin Menanggapi Pengaduan',
                     "Admin telah merespons keluhan Anda: {$complaint->title}",
                     $notificationData
                 );
@@ -375,7 +375,7 @@ class ComplaintController extends Controller
                 \App\Models\FcmNotification::create([
                     'user_id' => $user->id,
                     'type' => 'complaint_response',
-                    'title' => '💬 Tanggapan Admin',
+                    'title' => 'Admin Menanggapi Pengaduan',
                     'body' => "Admin telah merespons keluhan Anda: {$complaint->title}",
                     'data' => $notificationData,
                     'is_read' => false,

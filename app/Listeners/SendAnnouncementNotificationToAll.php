@@ -40,8 +40,7 @@ class SendAnnouncementNotificationToAll implements ShouldQueue
         }
 
         // Prepare notification data
-        $icon = $announcement->priority === 'urgent' ? '🚨' : '📢';
-        $title = $icon . ' Pengumuman Baru';
+        $title = 'Pengumuman Baru';
         $body = $announcement->title;
         $data = [
             'type' => 'announcement_created',
