@@ -188,6 +188,28 @@ class AnnouncementController extends Controller
         try {
             $announcement = Announcement::findOrFail($id);
 
+            if ($request->hasFile('cover_image') && !$request->file('cover_image')->isValid()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Diagnostics: cover_image upload failed before validation',
+                    'error_code' => $request->file('cover_image')->getError(),
+                    'error_message' => $request->file('cover_image')->getErrorMessage(),
+                ], 422);
+            }
+
+            if ($request->hasFile('attachments') && is_array($request->file('attachments'))) {
+                foreach ($request->file('attachments') as $index => $file) {
+                    if ($file && !$file->isValid()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Diagnostics: attachments.{$index} upload failed before validation",
+                            'error_code' => $file->getError(),
+                            'error_message' => $file->getErrorMessage(),
+                        ], 422);
+                    }
+                }
+            }
+
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
                 'slug' => 'nullable|string|max:255|unique:announcements,slug,' . $id,

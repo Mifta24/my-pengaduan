@@ -188,6 +188,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->name('api.ad
         Route::get('/{id}', [AdminAnnouncementController::class, 'show']);
         Route::post('/', [AdminAnnouncementController::class, 'store']);
         Route::put('/{id}', [AdminAnnouncementController::class, 'update']);
+        Route::post('/{id}', [AdminAnnouncementController::class, 'update']); // Alias for multipart/form-data upload
         Route::delete('/{id}', [AdminAnnouncementController::class, 'destroy']);
         Route::patch('/{id}/toggle-status', [AdminAnnouncementController::class, 'toggleStatus']);
         Route::patch('/{id}/toggle-sticky', [AdminAnnouncementController::class, 'toggleSticky']);
