@@ -91,6 +91,7 @@ class AnnouncementController extends Controller
             'priority' => 'nullable|in:urgent,high,medium,low',
             'target_audience' => 'nullable|array',
             'published_at' => 'nullable|date',
+            'cover_image' => 'nullable|image|max:10240',
             'attachments' => 'nullable|array',
             'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx'
         ]);
@@ -107,6 +108,12 @@ class AnnouncementController extends Controller
         $validated['priority'] = $validated['priority'] ?? 'medium';
         $validated['published_at'] = $validated['published_at'] ?? now();
         $validated['author_id'] = Auth::id();
+
+        // Handle cover image
+        if ($request->hasFile('cover_image')) {
+            $upload = $this->uploadToCloudinary($request->file('cover_image'), 'announcements/covers', 1920, 85);
+            $validated['cover_image'] = $upload['url'];
+        }
 
         // Handle file attachments (upload to Cloudinary)
         if ($request->hasFile('attachments')) {
@@ -164,6 +171,7 @@ class AnnouncementController extends Controller
             'priority' => 'nullable|in:urgent,high,medium,low',
             'target_audience' => 'nullable|array',
             'published_at' => 'nullable|date',
+            'cover_image' => 'nullable|image|max:10240',
             'attachments' => 'nullable|array',
             'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx'
         ]);
@@ -172,6 +180,19 @@ class AnnouncementController extends Controller
         $validated['is_active'] = $request->has('is_active') ? (bool)$request->is_active : false;
         $validated['is_sticky'] = $request->has('is_sticky') ? true : false;
         $validated['allow_comments'] = $request->has('allow_comments') ? true : false;
+
+        // Handle cover image
+        if ($request->hasFile('cover_image')) {
+            if (!empty($announcement->cover_image)) {
+                $path = $announcement->cover_image;
+                if ($path && filter_var($path, FILTER_VALIDATE_URL) && preg_match('/\/v\d+\/(.+)$/', $path, $matches)) {
+                    $publicId = pathinfo($matches[1], PATHINFO_DIRNAME) . '/' . pathinfo($matches[1], PATHINFO_FILENAME);
+                    $this->deleteFromCloudinary($publicId);
+                }
+            }
+            $upload = $this->uploadToCloudinary($request->file('cover_image'), 'announcements/covers', 1920, 85);
+            $validated['cover_image'] = $upload['url'];
+        }
 
         // Handle attachments removal
         $existingAttachments = $announcement->attachments ?? [];
@@ -227,6 +248,28 @@ class AnnouncementController extends Controller
      */
     public function destroy(Announcement $announcement)
     {
+        // Cleanup cover image
+        if (!empty($announcement->cover_image)) {
+            $path = $announcement->cover_image;
+            if ($path && filter_var($path, FILTER_VALIDATE_URL) && preg_match('/\/v\d+\/(.+)$/', $path, $matches)) {
+                $publicId = pathinfo($matches[1], PATHINFO_DIRNAME) . '/' . pathinfo($matches[1], PATHINFO_FILENAME);
+                $this->deleteFromCloudinary($publicId);
+            }
+        }
+
+        // Cleanup attachments
+        if (!empty($announcement->attachments)) {
+            foreach ($announcement->attachments as $attachment) {
+                if (is_array($attachment) && isset($attachment['path'])) {
+                    $path = $attachment['path'];
+                    if ($path && filter_var($path, FILTER_VALIDATE_URL) && preg_match('/\/v\d+\/(.+)$/', $path, $matches)) {
+                        $publicId = pathinfo($matches[1], PATHINFO_DIRNAME) . '/' . pathinfo($matches[1], PATHINFO_FILENAME);
+                        $this->deleteFromCloudinary($publicId);
+                    }
+                }
+            }
+        }
+
         $announcement->delete();
 
         return redirect()->route('admin.announcements.index')

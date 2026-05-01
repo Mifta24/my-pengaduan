@@ -128,23 +128,46 @@ class AnnouncementController extends Controller
                 'title' => 'required|string|max:255',
                 'slug' => 'nullable|string|max:255|unique:announcements,slug',
                 'content' => 'required|string',
-                'excerpt' => 'nullable|string',
+                'summary' => 'nullable|string',
                 'priority' => 'required|in:low,medium,high,urgent',
                 'is_sticky' => 'boolean',
                 'is_active' => 'boolean',
                 'published_at' => 'nullable|date',
+                'cover_image' => 'nullable|image|max:10240',
+                'attachments' => 'nullable|array',
+                'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx',
+                'target_audience' => 'nullable|array',
+                'target_audience.*' => 'in:user,admin',
             ]);
 
             if ($validator->fails()) {
                 return $this->validationError($validator->errors());
             }
 
-            $data = $request->all();
+            $data = $request->except(['cover_image', 'attachments']);
             $data['slug'] = $request->slug ?? Str::slug($request->title);
             $data['published_at'] = $request->published_at ?? now();
             $data['author_id'] = auth()->id();
 
-            // Note: API admin announcements currently do not manage attachments or images directly.
+            // Handle Cover Image
+            if ($request->hasFile('cover_image')) {
+                $uploadResult = $this->uploadToCloudinary($request->file('cover_image'), 'announcements/covers');
+                $data['cover_image'] = $uploadResult['url'] ?? $uploadResult['path'];
+            }
+
+            // Handle Attachments
+            if ($request->hasFile('attachments')) {
+                $attachmentsList = [];
+                foreach ($request->file('attachments') as $file) {
+                    $uploadResult = $this->uploadToCloudinary($file, 'announcements/attachments');
+                    $attachmentsList[] = [
+                        'path' => $uploadResult['url'],
+                        'original_name' => $file->getClientOriginalName(),
+                        'size' => $uploadResult['size'] ?? $file->getSize(),
+                    ];
+                }
+                $data['attachments'] = $attachmentsList;
+            }
 
             $announcement = Announcement::create($data);
 
@@ -169,23 +192,69 @@ class AnnouncementController extends Controller
                 'title' => 'required|string|max:255',
                 'slug' => 'nullable|string|max:255|unique:announcements,slug,' . $id,
                 'content' => 'required|string',
-                'excerpt' => 'nullable|string',
+                'summary' => 'nullable|string',
                 'priority' => 'required|in:low,medium,high,urgent',
                 'is_sticky' => 'boolean',
                 'is_active' => 'boolean',
                 'published_at' => 'nullable|date',
+                'cover_image' => 'nullable|image|max:10240',
+                'attachments' => 'nullable|array',
+                'attachments.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx',
+                'target_audience' => 'nullable|array',
+                'target_audience.*' => 'in:user,admin',
             ]);
 
             if ($validator->fails()) {
                 return $this->validationError($validator->errors());
             }
 
-            $data = $request->all();
+            $data = $request->except(['cover_image', 'attachments']);
             if ($request->has('title') && !$request->has('slug')) {
                 $data['slug'] = Str::slug($request->title);
             }
 
-            // Note: API admin announcements currently do not manage attachments or images directly.
+            // Handle Cover Image Update
+            if ($request->hasFile('cover_image')) {
+                // Remove old cover image
+                if (!empty($announcement->cover_image)) {
+                    $path = $announcement->cover_image;
+                    if ($path && filter_var($path, FILTER_VALIDATE_URL) && preg_match('/\/v\d+\/(.+)$/', $path, $matches)) {
+                        $publicId = pathinfo($matches[1], PATHINFO_DIRNAME) . '/' . pathinfo($matches[1], PATHINFO_FILENAME);
+                        $this->deleteFromCloudinary($publicId);
+                    }
+                }
+
+                $uploadResult = $this->uploadToCloudinary($request->file('cover_image'), 'announcements/covers');
+                $data['cover_image'] = $uploadResult['url'] ?? $uploadResult['path'];
+            }
+
+            // Handle Attachments Update (Replacing all attachments for now, or appending if logic is adjusted)
+            // Simple replace approach for API
+            if ($request->hasFile('attachments')) {
+                // Remove old attachments
+                if (!empty($announcement->attachments)) {
+                    foreach ($announcement->attachments as $attachment) {
+                        if (is_array($attachment) && isset($attachment['path'])) {
+                            $path = $attachment['path'];
+                            if ($path && filter_var($path, FILTER_VALIDATE_URL) && preg_match('/\/v\d+\/(.+)$/', $path, $matches)) {
+                                $publicId = pathinfo($matches[1], PATHINFO_DIRNAME) . '/' . pathinfo($matches[1], PATHINFO_FILENAME);
+                                $this->deleteFromCloudinary($publicId);
+                            }
+                        }
+                    }
+                }
+
+                $attachmentsList = [];
+                foreach ($request->file('attachments') as $file) {
+                    $uploadResult = $this->uploadToCloudinary($file, 'announcements/attachments');
+                    $attachmentsList[] = [
+                        'path' => $uploadResult['url'],
+                        'original_name' => $file->getClientOriginalName(),
+                        'size' => $uploadResult['size'] ?? $file->getSize(),
+                    ];
+                }
+                $data['attachments'] = $attachmentsList;
+            }
 
             $announcement->update($data);
 
@@ -203,7 +272,27 @@ class AnnouncementController extends Controller
         try {
             $announcement = Announcement::findOrFail($id);
 
-            // Note: Attachments cleanup (including Cloudinary) is handled via the web admin controller logic.
+            // Cleanup cover image
+            if (!empty($announcement->cover_image)) {
+                $path = $announcement->cover_image;
+                if ($path && filter_var($path, FILTER_VALIDATE_URL) && preg_match('/\/v\d+\/(.+)$/', $path, $matches)) {
+                    $publicId = pathinfo($matches[1], PATHINFO_DIRNAME) . '/' . pathinfo($matches[1], PATHINFO_FILENAME);
+                    $this->deleteFromCloudinary($publicId);
+                }
+            }
+
+            // Cleanup attachments
+            if (!empty($announcement->attachments)) {
+                foreach ($announcement->attachments as $attachment) {
+                    if (is_array($attachment) && isset($attachment['path'])) {
+                        $path = $attachment['path'];
+                        if ($path && filter_var($path, FILTER_VALIDATE_URL) && preg_match('/\/v\d+\/(.+)$/', $path, $matches)) {
+                            $publicId = pathinfo($matches[1], PATHINFO_DIRNAME) . '/' . pathinfo($matches[1], PATHINFO_FILENAME);
+                            $this->deleteFromCloudinary($publicId);
+                        }
+                    }
+                }
+            }
 
             $announcement->delete();
 
@@ -280,6 +369,10 @@ class AnnouncementController extends Controller
                 'status' => $announcement->status,
                 'is_sticky' => $announcement->is_sticky,
                 'allow_comments' => $announcement->allow_comments,
+                'target_audience' => $announcement->target_audience,
+                'cover_image' => $announcement->cover_image,
+                'cover_image_url' => $announcement->cover_image_url,
+                'attachments' => $announcement->attachments,
                 'published_at' => $announcement->published_at ? $announcement->published_at->format('Y-m-d\TH:i:s.u\Z') : null,
                 'updated_at' => $announcement->updated_at ? $announcement->updated_at->format('Y-m-d\TH:i:s\Z') : null,
                 'views_count' => $announcement->views_count,
@@ -329,6 +422,10 @@ class AnnouncementController extends Controller
                 'status' => $announcement->status,
                 'is_sticky' => $announcement->is_sticky,
                 'allow_comments' => $announcement->allow_comments,
+                'target_audience' => $announcement->target_audience,
+                'cover_image' => $announcement->cover_image,
+                'cover_image_url' => $announcement->cover_image_url,
+                'attachments' => $announcement->attachments,
                 'published_at' => $announcement->published_at ? $announcement->published_at->format('Y-m-d\TH:i:s.u\Z') : null,
                 'updated_at' => $announcement->updated_at ? $announcement->updated_at->format('Y-m-d\TH:i:s\Z') : null,
                 'views_count' => $announcement->views_count,

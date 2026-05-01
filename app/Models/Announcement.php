@@ -16,6 +16,7 @@ class Announcement extends Model
         'slug',
         'summary',
         'content',
+        'cover_image',
         'priority',
         'target_audience',
         'attachments',
@@ -37,7 +38,7 @@ class Announcement extends Model
         'views_count' => 'integer'
     ];
 
-    protected $appends = ['status'];
+    protected $appends = ['status', 'cover_image_url'];
 
     protected static function boot()
     {
@@ -150,6 +151,17 @@ class Announcement extends Model
     }
 
     /**
+     * Scope for target audience filtering based on user role
+     */
+    public function scopeForRole($query, $role)
+    {
+        return $query->where(function ($q) use ($role) {
+            $q->whereNull('target_audience')
+              ->orWhereJsonContains('target_audience', $role);
+        });
+    }
+
+    /**
      * Get status attribute
      */
     public function getStatusAttribute()
@@ -158,6 +170,14 @@ class Announcement extends Model
             return 'published';
         }
         return 'unpublished';
+    }
+
+    /**
+     * Get cover image URL
+     */
+    public function getCoverImageUrlAttribute()
+    {
+        return $this->getAttachmentUrl($this->cover_image);
     }
 
     /**

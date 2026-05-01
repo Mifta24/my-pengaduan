@@ -33,8 +33,12 @@ class AnnouncementController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = auth('sanctum')->user();
+            $role = $user ? $user->role : 'user';
+
             $query = Announcement::where('is_active', true)
-                ->where('published_at', '<=', now());
+                ->where('published_at', '<=', now())
+                ->forRole($role);
 
             // Filter by priority
             if ($request->filled('priority')) {
@@ -83,13 +87,23 @@ class AnnouncementController extends Controller
     public function show(Announcement $announcement)
     {
         try {
+            $user = auth('sanctum')->user();
+            $role = $user ? $user->role : 'user';
+
             // Check if announcement is active and published
             if (!$announcement->is_active || $announcement->published_at > now()) {
                 return $this->notFound('Announcement not found or not yet published');
             }
 
+            // Check target audience
+            $audience = $announcement->target_audience;
+            if (!empty($audience) && !in_array($role, $audience)) {
+                return $this->unauthorized('You do not have permission to view this announcement');
+            }
+
             $data = $announcement->only([
-                'id', 'title', 'content', 'priority', 'is_sticky', 'published_at', 'created_at'
+                'id', 'title', 'content', 'priority', 'is_sticky', 'published_at', 'created_at',
+                'cover_image', 'cover_image_url', 'attachments', 'target_audience'
             ]);
 
             return $this->success($data, 'Announcement details loaded successfully');
@@ -105,12 +119,16 @@ class AnnouncementController extends Controller
     public function urgent()
     {
         try {
+            $user = auth('sanctum')->user();
+            $role = $user ? $user->role : 'user';
+
             $announcements = Announcement::where('is_active', true)
                 ->where('priority', 'urgent')
                 ->where('published_at', '<=', now())
+                ->forRole($role)
                 ->orderBy('published_at', 'desc')
                 ->limit(5)
-                ->select('id', 'title', 'content', 'published_at')
+                ->select('id', 'title', 'content', 'published_at', 'cover_image')
                 ->get();
 
             return $this->success($announcements, 'Urgent announcements loaded successfully');
@@ -126,8 +144,12 @@ class AnnouncementController extends Controller
     public function latest()
     {
         try {
+            $user = auth('sanctum')->user();
+            $role = $user ? $user->role : 'user';
+
             $announcements = Announcement::where('is_active', true)
                 ->where('published_at', '<=', now())
+                ->forRole($role)
                 ->orderBy('is_sticky', 'desc')
                 ->orderByRaw("CASE
                     WHEN priority = 'urgent' THEN 1
@@ -136,7 +158,7 @@ class AnnouncementController extends Controller
                     ELSE 4 END")
                 ->orderBy('published_at', 'desc')
                 ->limit(3)
-                ->select('id', 'title', 'content', 'priority', 'is_sticky', 'published_at')
+                ->select('id', 'title', 'content', 'priority', 'is_sticky', 'published_at', 'cover_image')
                 ->get();
 
             return $this->success($announcements, 'Latest announcements loaded successfully');
@@ -154,10 +176,17 @@ class AnnouncementController extends Controller
         try {
             // Find announcement
             $announcement = Announcement::findOrFail($id);
+            $role = $request->user()->role;
 
             // Check if announcement is active and published
             if (!$announcement->is_active || $announcement->published_at > now()) {
                 return $this->notFound('Announcement not found or not yet published');
+            }
+
+            // Check target audience
+            $audience = $announcement->target_audience;
+            if (!empty($audience) && !in_array($role, $audience)) {
+                return $this->unauthorized('You do not have permission to view this announcement');
             }
 
             // Check if comments are allowed
@@ -200,10 +229,17 @@ class AnnouncementController extends Controller
     {
         try {
             $announcement = Announcement::findOrFail($id);
+            $role = $request->user()->role;
 
             // Check if announcement is active and published
             if (!$announcement->is_active || $announcement->published_at > now()) {
                 return $this->notFound('Announcement not found or not yet published');
+            }
+
+            // Check target audience
+            $audience = $announcement->target_audience;
+            if (!empty($audience) && !in_array($role, $audience)) {
+                return $this->unauthorized('You do not have permission to view this announcement');
             }
 
             $user = $request->user();
@@ -243,6 +279,7 @@ class AnnouncementController extends Controller
             $bookmarkedAnnouncements = $user->bookmarkedAnnouncements()
                 ->where('is_active', true)
                 ->where('published_at', '<=', now())
+                ->forRole($user->role)
                 ->orderBy('announcement_bookmarks.created_at', 'desc')
                 ->paginate($request->get('per_page', 10));
 
@@ -263,10 +300,17 @@ class AnnouncementController extends Controller
     {
         try {
             $announcement = Announcement::findOrFail($id);
+            $role = $request->user()->role;
 
             // Check if announcement is active and published
             if (!$announcement->is_active || $announcement->published_at > now()) {
                 return $this->notFound('Announcement not found or not yet published');
+            }
+
+            // Check target audience
+            $audience = $announcement->target_audience;
+            if (!empty($audience) && !in_array($role, $audience)) {
+                return $this->unauthorized('You do not have permission to view this announcement');
             }
 
             $comments = $announcement->comments()
