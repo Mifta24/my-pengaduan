@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Mail\ForgotPasswordMail;
 use App\Models\User;
+use App\Services\BrevoMailService;
 use App\Traits\ApiResponse;
 use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -397,8 +396,8 @@ class AuthController extends Controller
             // Increment attempt counter (10 menit)
             Cache::put($attemptsKey, $attempts + 1, now()->addMinutes(10));
 
-            // Kirim email OTP
-            Mail::to($email)->send(new ForgotPasswordMail($otp, $user->name));
+            // Kirim email OTP via Brevo API
+            app(BrevoMailService::class)->sendOtpEmail($email, $user->name, $otp);
 
             return $this->success(null, 'OTP berhasil dikirim ke email Anda. Berlaku selama 10 menit.');
         } catch (ValidationException $e) {
