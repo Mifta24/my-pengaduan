@@ -145,7 +145,7 @@ class AuthController extends Controller
             return $this->validationError($e->errors());
         } catch (\Exception $e) {
             Log::error('Registration failed: ' . $e->getMessage(), ['exception' => $e]);
-            return $this->serverError('Registration failed', $e);
+            return $this->serverError('Registration failed: ' . $e->getMessage(), $e);
         }
     }
 
@@ -405,7 +405,7 @@ class AuthController extends Controller
             return $this->validationError($e->errors());
         } catch (\Exception $e) {
             Log::error('Forgot password OTP sending failed: ' . $e->getMessage(), ['exception' => $e]);
-            return $this->serverError('Gagal mengirim OTP', $e);
+            return $this->serverError('Gagal mengirim OTP: ' . $e->getMessage(), $e);
         }
     }
 

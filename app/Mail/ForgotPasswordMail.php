@@ -14,13 +14,13 @@ class ForgotPasswordMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public string $otp;
-    public string $userName;
+    public $otp;
+    public $userName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(string $otp, string $userName)
+    public function __construct($otp, $userName = null)
     {
         $this->otp = $otp;
         $this->userName = $userName;
