@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -101,7 +102,7 @@ class AuthController extends Controller
             $user = User::create([
                 'name' => $validated['name'],
                 'nik' => $validated['nik'],
-                'ktp_photo' => $ktpPhotoPath,
+                'ktp_path' => $ktpPhotoPath,
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 'address' => $validated['address'],
@@ -143,6 +144,7 @@ class AuthController extends Controller
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         } catch (\Exception $e) {
+            Log::error('Registration failed: ' . $e->getMessage(), ['exception' => $e]);
             return $this->serverError('Registration failed', $e);
         }
     }
@@ -402,6 +404,7 @@ class AuthController extends Controller
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         } catch (\Exception $e) {
+            Log::error('Forgot password OTP sending failed: ' . $e->getMessage(), ['exception' => $e]);
             return $this->serverError('Gagal mengirim OTP', $e);
         }
     }
