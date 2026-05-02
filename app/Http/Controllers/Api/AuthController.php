@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ForgotPasswordMail;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -346,6 +350,149 @@ class AuthController extends Controller
             return $this->success(null, 'Logged out from all devices successfully');
         } catch (\Exception $e) {
             return $this->serverError('Logout failed', $e);
+        }
+    }
+
+    // =========================================================================
+    // FORGOT PASSWORD — FLOW 3 LANGKAH
+    // =========================================================================
+
+    /**
+     * Step 1 — Kirim OTP ke email
+     *
+     * @unauthenticated
+     * @bodyParam email string required Email yang terdaftar. Example: user@example.com
+     */
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'email' => 'required|email',
+            ]);
+
+            $email = strtolower(trim($validated['email']));
+
+            // Cek apakah email terdaftar
+            $user = User::where('email', $email)->first();
+            if (!$user) {
+                // Balas generik agar tidak membocorkan info akun
+                return $this->success(null, 'Jika email terdaftar, OTP akan segera dikirim.');
+            }
+
+            // Rate limit: max 3 permintaan OTP per 10 menit per email
+            $attemptsKey = 'forgot_password_attempts:' . $email;
+            $attempts = Cache::get($attemptsKey, 0);
+            if ($attempts >= 3) {
+                return $this->error('Terlalu banyak permintaan. Coba lagi dalam 10 menit.', 429);
+            }
+
+            // Generate OTP 6 digit
+            $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+            // Simpan OTP ke cache (10 menit)
+            Cache::put('forgot_password_otp:' . $email, $otp, now()->addMinutes(10));
+
+            // Increment attempt counter (10 menit)
+            Cache::put($attemptsKey, $attempts + 1, now()->addMinutes(10));
+
+            // Kirim email OTP
+            Mail::to($email)->send(new ForgotPasswordMail($otp, $user->name));
+
+            return $this->success(null, 'OTP berhasil dikirim ke email Anda. Berlaku selama 10 menit.');
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        } catch (\Exception $e) {
+            return $this->serverError('Gagal mengirim OTP', $e);
+        }
+    }
+
+    /**
+     * Step 2 — Verifikasi kode OTP
+     *
+     * @unauthenticated
+     * @bodyParam email string required Email yang sama dengan step 1. Example: user@example.com
+     * @bodyParam otp string required Kode OTP 6 digit. Example: 123456
+     */
+    public function verifyOtp(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'email' => 'required|email',
+                'otp'   => 'required|string|size:6',
+            ]);
+
+            $email = strtolower(trim($validated['email']));
+            $otpKey = 'forgot_password_otp:' . $email;
+
+            $storedOtp = Cache::get($otpKey);
+
+            if (!$storedOtp || $storedOtp !== $validated['otp']) {
+                return $this->error('OTP tidak valid atau sudah kadaluarsa.', 422);
+            }
+
+            // OTP valid — hapus dari cache (one-time use)
+            Cache::forget($otpKey);
+            Cache::forget('forgot_password_attempts:' . $email);
+
+            // Generate reset token (UUID) dan simpan 15 menit
+            $resetToken = Str::uuid()->toString();
+            Cache::put('password_reset_token:' . $resetToken, $email, now()->addMinutes(15));
+
+            return $this->success(
+                ['reset_token' => $resetToken],
+                'OTP valid. Gunakan reset_token untuk membuat password baru (berlaku 15 menit).'
+            );
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        } catch (\Exception $e) {
+            return $this->serverError('Verifikasi OTP gagal', $e);
+        }
+    }
+
+    /**
+     * Step 3 — Reset password dengan token
+     *
+     * @unauthenticated
+     * @bodyParam reset_token string required Token dari step verifikasi OTP. Example: uuid-xxxx
+     * @bodyParam password string required Password baru minimal 8 karakter. Example: newpassword123
+     * @bodyParam password_confirmation string required Konfirmasi password baru. Example: newpassword123
+     */
+    public function resetPassword(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'reset_token'           => 'required|string',
+                'password'              => 'required|string|min:8|confirmed',
+            ]);
+
+            $tokenKey = 'password_reset_token:' . $validated['reset_token'];
+            $email = Cache::get($tokenKey);
+
+            if (!$email) {
+                return $this->error('Token tidak valid atau sudah kadaluarsa. Ulangi proses dari awal.', 422);
+            }
+
+            $user = User::where('email', $email)->first();
+            if (!$user) {
+                return $this->error('Akun tidak ditemukan.', 404);
+            }
+
+            // Update password
+            $user->update([
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            // Hapus reset token dari cache (one-time use)
+            Cache::forget($tokenKey);
+
+            // Opsional: cabut semua token Sanctum lama agar user wajib login ulang
+            $user->tokens()->delete();
+
+            return $this->success(null, 'Password berhasil direset. Silakan login dengan password baru Anda.');
+        } catch (ValidationException $e) {
+            return $this->validationError($e->errors());
+        } catch (\Exception $e) {
+            return $this->serverError('Reset password gagal', $e);
         }
     }
 }
