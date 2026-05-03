@@ -173,6 +173,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Keep the legacy users.role column and Spatie roles in sync.
+     */
+    public function syncPrimaryRole(string $role): void
+    {
+        $this->forceFill(['role' => $role])->save();
+        $this->syncRoles([$role]);
+    }
+
+    /**
      * Helper methods
      */
     public function isAdmin()

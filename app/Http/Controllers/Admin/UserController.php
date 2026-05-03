@@ -80,13 +80,14 @@ class UserController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
             'address' => $validated['address'],
             'phone' => $validated['phone'] ?? null,
             'email_verified_at' => now(), // Auto-verify admin created accounts
         ]);
 
         // Assign role
-        $user->assignRole($validated['role']);
+        $user->syncPrimaryRole($validated['role']);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Pengguna berhasil ditambahkan.');
@@ -141,6 +142,7 @@ class UserController extends Controller
             'email' => $validated['email'],
             'address' => $validated['address'],
             'phone' => $validated['phone'],
+            'role' => $validated['role'],
         ];
 
         // Update password if provided
@@ -151,7 +153,7 @@ class UserController extends Controller
         $user->update($updateData);
 
         // Update role
-        $user->syncRoles([$validated['role']]);
+        $user->syncPrimaryRole($validated['role']);
 
         return redirect()->route('admin.users.show', $user)
             ->with('success', 'Pengguna berhasil diperbarui.');
@@ -219,7 +221,7 @@ class UserController extends Controller
                 ->with('error', 'Anda tidak dapat mengubah role Anda sendiri.');
         }
 
-        $user->syncRoles([$validated['role']]);
+        $user->syncPrimaryRole($validated['role']);
 
         return redirect()->back()
             ->with('success', 'Role pengguna berhasil diubah.');
@@ -275,7 +277,7 @@ class UserController extends Controller
 
             case 'change_role':
                 foreach ($users->get() as $user) {
-                    $user->syncRoles([$validated['role']]);
+                    $user->syncPrimaryRole($validated['role']);
                 }
                 $message = 'Role pengguna yang dipilih berhasil diubah.';
                 break;

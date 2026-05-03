@@ -143,13 +143,14 @@ class UserController extends Controller
             }
 
             $userData = $request->except(['password', 'password_confirmation', 'role']);
+            $userData['role'] = $request->role;
             $userData['password'] = Hash::make($request->password);
             $userData['email_verified_at'] = now(); // Auto-verify admin-created users
 
             $user = User::create($userData);
-            $user->assignRole($request->role);
+            $user->syncPrimaryRole($request->role);
 
-            return $this->created($user, 'User created successfully');
+            return $this->created($user->fresh(), 'User created successfully');
         } catch (\Exception $e) {
             return $this->serverError('Failed to create user', $e);
         }
@@ -171,6 +172,7 @@ class UserController extends Controller
                 'address' => 'nullable|string',
                 'rt' => 'nullable|string|max:10',
                 'rw' => 'nullable|string|max:10',
+                'role' => 'sometimes|required|in:admin,user',
             ]);
 
             if ($validator->fails()) {
@@ -180,6 +182,14 @@ class UserController extends Controller
             $user->update($request->only([
                 'name', 'email', 'phone', 'nik', 'address', 'rt', 'rw'
             ]));
+
+            if ($request->filled('role')) {
+                if ($user->id === auth()->id()) {
+                    return $this->error('Cannot change your own role');
+                }
+
+                $user->syncPrimaryRole($request->role);
+            }
 
             return $this->success($user->fresh(), 'User updated successfully');
         } catch (\Exception $e) {
@@ -295,7 +305,7 @@ class UserController extends Controller
                 return $this->error('Cannot change your own role');
             }
 
-            $user->syncRoles([$request->role]);
+            $user->syncPrimaryRole($request->role);
 
             return $this->success($user->fresh(), 'User role updated successfully');
         } catch (\Exception $e) {
