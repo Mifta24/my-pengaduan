@@ -30,6 +30,8 @@ class User extends Authenticatable
         'nik',
         'ktp_path',
         'phone',
+        'rt',
+        'rw',
         'rt_number',
         'rw_number',
         'is_verified',
@@ -66,7 +68,39 @@ class User extends Authenticatable
     /**
      * Append custom attributes
      */
-    protected $appends = ['ktp_url', 'avatar_url'];
+    protected $appends = ['ktp_url', 'avatar_url', 'rt', 'rw'];
+
+    /**
+     * API alias for rt_number.
+     */
+    public function getRtAttribute()
+    {
+        return $this->rt_number;
+    }
+
+    /**
+     * API alias for rw_number.
+     */
+    public function getRwAttribute()
+    {
+        return $this->rw_number;
+    }
+
+    /**
+     * Store API rt payloads in the actual database column.
+     */
+    public function setRtAttribute($value): void
+    {
+        $this->attributes['rt_number'] = $value;
+    }
+
+    /**
+     * Store API rw payloads in the actual database column.
+     */
+    public function setRwAttribute($value): void
+    {
+        $this->attributes['rw_number'] = $value;
+    }
 
     /**
      * Get avatar URL accessor

@@ -126,6 +126,8 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
+            $this->normalizeRtRwInput($request);
+
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
@@ -133,8 +135,8 @@ class UserController extends Controller
                 'phone' => 'nullable|string|max:20',
                 'nik' => 'nullable|string|max:20|unique:users,nik',
                 'address' => 'nullable|string',
-                'rt' => 'nullable|string|max:10',
-                'rw' => 'nullable|string|max:10',
+                'rt_number' => 'nullable|string|max:3',
+                'rw_number' => 'nullable|string|max:3',
                 'role' => 'required|in:admin,user',
             ]);
 
@@ -163,6 +165,7 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
+            $this->normalizeRtRwInput($request);
 
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
@@ -170,8 +173,8 @@ class UserController extends Controller
                 'phone' => 'nullable|string|max:20',
                 'nik' => 'nullable|string|max:20|unique:users,nik,' . $id,
                 'address' => 'nullable|string',
-                'rt' => 'nullable|string|max:10',
-                'rw' => 'nullable|string|max:10',
+                'rt_number' => 'nullable|string|max:3',
+                'rw_number' => 'nullable|string|max:3',
                 'role' => 'sometimes|required|in:admin,user',
             ]);
 
@@ -180,7 +183,7 @@ class UserController extends Controller
             }
 
             $user->update($request->only([
-                'name', 'email', 'phone', 'nik', 'address', 'rt', 'rw'
+                'name', 'email', 'phone', 'nik', 'address', 'rt_number', 'rw_number'
             ]));
 
             if ($request->filled('role')) {
@@ -335,5 +338,13 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return $this->notFound('User not found');
         }
+    }
+
+    private function normalizeRtRwInput(Request $request): void
+    {
+        $request->merge([
+            'rt_number' => $request->input('rt_number', $request->input('rt')),
+            'rw_number' => $request->input('rw_number', $request->input('rw')),
+        ]);
     }
 }

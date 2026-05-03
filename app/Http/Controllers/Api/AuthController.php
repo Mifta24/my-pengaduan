@@ -73,6 +73,8 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
+            $this->normalizeRtRwInput($request);
+
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'nik' => 'required|string|size:16|unique:users',
@@ -80,8 +82,8 @@ class AuthController extends Controller
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8|confirmed',
                 'address' => 'required|string|max:500',
-                'rt' => 'nullable|string|max:10',
-                'rw' => 'nullable|string|max:10',
+                'rt_number' => 'nullable|string|max:3',
+                'rw_number' => 'nullable|string|max:3',
                 'phone' => 'nullable|string|max:20'
             ]);
 
@@ -105,8 +107,8 @@ class AuthController extends Controller
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 'address' => $validated['address'],
-                'rt' => $validated['rt'] ?? null,
-                'rw' => $validated['rw'] ?? null,
+                'rt_number' => $validated['rt_number'] ?? null,
+                'rw_number' => $validated['rw_number'] ?? null,
                 'phone' => $validated['phone'] ?? null,
             ]);
 
@@ -261,10 +263,12 @@ class AuthController extends Controller
     {
         try {
             $user = $request->user();
+            $this->normalizeRtRwInput($request);
+
             $validated = $request->validate([
                 'address' => 'nullable|string|max:255',
-                'rt' => 'nullable|string|max:10',
-                'rw' => 'nullable|string|max:10',
+                'rt_number' => 'nullable|string|max:3',
+                'rw_number' => 'nullable|string|max:3',
                 'phone' => 'nullable|string|max:20'
             ]);
 
@@ -283,11 +287,6 @@ class AuthController extends Controller
                     'phone' => $user->phone,
                 ],
             ];
-            $user->update($validated);
-
-            $data = [
-                'user' => $user->only(['id', 'name', 'email', 'address', 'phone'])
-            ];
 
             return $this->success($data, 'Profile updated successfully');
         } catch (ValidationException $e) {
@@ -295,6 +294,14 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return $this->serverError('Failed to update profile', $e);
         }
+    }
+
+    private function normalizeRtRwInput(Request $request): void
+    {
+        $request->merge([
+            'rt_number' => $request->input('rt_number', $request->input('rt')),
+            'rw_number' => $request->input('rw_number', $request->input('rw')),
+        ]);
     }
 
     /**
