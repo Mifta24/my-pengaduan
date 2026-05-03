@@ -464,7 +464,8 @@ class AuthController extends Controller
         try {
             $validated = $request->validate([
                 'reset_token'           => 'required|string',
-                'password'              => 'required|string|min:8|confirmed',
+                'password'              => 'required|string|min:8',
+                'password_confirmation' => 'required|string|same:password',
             ]);
 
             $tokenKey = 'password_reset_token:' . $validated['reset_token'];
