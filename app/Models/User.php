@@ -34,6 +34,7 @@ class User extends Authenticatable
         'rw',
         'rt_number',
         'rw_number',
+        'avatar',
         'is_verified',
         'verified_at',
         'is_active',

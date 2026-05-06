@@ -201,12 +201,13 @@ class AuthController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'nik' => $user->nik,
-                    'ktp_photo' => $user->ktp_photo ? asset('storage/' . $user->ktp_photo) : null,
                     'email' => $user->email,
                     'address' => $user->address,
                     'rt' => $user->rt,
                     'rw' => $user->rw,
                     'phone' => $user->phone,
+                    'avatar_url' => $user->avatar_url,
+                    'ktp_url' => $user->ktp_url,
                     'role' => $user->getRoleNames()->first(),
                     'email_verified_at' => $user->email_verified_at,
                     'is_verified' => (bool) $user->is_verified,
@@ -233,17 +234,16 @@ class AuthController extends Controller
             $user = $request->user();
 
             $data = [
+                'id' => $user->id,
+                'name' => $user->name,
                 'nik' => $user->nik,
-                'ktp_photo' => $user->ktp_photo ? asset('storage/' . $user->ktp_photo) : null,
                 'email' => $user->email,
                 'address' => $user->address,
                 'rt' => $user->rt,
                 'rw' => $user->rw,
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'address' => $user->address,
                 'phone' => $user->phone,
+                'avatar_url' => $user->avatar_url,
+                'ktp_url' => $user->ktp_url,
                 'role' => $user->getRoleNames()->first(),
                 'email_verified_at' => $user->email_verified_at,
                 'is_verified' => (bool) $user->is_verified,
@@ -269,8 +269,21 @@ class AuthController extends Controller
                 'address' => 'nullable|string|max:255',
                 'rt_number' => 'nullable|string|max:3',
                 'rw_number' => 'nullable|string|max:3',
-                'phone' => 'nullable|string|max:20'
+                'phone' => 'nullable|string|max:20',
+                'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             ]);
+
+            if ($request->hasFile('avatar')) {
+                $upload = $this->uploadToCloudinary(
+                    $request->file('avatar'),
+                    'avatars',
+                    512,
+                    85
+                );
+                $validated['avatar'] = $upload['url'];
+            } else {
+                unset($validated['avatar']);
+            }
 
             $user->update($validated);
 
@@ -279,12 +292,12 @@ class AuthController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'nik' => $user->nik,
-                    'ktp_photo' => $user->ktp_photo ? asset('storage/' . $user->ktp_photo) : null,
                     'email' => $user->email,
                     'address' => $user->address,
                     'rt' => $user->rt,
                     'rw' => $user->rw,
                     'phone' => $user->phone,
+                    'avatar_url' => $user->avatar_url,
                 ],
             ];
 
