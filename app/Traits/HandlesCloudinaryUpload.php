@@ -81,6 +81,32 @@ trait HandlesCloudinaryUpload
     }
 
     /**
+     * Upload video to Cloudinary.
+     *
+     * @param string $absolutePath Absolute filesystem path to the video file
+     * @param string $folder       Cloudinary folder
+     * @return array ['url' => string, 'size' => int]
+     */
+    protected function uploadVideoToCloudinary(
+        string $absolutePath,
+        string $folder = 'complaints/videos'
+    ): array {
+        $result = Cloudinary::uploadApi()->upload($absolutePath, [
+            'folder'        => $folder,
+            'resource_type' => 'video',
+        ]);
+
+        if (empty($result['secure_url'])) {
+            throw new \RuntimeException('Cloudinary did not return a secure URL for the uploaded video.');
+        }
+
+        return [
+            'url'  => $result['secure_url'],
+            'size' => $result['bytes'] ?? 0,
+        ];
+    }
+
+    /**
      * Delete file from Cloudinary
      *
      * @param string $publicId Cloudinary public ID

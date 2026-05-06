@@ -6,8 +6,10 @@ use App\Models\Complaint;
 use App\Models\Category;
 use App\Models\Attachment;
 use App\Events\ComplaintCreated;
+use App\Services\VideoCompressionService;
 use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -116,11 +118,16 @@ class ComplaintController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'location' => 'nullable|string|max:255',
                 'priority' => 'required|in:low,medium,high,urgent',
-                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240' // 10MB max per image
+                'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+                'videos' => 'nullable|array|max:3',
+                'videos.*' => 'nullable|file|mimes:mp4,mov,webm,avi|max:102400',
             ], [
                 'images.*.image' => 'File harus berupa gambar.',
                 'images.*.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif.',
                 'images.*.max' => 'Ukuran gambar maksimal 10MB.',
+                'videos.max' => 'Maksimal 3 video yang dapat diupload.',
+                'videos.*.mimes' => 'Format video harus mp4, mov, webm, atau avi.',
+                'videos.*.max' => 'Ukuran video maksimal 100MB.',
             ]);
 
             $complaint = Complaint::create([
@@ -146,8 +153,15 @@ class ComplaintController extends Controller
                         'file_path' => $imagePath,
                         'file_size' => $image->getSize(),
                         'mime_type' => $image->getMimeType(),
-                        'attachment_type' => 'complaint', // Set attachment type
+                        'attachment_type' => 'complaint',
                     ]);
+                }
+            }
+
+            // Handle video uploads
+            if ($request->hasFile('videos')) {
+                foreach ($request->file('videos') as $video) {
+                    $this->storeVideoAttachment($video, $complaint);
                 }
             }
 
@@ -230,11 +244,16 @@ class ComplaintController extends Controller
                 'location' => 'nullable|string|max:255',
                 'priority' => 'required|in:low,medium,high,urgent',
                 'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
-                'deleted_images.*' => 'nullable|exists:attachments,id'
+                'videos' => 'nullable|array|max:3',
+                'videos.*' => 'nullable|file|mimes:mp4,mov,webm,avi|max:102400',
+                'deleted_images.*' => 'nullable|exists:attachments,id',
             ], [
                 'images.*.image' => 'File harus berupa gambar.',
                 'images.*.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif.',
                 'images.*.max' => 'Ukuran gambar maksimal 10MB.',
+                'videos.max' => 'Maksimal 3 video yang dapat diupload.',
+                'videos.*.mimes' => 'Format video harus mp4, mov, webm, atau avi.',
+                'videos.*.max' => 'Ukuran video maksimal 100MB.',
             ]);
 
             $complaint->update([
@@ -274,8 +293,15 @@ class ComplaintController extends Controller
                         'file_path' => $imagePath,
                         'file_size' => $image->getSize(),
                         'mime_type' => $image->getMimeType(),
-                        'attachment_type' => 'complaint', // Set attachment type
+                        'attachment_type' => 'complaint',
                     ]);
+                }
+            }
+
+            // Handle new video uploads
+            if ($request->hasFile('videos')) {
+                foreach ($request->file('videos') as $video) {
+                    $this->storeVideoAttachment($video, $complaint);
                 }
             }
 
@@ -355,5 +381,84 @@ class ComplaintController extends Controller
         }
 
         return view('complaints.track', compact('complaint', 'timeline'));
+    }
+
+    /**
+     * Store a video attachment.
+     *
+     * Cloudinary path  → uses PHP upload temp file directly (no local storage).
+     * Local-only path  → saves to public disk, then compresses in place if needed.
+     */
+    private function storeVideoAttachment(UploadedFile $video, Complaint $complaint): void
+    {
+        $finalMime = $video->getMimeType();
+        $finalName = $video->getClientOriginalName();
+        $compression = new VideoCompressionService(40);
+
+        // ── Cloudinary: work entirely in temp dir, never touch public storage ──
+        if ($this->isCloudinaryEnabled()) {
+            $srcPath           = $video->getRealPath();   // PHP upload temp file
+            $compressedAbsPath = null;
+            $uploadAbsPath     = $srcPath;
+
+            if ($compression->needsCompression($srcPath)) {
+                $tmpCompressed = sys_get_temp_dir() . '/' . uniqid('video_') . '.mp4';
+                if ($compression->compress($srcPath, $tmpCompressed)) {
+                    $compressedAbsPath = $tmpCompressed;
+                    $uploadAbsPath     = $tmpCompressed;
+                    $finalMime         = 'video/mp4';
+                    $finalName         = pathinfo($finalName, PATHINFO_FILENAME) . '.mp4';
+                }
+            }
+
+            $upload = $this->uploadVideoToCloudinary($uploadAbsPath, 'complaints/videos');
+
+            // PHP cleans up $srcPath automatically; only our compressed temp needs manual removal
+            if ($compressedAbsPath && file_exists($compressedAbsPath)) {
+                @unlink($compressedAbsPath);
+            }
+
+            Attachment::create([
+                'attachable_type' => Complaint::class,
+                'attachable_id'   => $complaint->id,
+                'file_name'       => $finalName,
+                'file_path'       => $upload['url'],
+                'file_size'       => $upload['size'],
+                'mime_type'       => $finalMime,
+                'attachment_type' => 'complaint',
+            ]);
+            return;
+        }
+
+        // ── Local storage fallback ────────────────────────────────────────────
+        $storedRelPath = $video->store('complaints/videos', 'public');
+        $storedAbsPath = Storage::disk('public')->path($storedRelPath);
+        $finalRelPath  = $storedRelPath;
+
+        if ($compression->needsCompression($storedAbsPath)) {
+            $pathInfo      = pathinfo($storedRelPath);
+            $mp4RelPath    = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.mp4';
+            $mp4AbsPath    = Storage::disk('public')->path($mp4RelPath);
+            $tmpCompressed = $storedAbsPath . '.compressed.mp4';
+
+            if ($compression->compress($storedAbsPath, $tmpCompressed)) {
+                if (file_exists($storedAbsPath)) @unlink($storedAbsPath);
+                if (file_exists($mp4AbsPath))    @unlink($mp4AbsPath);
+                rename($tmpCompressed, $mp4AbsPath);
+                $finalRelPath = $mp4RelPath;
+                $finalMime    = 'video/mp4';
+                $finalName    = pathinfo($finalName, PATHINFO_FILENAME) . '.mp4';
+            }
+        }
+
+        Attachment::create([
+            'attachable_type' => Complaint::class,
+            'attachable_id'   => $complaint->id,
+            'file_name'       => $finalName,
+            'file_path'       => $finalRelPath,
+            'file_size'       => filesize(Storage::disk('public')->path($finalRelPath)),
+            'mime_type'       => $finalMime,
+            'attachment_type' => 'complaint',
+        ]);
     }
 }

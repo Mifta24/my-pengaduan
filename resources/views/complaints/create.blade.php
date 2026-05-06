@@ -166,6 +166,39 @@
                 @enderror
             </div>
 
+            <!-- Videos -->
+            <div>
+                <label for="videos" class="block text-sm font-medium leading-6 text-gray-900">
+                    Video Pendukung
+                </label>
+                <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10" id="videoDropzone">
+                    <div class="text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M4.5 4.5a3 3 0 00-3 3v9a3 3 0 003 3h8.25a3 3 0 003-3v-9a3 3 0 00-3-3H4.5zM19.94 18.75l-2.69-2.69V7.94l2.69-2.69c.944-.945 2.56-.276 2.56 1.06v11.38c0 1.336-1.616 2.005-2.56 1.06z" />
+                        </svg>
+                        <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                            <label for="videos" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                                <span>Upload video</span>
+                                <input id="videos" name="videos[]" type="file" class="sr-only" multiple accept="video/mp4,video/quicktime,video/webm,video/x-msvideo">
+                            </label>
+                            <p class="pl-1">atau drag and drop</p>
+                        </div>
+                        <p class="text-xs leading-5 text-gray-600">MP4, MOV, WEBM, AVI hingga 100MB (maksimal 3 video)</p>
+                        <p class="text-xs leading-5 text-amber-600 mt-1">Video &gt; 40MB akan otomatis dikompres — proses upload mungkin lebih lama.</p>
+                    </div>
+                </div>
+
+                <!-- Video Preview -->
+                <div id="videoPreview" class="mt-4 space-y-3" style="display: none;"></div>
+
+                @error('videos')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                @error('videos.*')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
             <!-- Contact Info -->
             <div class="bg-blue-50 rounded-lg p-4">
                 <div class="flex">
@@ -201,9 +234,13 @@
                    class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                     Batal
                 </a>
-                <button type="submit"
-                        class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                    Ajukan Keluhan
+                <button type="submit" id="submitBtn"
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed">
+                    <svg id="submitSpinner" class="hidden animate-spin -ml-0.5 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    <span id="submitText">Ajukan Keluhan</span>
                 </button>
             </div>
         </form>
@@ -213,17 +250,16 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // ── Image handling ──
     const fileInput = document.getElementById('images');
     const imagePreview = document.getElementById('imagePreview');
     const dropzone = document.getElementById('dropzone');
     let selectedFiles = [];
 
-    // File input change handler
     fileInput.addEventListener('change', function(e) {
         handleFiles(e.target.files);
     });
 
-    // Drag and drop handlers
     dropzone.addEventListener('dragover', function(e) {
         e.preventDefault();
         dropzone.classList.add('border-indigo-500', 'bg-indigo-50');
@@ -237,96 +273,170 @@ document.addEventListener('DOMContentLoaded', function() {
     dropzone.addEventListener('drop', function(e) {
         e.preventDefault();
         dropzone.classList.remove('border-indigo-500', 'bg-indigo-50');
-
-        const files = Array.from(e.dataTransfer.files).filter(file =>
-            file.type.startsWith('image/')
-        );
-
-        if (files.length > 0) {
-            handleFiles(files);
-        }
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+        if (files.length > 0) handleFiles(files);
     });
 
     function handleFiles(files) {
-        // Limit to 5 files
         const newFiles = Array.from(files).slice(0, 5 - selectedFiles.length);
-
         if (selectedFiles.length + newFiles.length > 5) {
-            alert('Maksimal 5 file yang dapat diupload.');
+            alert('Maksimal 5 foto yang dapat diupload.');
             return;
         }
-
         newFiles.forEach(file => {
-            // Check file size (10MB)
             if (file.size > 10 * 1024 * 1024) {
                 alert(`File ${file.name} terlalu besar. Maksimal 10MB.`);
                 return;
             }
-
-            // Check file type
             if (!file.type.match(/image\/(jpeg|jpg|png|gif)/)) {
                 alert(`File ${file.name} bukan format yang didukung.`);
                 return;
             }
-
             selectedFiles.push(file);
-            createPreview(file, selectedFiles.length - 1);
+            createImagePreview(file, selectedFiles.length - 1);
         });
-
         updateFileInput();
-        updatePreviewVisibility();
+        updateImagePreviewVisibility();
     }
 
-    function createPreview(file, index) {
+    function createImagePreview(file, index) {
         const reader = new FileReader();
-
         reader.onload = function(e) {
             const previewItem = document.createElement('div');
             previewItem.className = 'relative group';
             previewItem.innerHTML = `
                 <div class="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                    <img src="${e.target.result}"
-                         alt="Preview ${index + 1}"
-                         class="w-full h-full object-cover">
+                    <img src="${e.target.result}" alt="Preview ${index + 1}" class="w-full h-full object-cover">
                 </div>
-                <button type="button"
-                        onclick="removeImage(${index})"
-                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors">
-                    ×
-                </button>
+                <button type="button" onclick="removeImage(${index})"
+                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors">×</button>
                 <p class="mt-1 text-xs text-gray-600 truncate">${file.name}</p>
             `;
-
             imagePreview.appendChild(previewItem);
         };
-
         reader.readAsDataURL(file);
     }
 
     function updateFileInput() {
-        // Create a new DataTransfer object to update the file input
         const dt = new DataTransfer();
         selectedFiles.forEach(file => dt.items.add(file));
         fileInput.files = dt.files;
     }
 
-    function updatePreviewVisibility() {
+    function updateImagePreviewVisibility() {
         imagePreview.style.display = selectedFiles.length > 0 ? 'grid' : 'none';
     }
 
-    // Global function to remove image
     window.removeImage = function(index) {
         selectedFiles.splice(index, 1);
         imagePreview.innerHTML = '';
-
-        // Recreate previews with updated indices
-        selectedFiles.forEach((file, newIndex) => {
-            createPreview(file, newIndex);
-        });
-
+        selectedFiles.forEach((file, newIndex) => createImagePreview(file, newIndex));
         updateFileInput();
-        updatePreviewVisibility();
+        updateImagePreviewVisibility();
     };
+
+    // ── Video handling ──
+    const videoInput = document.getElementById('videos');
+    const videoPreview = document.getElementById('videoPreview');
+    const videoDropzone = document.getElementById('videoDropzone');
+    let selectedVideos = [];
+
+    videoInput.addEventListener('change', function(e) {
+        handleVideos(e.target.files);
+    });
+
+    videoDropzone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        videoDropzone.classList.add('border-indigo-500', 'bg-indigo-50');
+    });
+
+    videoDropzone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        videoDropzone.classList.remove('border-indigo-500', 'bg-indigo-50');
+    });
+
+    videoDropzone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        videoDropzone.classList.remove('border-indigo-500', 'bg-indigo-50');
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('video/'));
+        if (files.length > 0) handleVideos(files);
+    });
+
+    function handleVideos(files) {
+        const newFiles = Array.from(files).slice(0, 3 - selectedVideos.length);
+        if (selectedVideos.length + newFiles.length > 3) {
+            alert('Maksimal 3 video yang dapat diupload.');
+            return;
+        }
+        newFiles.forEach(file => {
+            if (file.size > 100 * 1024 * 1024) {
+                alert(`Video ${file.name} terlalu besar. Maksimal 100MB.`);
+                return;
+            }
+            if (!file.type.match(/video\/(mp4|quicktime|webm|x-msvideo|avi)/)) {
+                alert(`File ${file.name} bukan format video yang didukung (MP4, MOV, WEBM, AVI).`);
+                return;
+            }
+            selectedVideos.push(file);
+            createVideoPreview(file, selectedVideos.length - 1);
+        });
+        updateVideoInput();
+        updateVideoPreviewVisibility();
+    }
+
+    function createVideoPreview(file, index) {
+        const url = URL.createObjectURL(file);
+        const previewItem = document.createElement('div');
+        previewItem.className = 'relative flex items-center space-x-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3';
+        previewItem.id = `video-preview-${index}`;
+        previewItem.innerHTML = `
+            <div class="flex-shrink-0">
+                <video src="${url}" class="h-16 w-24 rounded object-cover bg-black" preload="metadata" muted></video>
+            </div>
+            <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
+                <p class="text-xs text-gray-500">${(file.size / (1024 * 1024)).toFixed(1)} MB</p>
+            </div>
+            <button type="button" onclick="removeVideo(${index})"
+                class="flex-shrink-0 rounded-full bg-red-500 p-1 text-white hover:bg-red-600 transition-colors">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        `;
+        videoPreview.appendChild(previewItem);
+    }
+
+    function updateVideoInput() {
+        const dt = new DataTransfer();
+        selectedVideos.forEach(file => dt.items.add(file));
+        videoInput.files = dt.files;
+    }
+
+    function updateVideoPreviewVisibility() {
+        videoPreview.style.display = selectedVideos.length > 0 ? 'block' : 'none';
+    }
+
+    window.removeVideo = function(index) {
+        selectedVideos.splice(index, 1);
+        videoPreview.innerHTML = '';
+        selectedVideos.forEach((file, newIndex) => createVideoPreview(file, newIndex));
+        updateVideoInput();
+        updateVideoPreviewVisibility();
+    };
+
+    // ── Loading state on submit ──
+    document.querySelector('form').addEventListener('submit', function() {
+        const hasVideos = selectedVideos.some(f => f.size > 40 * 1024 * 1024);
+        if (hasVideos) {
+            const btn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('submitSpinner');
+            const text = document.getElementById('submitText');
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            text.textContent = 'Mengompresi & Mengunggah...';
+        }
+    });
 });
 </script>
 @endpush

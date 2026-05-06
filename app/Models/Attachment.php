@@ -57,6 +57,11 @@ class Attachment extends Model
         return $this->mime_type === 'application/pdf';
     }
 
+    public function isVideo()
+    {
+        return str_starts_with($this->mime_type, 'video/');
+    }
+
     public function getFileUrlAttribute()
     {
         if (!$this->file_path) {

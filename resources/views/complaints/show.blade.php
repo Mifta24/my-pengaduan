@@ -136,15 +136,20 @@
             </div>
 
             <!-- Images -->
-            @if($complaint->attachments && $complaint->attachments->count() > 0)
+            @php
+                $images = $complaint->attachments ? $complaint->attachments->filter(fn($a) => $a->isImage()) : collect();
+                $videos = $complaint->attachments ? $complaint->attachments->filter(fn($a) => $a->isVideo()) : collect();
+            @endphp
+
+            @if($images->count() > 0)
                 <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h2 class="text-lg font-semibold text-gray-900">Foto Pendukung</h2>
-                        <p class="mt-1 text-sm text-gray-500">{{ $complaint->attachments->count() }} foto</p>
+                        <p class="mt-1 text-sm text-gray-500">{{ $images->count() }} foto</p>
                     </div>
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                            @foreach($complaint->attachments as $attachment)
+                            @foreach($images as $attachment)
                                 <div class="relative group">
                                     <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
                                         <img src="{{ $attachment->file_url }}"
@@ -154,13 +159,11 @@
                                     </div>
                                     <div class="absolute inset-0 rounded-lg ring-1 ring-inset ring-gray-900/10"></div>
 
-                                    <!-- File info overlay -->
                                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent rounded-b-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <p class="text-xs text-white truncate">{{ $attachment->file_name }}</p>
                                         <p class="text-xs text-gray-300">{{ number_format($attachment->file_size / 1024, 1) }} KB</p>
                                     </div>
 
-                                    <!-- View fullscreen icon -->
                                     <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <div class="bg-black/50 rounded-full p-1">
                                             <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -171,6 +174,40 @@
                                 </div>
                             @endforeach
                         </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Videos -->
+            @if($videos->count() > 0)
+                <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900">Video Pendukung</h2>
+                        <p class="mt-1 text-sm text-gray-500">{{ $videos->count() }} video</p>
+                    </div>
+                    <div class="px-6 py-4 space-y-4">
+                        @foreach($videos as $attachment)
+                            <div class="rounded-lg border border-gray-200 bg-gray-50 overflow-hidden">
+                                <video controls class="w-full max-h-72 bg-black"
+                                       preload="metadata">
+                                    <source src="{{ $attachment->file_url }}" type="{{ $attachment->mime_type }}">
+                                    Browser Anda tidak mendukung pemutaran video.
+                                </video>
+                                <div class="px-4 py-2 flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900 truncate">{{ $attachment->file_name }}</p>
+                                        <p class="text-xs text-gray-500">{{ $attachment->file_size_human }}</p>
+                                    </div>
+                                    <a href="{{ $attachment->file_url }}" download="{{ $attachment->file_name }}"
+                                       class="flex-shrink-0 inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                        <svg class="mr-1 h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        Unduh
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             @endif

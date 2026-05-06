@@ -29,3 +29,6 @@ Thumbs.db
 firebase-credentials.json
 storage/app/firebase-credentials.json
 firebase-base64.txt
+
+.claude
+docs/CLASS_DIAGRAM_AND_ERD.md
