@@ -171,6 +171,8 @@ class ComplaintController extends Controller
                 'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240',
                 'videos' => 'nullable|array|max:3',
                 'videos.*' => 'nullable|file|mimes:mp4,mov,avi,mkv,webm,3gp|max:102400',
+                'video_urls' => 'nullable|array|max:3',
+                'video_urls.*' => 'nullable|url',
             ]);
 
             $complaint = Complaint::create([
@@ -291,7 +293,7 @@ class ComplaintController extends Controller
                 }
             }
 
-            // Handle video uploads
+            // Handle video file uploads (via PHP — may hit upload_max_filesize)
             if ($request->hasFile('videos')) {
                 foreach ($request->file('videos') as $videoFile) {
                     $upload = $this->uploadVideoToCloudinary(
@@ -311,6 +313,19 @@ class ComplaintController extends Controller
 
                     Log::info('Video uploaded to Cloudinary', ['url' => $upload['url']]);
                 }
+            }
+
+            // Handle pre-uploaded video URLs (Flutter uploads directly to Cloudinary)
+            foreach ($validated['video_urls'] ?? [] as $url) {
+                Attachment::create([
+                    'attachable_type' => Complaint::class,
+                    'attachable_id' => $complaint->id,
+                    'file_name' => basename(parse_url($url, PHP_URL_PATH)),
+                    'file_path' => $url,
+                    'file_size' => 0,
+                    'mime_type' => 'video/mp4',
+                    'attachment_type' => 'complaint',
+                ]);
             }
 
             $complaint->load(['category:id,name,icon,color,description', 'attachments', 'user:id,name,email']);
@@ -445,6 +460,8 @@ class ComplaintController extends Controller
                 'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240',
                 'videos' => 'nullable|array|max:3',
                 'videos.*' => 'nullable|file|mimes:mp4,mov,avi,mkv,webm,3gp|max:102400',
+                'video_urls' => 'nullable|array|max:3',
+                'video_urls.*' => 'nullable|url',
             ]);
 
             $updateData = [
@@ -550,7 +567,7 @@ class ComplaintController extends Controller
                 }
             }
 
-            // Handle video uploads
+            // Handle video file uploads (via PHP — may hit upload_max_filesize)
             if ($request->hasFile('videos')) {
                 foreach ($request->file('videos') as $videoFile) {
                     $upload = $this->uploadVideoToCloudinary(
@@ -568,6 +585,19 @@ class ComplaintController extends Controller
                         'attachment_type' => 'complaint',
                     ]);
                 }
+            }
+
+            // Handle pre-uploaded video URLs (Flutter uploads directly to Cloudinary)
+            foreach ($validated['video_urls'] ?? [] as $url) {
+                Attachment::create([
+                    'attachable_type' => Complaint::class,
+                    'attachable_id' => $complaint->id,
+                    'file_name' => basename(parse_url($url, PHP_URL_PATH)),
+                    'file_path' => $url,
+                    'file_size' => 0,
+                    'mime_type' => 'video/mp4',
+                    'attachment_type' => 'complaint',
+                ]);
             }
 
             $complaint->load(['category:id,name,icon,color,description', 'attachments']);
@@ -960,6 +990,34 @@ class ComplaintController extends Controller
         } catch (\Exception $e) {
             return $this->serverError('Failed to confirm complaint resolution', $e);
         }
+    }
+
+    /**
+     * Generate a Cloudinary upload signature for direct client-side upload.
+     * Flutter should call this, upload directly to Cloudinary, then send
+     * the resulting secure_url back via video_urls[] in store/update.
+     */
+    public function cloudinarySignature()
+    {
+        $folder    = 'complaints/videos';
+        $timestamp = time();
+
+        $params = ['folder' => $folder, 'timestamp' => $timestamp];
+        ksort($params);
+        $paramString = collect($params)
+            ->map(fn($v, $k) => "{$k}={$v}")
+            ->implode('&');
+
+        $signature = sha1($paramString . env('CLOUDINARY_API_SECRET'));
+
+        return $this->success([
+            'signature'  => $signature,
+            'timestamp'  => $timestamp,
+            'api_key'    => env('CLOUDINARY_API_KEY'),
+            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+            'folder'     => $folder,
+            'upload_url' => 'https://api.cloudinary.com/v1_1/' . env('CLOUDINARY_CLOUD_NAME') . '/video/upload',
+        ], 'Upload signature generated');
     }
 
     /**

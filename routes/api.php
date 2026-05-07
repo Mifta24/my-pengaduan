@@ -82,6 +82,7 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::post('/', [ComplaintController::class, 'store']);
         Route::get('/statistics', [ComplaintController::class, 'statistics']);
         Route::get('/categories', [ComplaintController::class, 'categories']);
+        Route::get('/cloudinary-signature', [ComplaintController::class, 'cloudinarySignature']);
         Route::get('/{complaint}', [ComplaintController::class, 'show']);
         Route::get('/{complaint}/track', [ComplaintController::class, 'track']);
         Route::post('/{complaint}/responses', [ComplaintController::class, 'addResponse']);
