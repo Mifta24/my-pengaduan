@@ -442,7 +442,9 @@ class ComplaintController extends Controller
                 'priority' => 'nullable|in:low,medium,high,urgent',
                 'report_date' => 'nullable|date|before_or_equal:today',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-                'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240'
+                'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240',
+                'videos' => 'nullable|array|max:3',
+                'videos.*' => 'nullable|file|mimes:mp4,mov,avi,mkv,webm,3gp|max:102400',
             ]);
 
             $updateData = [
@@ -548,6 +550,26 @@ class ComplaintController extends Controller
                 }
             }
 
+            // Handle video uploads
+            if ($request->hasFile('videos')) {
+                foreach ($request->file('videos') as $videoFile) {
+                    $upload = $this->uploadVideoToCloudinary(
+                        $videoFile->getRealPath(),
+                        'complaints/videos'
+                    );
+
+                    Attachment::create([
+                        'attachable_type' => Complaint::class,
+                        'attachable_id' => $complaint->id,
+                        'file_name' => $videoFile->getClientOriginalName(),
+                        'file_path' => $upload['url'],
+                        'file_size' => $upload['size'] ?? $videoFile->getSize(),
+                        'mime_type' => $videoFile->getMimeType(),
+                        'attachment_type' => 'complaint',
+                    ]);
+                }
+            }
+
             $complaint->load(['category:id,name,icon,color,description', 'attachments']);
 
             // Transform data to hide unnecessary fields
@@ -594,13 +616,24 @@ class ComplaintController extends Controller
                 return $this->error('Complaints that have been processed cannot be deleted');
             }
 
-            // Delete files
+            // Delete photo
             if ($complaint->photo) {
-                Storage::disk('public')->delete($complaint->photo);
+                $publicId = $this->extractCloudinaryPublicId($complaint->photo);
+                if ($publicId) {
+                    $this->deleteFromCloudinary($publicId);
+                } else {
+                    Storage::disk('public')->delete($complaint->photo);
+                }
             }
 
+            // Delete all attachments (images, docs, videos)
             foreach ($complaint->attachments as $attachment) {
-                Storage::disk('public')->delete($attachment->file_path);
+                $publicId = $this->extractCloudinaryPublicId($attachment->file_path);
+                if ($publicId) {
+                    $this->deleteFromCloudinary($publicId);
+                } else {
+                    Storage::disk('public')->delete($attachment->file_path);
+                }
                 $attachment->delete();
             }
 
@@ -927,5 +960,23 @@ class ComplaintController extends Controller
         } catch (\Exception $e) {
             return $this->serverError('Failed to confirm complaint resolution', $e);
         }
+    }
+
+    /**
+     * Extract Cloudinary public_id from a Cloudinary URL.
+     * Returns null if the URL is not a Cloudinary URL (e.g. local storage path).
+     */
+    private function extractCloudinaryPublicId(string $path): ?string
+    {
+        if (!filter_var($path, FILTER_VALIDATE_URL)) {
+            return null;
+        }
+
+        // e.g. https://res.cloudinary.com/{cloud}/{type}/upload/v123/folder/file.ext
+        if (preg_match('/cloudinary\.com\/[^\/]+\/(?:image|video|raw)\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/', $path, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
     }
 }
