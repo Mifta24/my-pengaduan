@@ -168,7 +168,9 @@ class ComplaintController extends Controller
                 'priority' => 'nullable|in:low,medium,high,urgent',
                 'report_date' => 'nullable|date|before_or_equal:today',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-                'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240'
+                'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpeg,jpg,png,webp|max:10240',
+                'videos' => 'nullable|array|max:3',
+                'videos.*' => 'nullable|file|mimes:mp4,mov,avi,mkv,webm,3gp|max:102400',
             ]);
 
             $complaint = Complaint::create([
@@ -286,6 +288,28 @@ class ComplaintController extends Controller
                             'mime_type' => $mimeType,
                         ]);
                     }
+                }
+            }
+
+            // Handle video uploads
+            if ($request->hasFile('videos')) {
+                foreach ($request->file('videos') as $videoFile) {
+                    $upload = $this->uploadVideoToCloudinary(
+                        $videoFile->getRealPath(),
+                        'complaints/videos'
+                    );
+
+                    Attachment::create([
+                        'attachable_type' => Complaint::class,
+                        'attachable_id' => $complaint->id,
+                        'file_name' => $videoFile->getClientOriginalName(),
+                        'file_path' => $upload['url'],
+                        'file_size' => $upload['size'] ?? $videoFile->getSize(),
+                        'mime_type' => $videoFile->getMimeType(),
+                        'attachment_type' => 'complaint',
+                    ]);
+
+                    Log::info('Video uploaded to Cloudinary', ['url' => $upload['url']]);
                 }
             }
 
