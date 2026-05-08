@@ -207,6 +207,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->name('api.ad
         Route::get('/overview', [AdminReportController::class, 'overview']);
         Route::get('/complaints', [AdminReportController::class, 'complaints']);
         Route::get('/users', [AdminReportController::class, 'users']);
+        Route::get('/export', [AdminReportController::class, 'export']);
     });
 });
 
