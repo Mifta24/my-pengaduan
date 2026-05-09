@@ -55,6 +55,16 @@ Route::prefix('announcements')->group(function () {
     Route::get('/', [AnnouncementController::class, 'index']);
     Route::get('/urgent', [AnnouncementController::class, 'urgent']);
     Route::get('/latest', [AnnouncementController::class, 'latest']);
+
+    // Static auth routes MUST be declared before /{announcement} to avoid route conflict
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/bookmarked', [AnnouncementController::class, 'getBookmarkedAnnouncements']);
+        Route::post('/{announcement}/bookmark', [AnnouncementController::class, 'toggleBookmark']);
+        Route::post('/{announcement}/comments', [AnnouncementController::class, 'storeComment']);
+        Route::get('/{announcement}/comments', [AnnouncementController::class, 'getComments']);
+        Route::delete('/{announcement}/comments/{commentId}', [AnnouncementController::class, 'deleteComment']);
+    });
+
     Route::get('/{announcement}', [AnnouncementController::class, 'show']);
 });
 
@@ -90,18 +100,6 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::post('/{complaint}/confirm-resolution', [ComplaintController::class, 'confirmResolution']);
         Route::put('/{complaint}', [ComplaintController::class, 'update']);
         Route::delete('/{complaint}', [ComplaintController::class, 'destroy']);
-    });
-
-    // Announcement interactions
-    Route::prefix('announcements')->group(function () {
-        // Bookmarks
-        Route::post('/{announcement}/bookmark', [AnnouncementController::class, 'toggleBookmark']);
-        Route::get('/bookmarked', [AnnouncementController::class, 'getBookmarkedAnnouncements']);
-
-        // Comments
-        Route::post('/{announcement}/comments', [AnnouncementController::class, 'storeComment']);
-        Route::get('/{announcement}/comments', [AnnouncementController::class, 'getComments']);
-        Route::delete('/{announcement}/comments/{commentId}', [AnnouncementController::class, 'deleteComment']);
     });
 
     // Device Token routes (for FCM)
