@@ -97,7 +97,7 @@ class AnnouncementController extends Controller
 
             // Check target audience
             $audience = $announcement->target_audience;
-            if (!empty($audience) && !in_array($role, $audience)) {
+            if (!empty($audience) && !in_array('all', $audience) && !in_array($role, $audience)) {
                 return $this->unauthorized('You do not have permission to view this announcement');
             }
 
@@ -185,7 +185,7 @@ class AnnouncementController extends Controller
 
             // Check target audience
             $audience = $announcement->target_audience;
-            if (!empty($audience) && !in_array($role, $audience)) {
+            if (!empty($audience) && !in_array('all', $audience) && !in_array($role, $audience)) {
                 return $this->unauthorized('You do not have permission to view this announcement');
             }
 
@@ -238,7 +238,7 @@ class AnnouncementController extends Controller
 
             // Check target audience
             $audience = $announcement->target_audience;
-            if (!empty($audience) && !in_array($role, $audience)) {
+            if (!empty($audience) && !in_array('all', $audience) && !in_array($role, $audience)) {
                 return $this->unauthorized('You do not have permission to view this announcement');
             }
 
@@ -309,7 +309,7 @@ class AnnouncementController extends Controller
 
             // Check target audience
             $audience = $announcement->target_audience;
-            if (!empty($audience) && !in_array($role, $audience)) {
+            if (!empty($audience) && !in_array('all', $audience) && !in_array($role, $audience)) {
                 return $this->unauthorized('You do not have permission to view this announcement');
             }
 
