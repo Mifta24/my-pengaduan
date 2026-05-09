@@ -2,21 +2,17 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RolePermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Create permissions
+        // ── Permissions ─────────────────────────────────────────────────────────
         $permissions = [
             'view-complaints',
             'create-complaints',
@@ -34,65 +30,39 @@ class RolePermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Create roles - Admin RT dan Warga
-        $rtRole = Role::firstOrCreate(['name' => 'admin']);
-        $wargaRole = Role::firstOrCreate(['name' => 'user']);
+        // ── Roles ────────────────────────────────────────────────────────────────
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $userRole  = Role::firstOrCreate(['name' => 'user']);
 
-        // Assign all permissions to RT (admin)
-        $rtRole->givePermissionTo(Permission::all());
+        $adminRole->syncPermissions(Permission::all());
+        $userRole->syncPermissions(['view-complaints', 'create-complaints', 'edit-complaints']);
 
-        // Give limited permissions to warga (user)
-        $wargaRole->givePermissionTo([
-            'view-complaints',
-            'create-complaints',
-            'edit-complaints'
-        ]);
-
-        // Create RT (admin) user
-        $rt = User::firstOrCreate(
-            ['email' => 'rt@rt.com'],
+        // ── Admin (Ketua RT) ─────────────────────────────────────────────────────
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@mypengaduan.com'],
             [
-                'name' => 'Ketua RT',
-                'password' => Hash::make('password'),
-                'role' => 'admin',
-                'address' => 'Pos RT 05, Gang Annur 2'
+                'name'                    => 'Ketua RT',
+                'password'                => Hash::make('password'),
+                'role'                    => 'admin',
+                'nik'                     => '3201051505700001',
+                'phone'                   => '081234567890',
+                'address'                 => 'Gang Annur 2 RT 05 / RW 01, Poris Plawad Utara, Cipondoh, Tangerang',
+                'rt_number'               => '005',
+                'rw_number'               => '001',
+                'is_verified'             => true,
+                'verified_at'             => now()->subMonths(6),
+                'is_active'               => true,
+                'email_verified_at'       => now()->subMonths(6),
+                'notification_preferences' => [
+                    'email_notifications'  => true,
+                    'sms_notifications'    => false,
+                    'push_notifications'   => true,
+                    'complaint_updates'    => true,
+                    'system_announcements' => true,
+                    'marketing_emails'     => false,
+                ],
             ]
         );
-
-        $rt->assignRole('admin');
-
-        // Create warga (user) users
-        $warga1 = User::firstOrCreate(
-            ['email' => 'warga1@test.com'],
-            [
-                'name' => 'Budi Santoso',
-                'password' => Hash::make('password'),
-                'role' => 'user',
-                'address' => 'Gang Annur 2 RT 05'
-            ]
-        );
-        $warga1->assignRole('user');
-
-        $warga2 = User::firstOrCreate(
-            ['email' => 'warga2@test.com'],
-            [
-                'name' => 'Siti Nurhaliza',
-                'password' => Hash::make('password'),
-                'role' => 'user',
-                'address' => 'Gang Annur 2 RT 05'
-            ]
-        );
-        $warga2->assignRole('user');
-
-        $warga3 = User::firstOrCreate(
-            ['email' => 'warga3@test.com'],
-            [
-                'name' => 'Ahmad Fauzi',
-                'password' => Hash::make('password'),
-                'role' => 'user',
-                'address' => 'Gang Annur 2 RT 05'
-            ]
-        );
-        $warga3->assignRole('user');
+        $admin->syncRoles(['admin']);
     }
 }
