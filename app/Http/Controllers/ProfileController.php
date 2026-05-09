@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Traits\HandlesCloudinaryUpload;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,8 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    use HandlesCloudinaryUpload;
+
     /**
      * Display the user's profile form.
      */
@@ -26,15 +29,50 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->safe()->except(['avatar']));
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        // Handle avatar removal
+        if ($request->boolean('remove_avatar')) {
+            if ($user->avatar) {
+                $this->deleteAvatarFromCloudinary($user->avatar);
+            }
+            $user->avatar = null;
+        } elseif ($request->hasFile('avatar')) {
+            // Delete old avatar from Cloudinary before uploading new one
+            if ($user->avatar) {
+                $this->deleteAvatarFromCloudinary($user->avatar);
+            }
+            $upload = $this->uploadToCloudinary(
+                $request->file('avatar'),
+                'avatars',
+                800,
+                85
+            );
+            $user->avatar = $upload['url'];
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Extract public_id from Cloudinary URL and delete the asset.
+     */
+    private function deleteAvatarFromCloudinary(string $avatarUrl): void
+    {
+        // Cloudinary URL format: .../image/upload/v{version}/{public_id}.{ext}
+        // or .../image/upload/{public_id}.{ext}
+        if (filter_var($avatarUrl, FILTER_VALIDATE_URL)) {
+            if (preg_match('/\/upload\/(?:v\d+\/)?(.+?)(?:\.\w+)?$/', $avatarUrl, $matches)) {
+                $this->deleteFromCloudinary($matches[1]);
+            }
+        }
     }
 
     /**

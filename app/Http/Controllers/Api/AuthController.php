@@ -274,6 +274,9 @@ class AuthController extends Controller
             ]);
 
             if ($request->hasFile('avatar')) {
+                if ($user->avatar) {
+                    $this->deleteAvatarFromCloudinary($user->avatar);
+                }
                 $upload = $this->uploadToCloudinary(
                     $request->file('avatar'),
                     'avatars',
@@ -306,6 +309,39 @@ class AuthController extends Controller
             return $this->validationError($e->errors());
         } catch (\Exception $e) {
             return $this->serverError('Failed to update profile', $e);
+        }
+    }
+
+    /**
+     * Remove user avatar
+     */
+    public function removeAvatar(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            if (!$user->avatar) {
+                return $this->error('No avatar to remove', 422);
+            }
+
+            $this->deleteAvatarFromCloudinary($user->avatar);
+            $user->update(['avatar' => null]);
+
+            return $this->success(null, 'Avatar removed successfully');
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to remove avatar', $e);
+        }
+    }
+
+    /**
+     * Extract public_id from Cloudinary URL and delete the asset.
+     */
+    private function deleteAvatarFromCloudinary(string $avatarUrl): void
+    {
+        if (filter_var($avatarUrl, FILTER_VALIDATE_URL)) {
+            if (preg_match('/\/upload\/(?:v\d+\/)?(.+?)(?:\.\w+)?$/', $avatarUrl, $matches)) {
+                $this->deleteFromCloudinary($matches[1]);
+            }
         }
     }
 
