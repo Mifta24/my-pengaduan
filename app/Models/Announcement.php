@@ -157,6 +157,7 @@ class Announcement extends Model
     {
         return $query->where(function ($q) use ($role) {
             $q->whereNull('target_audience')
+              ->orWhereJsonContains('target_audience', 'all')
               ->orWhereJsonContains('target_audience', $role);
         });
     }
