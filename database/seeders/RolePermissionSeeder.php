@@ -5,37 +5,15 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // ── Permissions ─────────────────────────────────────────────────────────
-        $permissions = [
-            'view-complaints',
-            'create-complaints',
-            'edit-complaints',
-            'delete-complaints',
-            'manage-users',
-            'create-announcements',
-            'edit-announcements',
-            'delete-announcements',
-            'view-dashboard',
-            'export-reports',
-        ];
-
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
-        }
-
         // ── Roles ────────────────────────────────────────────────────────────────
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $userRole  = Role::firstOrCreate(['name' => 'user']);
-
-        $adminRole->syncPermissions(Permission::all());
-        $userRole->syncPermissions(['view-complaints', 'create-complaints', 'edit-complaints']);
+        Role::firstOrCreate(['name' => 'admin']);
+        Role::firstOrCreate(['name' => 'user']);
 
         // ── Admin (Ketua RT) ─────────────────────────────────────────────────────
         $admin = User::firstOrCreate(
