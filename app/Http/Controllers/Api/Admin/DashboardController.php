@@ -134,6 +134,25 @@ class DashboardController extends Controller
                 ->orderBy('month', 'asc')
                 ->get();
 
+            // Daily complaints last 7 days (for bar chart with tap details)
+            $dailyComplaints = collect(range(6, 0))->map(function ($daysAgo) {
+                $date = now()->subDays($daysAgo)->toDateString();
+                return [
+                    'date'     => $date,
+                    'count'    => Complaint::whereDate('created_at', $date)->count(),
+                    'pending'  => Complaint::whereDate('created_at', $date)->where('status', 'pending')->count(),
+                    'resolved' => Complaint::whereDate('created_at', $date)->where('status', 'resolved')->count(),
+                ];
+            })->values();
+
+            // Today vs yesterday for stat card deltas
+            $todayStats = [
+                'new_today'      => Complaint::whereDate('created_at', today())->count(),
+                'new_yesterday'  => Complaint::whereDate('created_at', today()->subDay())->count(),
+                'resolved_today' => Complaint::whereDate('updated_at', today())->where('status', 'resolved')->count(),
+                'pending_today'  => Complaint::whereDate('created_at', today())->where('status', 'pending')->count(),
+            ];
+
             $data = [
                 // Main Statistics with Percentage Changes
                 'total_complaints' => [
@@ -183,7 +202,9 @@ class DashboardController extends Controller
                     'active' => $activeAnnouncements,
                     'urgent' => $urgentAnnouncements,
                 ],
-                'recent_complaints' => $recentComplaints,
+                'recent_complaints'  => $recentComplaints,
+                'daily_complaints'  => $dailyComplaints,
+                'today_stats'       => $todayStats,
             ];
 
             return $this->success($data, 'Dashboard statistics loaded successfully');
