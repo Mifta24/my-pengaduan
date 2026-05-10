@@ -101,9 +101,11 @@ class AnnouncementController extends Controller
                 return $this->unauthorized('You do not have permission to view this announcement');
             }
 
+            $announcement->increment('views_count');
+
             $data = $announcement->only([
                 'id', 'title', 'content', 'priority', 'is_sticky', 'published_at', 'created_at',
-                'cover_image', 'cover_image_url', 'attachments', 'target_audience'
+                'cover_image', 'cover_image_url', 'attachments', 'target_audience', 'views_count',
             ]);
 
             return $this->success($data, 'Announcement details loaded successfully');
