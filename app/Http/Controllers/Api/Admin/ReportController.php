@@ -338,23 +338,32 @@ class ReportController extends Controller
 
     /**
      * Export report data
+     *
+     * Supports period shortcuts:
+     * - period=this_week  → current week (Mon–Sun)
+     * - period=this_month → current month
+     * - period=all        → no date filter (all data)
+     * Or use date_from / date_to for a custom range.
      */
     public function export(Request $request)
     {
         try {
             $validated = $request->validate([
-                'type' => 'required|in:complaints,users,overview',
-                'date_from' => 'nullable|date',
-                'date_to' => 'nullable|date|after_or_equal:date_from',
-                'status' => 'nullable|in:pending,in_progress,resolved,rejected',
+                'type'        => 'required|in:complaints,users,overview',
+                'period'      => 'nullable|in:this_week,this_month,all',
+                'date_from'   => 'nullable|date|required_without:period',
+                'date_to'     => 'nullable|date|after_or_equal:date_from',
+                'status'      => 'nullable|in:pending,in_progress,resolved,rejected',
                 'category_id' => 'nullable|exists:categories,id',
-                'role' => 'nullable|in:admin,user',
-                'is_active' => 'nullable|boolean',
+                'role'        => 'nullable|in:admin,user',
+                'is_active'   => 'nullable|boolean',
             ]);
 
-            $type = $request->input('type');
-            $dateFrom = $request->input('date_from', Carbon::now()->subMonth()->format('Y-m-d'));
-            $dateTo = $request->input('date_to', Carbon::now()->format('Y-m-d'));
+            $type   = $request->input('type');
+            $period = $request->input('period');
+
+            // Resolve date range from period shortcut or explicit dates
+            [$dateFrom, $dateTo] = $this->resolveDateRange($period, $request);
 
             switch ($type) {
                 case 'complaints':
@@ -371,9 +380,12 @@ class ReportController extends Controller
             }
 
             return $this->success([
-                'data' => $data,
+                'data'        => $data,
                 'exported_at' => now()->format('Y-m-d\TH:i:s.u\Z'),
-                'filters' => $request->only(['date_from', 'date_to', 'status', 'category_id', 'role', 'is_active']),
+                'period'      => $period ?? 'custom',
+                'date_from'   => $dateFrom,
+                'date_to'     => $dateTo,
+                'filters'     => $request->only(['status', 'category_id', 'role', 'is_active']),
             ], 'Report data exported successfully');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -384,12 +396,46 @@ class ReportController extends Controller
     }
 
     /**
+     * Resolve date range from period shortcut or explicit request params.
+     * Returns [dateFrom|null, dateTo|null] — both null means no date filter (all data).
+     */
+    private function resolveDateRange(?string $period, Request $request): array
+    {
+        if ($period === 'all') {
+            return [null, null];
+        }
+
+        if ($period === 'this_week') {
+            return [
+                Carbon::now()->startOfWeek()->format('Y-m-d'),
+                Carbon::now()->endOfWeek()->format('Y-m-d'),
+            ];
+        }
+
+        if ($period === 'this_month') {
+            return [
+                Carbon::now()->startOfMonth()->format('Y-m-d'),
+                Carbon::now()->endOfMonth()->format('Y-m-d'),
+            ];
+        }
+
+        // Fall back to explicit date_from / date_to (default: last 1 month)
+        return [
+            $request->input('date_from', Carbon::now()->subMonth()->format('Y-m-d')),
+            $request->input('date_to', Carbon::now()->format('Y-m-d')),
+        ];
+    }
+
+    /**
      * Export complaints data
      */
     private function exportComplaintsData(Request $request, $dateFrom, $dateTo)
     {
-        $query = Complaint::with(['user:id,name,email', 'category:id,name'])
-            ->whereBetween('created_at', [$dateFrom, $dateTo]);
+        $query = Complaint::with(['user:id,name,email', 'category:id,name']);
+
+        if ($dateFrom && $dateTo) {
+            $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -423,8 +469,11 @@ class ReportController extends Controller
     private function exportUsersData(Request $request, $dateFrom, $dateTo)
     {
         $query = User::with('roles:name')
-            ->withCount(['complaints'])
-            ->whereBetween('created_at', [$dateFrom, $dateTo]);
+            ->withCount(['complaints']);
+
+        if ($dateFrom && $dateTo) {
+            $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+        }
 
         if ($request->filled('role')) {
             $query->whereHas('roles', function($q) use ($request) {
