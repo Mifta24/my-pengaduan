@@ -266,6 +266,7 @@ class AuthController extends Controller
             $this->normalizeRtRwInput($request);
 
             $validated = $request->validate([
+                'name' => 'nullable|string|max:255',
                 'address' => 'nullable|string|max:255',
                 'rt_number' => 'nullable|string|max:3',
                 'rw_number' => 'nullable|string|max:3',
@@ -284,6 +285,11 @@ class AuthController extends Controller
                     85
                 );
                 $validated['avatar'] = $upload['url'];
+            } elseif ($request->input('remove_avatar') == '1') {
+                if ($user->avatar) {
+                    $this->deleteAvatarFromCloudinary($user->avatar);
+                }
+                $validated['avatar'] = null;
             } else {
                 unset($validated['avatar']);
             }

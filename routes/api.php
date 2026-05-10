@@ -37,6 +37,7 @@ Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('profile', [AuthController::class, 'profile']);
         Route::put('profile', [AuthController::class, 'updateProfile']);
+        Route::post('profile', [AuthController::class, 'updateProfile']); // Alias for multipart/form-data (avatar upload)
         Route::delete('profile/avatar', [AuthController::class, 'removeAvatar']);
         Route::put('change-password', [AuthController::class, 'changePassword']);
         Route::post('logout', [AuthController::class, 'logout']);
