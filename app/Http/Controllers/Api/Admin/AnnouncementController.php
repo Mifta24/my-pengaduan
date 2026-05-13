@@ -38,7 +38,7 @@ class AnnouncementController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Announcement::withCount('comments');
+            $query = Announcement::with(['updatedBy:id,name'])->withCount('comments');
 
             // Filter by status
             if ($request->has('is_active')) {
@@ -107,9 +107,12 @@ class AnnouncementController extends Controller
     {
         try {
             $announcement = Announcement::withCount('comments')
-                ->with(['comments' => function ($query) {
-                    $query->latest()->limit(10);
-                }])
+                ->with([
+                    'updatedBy:id,name',
+                    'comments' => function ($query) {
+                        $query->latest()->limit(10);
+                    },
+                ])
                 ->findOrFail($id);
 
             return $this->success($announcement, 'Announcement details loaded successfully');
@@ -234,6 +237,7 @@ class AnnouncementController extends Controller
             if ($request->has('title') && !$request->has('slug')) {
                 $data['slug'] = Str::slug($request->title);
             }
+            $data['updated_by'] = auth()->id();
 
             // Handle Cover Image Update
             if ($request->hasFile('cover_image')) {

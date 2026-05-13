@@ -33,8 +33,9 @@ class AppIdentityController extends Controller
             'contact_phone' => 'nullable|string|max:50',
         ]);
 
+        $userId = auth()->id();
         foreach ($validated as $key => $value) {
-            AppSetting::setValue($key, $value);
+            AppSetting::setValue($key, $value, $userId);
         }
 
         Cache::forget('app_identity_settings');

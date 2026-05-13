@@ -25,7 +25,8 @@ class Announcement extends Model
         'allow_comments',
         'published_at',
         'views_count',
-        'author_id'
+        'author_id',
+        'updated_by',
     ];
 
     protected $casts = [
@@ -79,6 +80,11 @@ class Announcement extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     /**
