@@ -60,15 +60,7 @@ class SendAnnouncementNotificationToAll implements ShouldQueue
                 continue; // Skip if user disabled announcement notifications
             }
 
-            $tokens = $user->getActiveDeviceTokens();
-
-            if (empty($tokens)) {
-                continue; // Skip if user has no devices
-            }
-
-            $allTokens = array_merge($allTokens, $tokens);
-
-            // Save notification to database for each user
+            // Save notification to database regardless of device token status
             FcmNotification::create([
                 'user_id' => $user->id,
                 'type' => 'announcement_created',
@@ -79,6 +71,13 @@ class SendAnnouncementNotificationToAll implements ShouldQueue
             ]);
 
             $notifiedUserCount++;
+
+            // Collect device tokens for push notification (optional)
+            $tokens = $user->getActiveDeviceTokens();
+
+            if (!empty($tokens)) {
+                $allTokens = array_merge($allTokens, $tokens);
+            }
         }
 
         if (empty($allTokens)) {

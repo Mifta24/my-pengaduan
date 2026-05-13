@@ -31,7 +31,7 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Category::withCount('complaints');
+            $query = Category::with(['user:id,name', 'updatedBy:id,name'])->withCount('complaints');
 
             // Filter by status
             if ($request->has('is_active')) {
@@ -104,7 +104,7 @@ class CategoryController extends Controller
     public function show($id)
     {
         try {
-            $category = Category::withCount('complaints')->findOrFail($id);
+            $category = Category::with(['user:id,name', 'updatedBy:id,name'])->withCount('complaints')->findOrFail($id);
             return $this->success($category, 'Detail Category loaded successfully');
         } catch (\Exception $e) {
             return $this->notFound('Category not found');
@@ -132,6 +132,7 @@ class CategoryController extends Controller
 
             // Only include fields that exist in database
             $data = $request->only(['name', 'description', 'icon', 'color', 'is_active']);
+            $data['user_id'] = $request->user()->id;
 
             $category = Category::create($data);
 
@@ -164,6 +165,7 @@ class CategoryController extends Controller
 
             // Only include fields that exist in database
             $data = $request->only(['name', 'description', 'icon', 'color', 'is_active']);
+            $data['updated_by'] = $request->user()->id;
 
             $category->update($data);
 
