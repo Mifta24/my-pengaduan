@@ -160,6 +160,12 @@ class ComplaintController extends Controller
     public function store(Request $request)
     {
         try {
+            $user = $request->user();
+
+            if (!$user->is_verified) {
+                return $this->error('Akun Anda belum diverifikasi oleh admin. Harap tunggu proses verifikasi KTP Anda.', null, 403);
+            }
+
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'description' => 'required|string',
@@ -176,7 +182,7 @@ class ComplaintController extends Controller
             ]);
 
             $complaint = Complaint::create([
-                'user_id' => $request->user()->id,
+                'user_id' => $user->id,
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'category_id' => $validated['category_id'],
