@@ -25,9 +25,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
-    Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']);
+Route::prefix('auth')->group(function () {
+    Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5,60');
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
     // Forgot Password — 3-Step OTP Flow
     Route::post('forgot-password', [AuthController::class, 'forgotPassword']);

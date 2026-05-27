@@ -3,9 +3,11 @@
 use App\Events\ComplaintStatusChanged;
 use App\Models\Attachment;
 use App\Models\Complaint;
+use App\Models\User;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Storage;
 
@@ -139,3 +141,46 @@ Artisan::command('complaints:auto-resolve {--dry-run : Preview affected complain
 })->purpose('Auto resolve complaints after 3 days waiting for user confirmation');
 
 Schedule::command('complaints:auto-resolve')->hourly();
+
+Artisan::command('users:cleanup-unverified {--dry-run : Preview tanpa menghapus} {--days=30 : Usia akun minimum dalam hari}', function () {
+    $dryRun = (bool) $this->option('dry-run');
+    $days   = max(1, (int) $this->option('days'));
+
+    $users = User::query()
+        ->where('is_verified', false)
+        ->where('created_at', '<', now()->subDays($days))
+        ->doesntHave('complaints')
+        ->get();
+
+    if ($users->isEmpty()) {
+        $this->info("Tidak ada akun tidak terverifikasi yang perlu dibersihkan (threshold: {$days} hari).");
+        return;
+    }
+
+    $this->info("Ditemukan {$users->count()} akun tidak terverifikasi (> {$days} hari, tanpa pengaduan):");
+
+    foreach ($users as $user) {
+        $this->line("  - #{$user->id} {$user->name} ({$user->email}) — daftar {$user->created_at->diffForHumans()}");
+    }
+
+    if ($dryRun) {
+        $this->warn('[DRY-RUN] Tidak ada yang dihapus. Jalankan tanpa --dry-run untuk menghapus.');
+        return;
+    }
+
+    $deleted = 0;
+    foreach ($users as $user) {
+        try {
+            $user->delete();
+            $deleted++;
+        } catch (\Throwable $e) {
+            $this->error("Gagal hapus #{$user->id}: {$e->getMessage()}");
+            Log::error("users:cleanup-unverified gagal hapus user #{$user->id}", ['error' => $e->getMessage()]);
+        }
+    }
+
+    $this->info("Selesai. {$deleted} akun dihapus.");
+    Log::info("users:cleanup-unverified: {$deleted} akun tidak terverifikasi dihapus (threshold: {$days} hari).");
+})->purpose('Hapus akun tidak terverifikasi yang sudah lebih dari N hari dan belum punya pengaduan');
+
+Schedule::command('users:cleanup-unverified')->dailyAt('02:00');
