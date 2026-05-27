@@ -196,6 +196,11 @@ class AnnouncementController extends Controller
                 return $this->unauthorized('Comments are not allowed for this announcement');
             }
 
+            // Check if user is verified
+            if (!$request->user()->is_verified) {
+                return $this->error('Akun Anda belum diverifikasi oleh admin. Verifikasi KTP diperlukan untuk berkomentar.', 403);
+            }
+
             // Validate input
             $validator = Validator::make($request->all(), [
                 'content' => 'required|string|min:5|max:1000',
