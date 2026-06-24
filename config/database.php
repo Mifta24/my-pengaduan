@@ -97,8 +97,8 @@ return [
             'search_path' => 'public',
             'sslmode' => 'require',
             'options' => extension_loaded('pdo_pgsql') ? [
-                PDO::ATTR_PERSISTENT => false,
-                PDO::ATTR_TIMEOUT    => 60,
+                PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', true),
+                PDO::ATTR_TIMEOUT    => 30,
             ] : [],
         ],
 
