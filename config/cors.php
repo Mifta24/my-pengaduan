@@ -19,7 +19,16 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    /*
+    | The Flutter/Android app calls the API directly (not subject to browser
+    | CORS), so this only matters for browser-based callers: the Scribe docs
+    | "try it out" page and any admin/SPA frontend. Default to APP_URL only;
+    | add more via a comma-separated CORS_ALLOWED_ORIGINS env value.
+    */
+    'allowed_origins' => array_values(array_filter(array_map(
+        fn ($origin) => rtrim(trim($origin), '/'),
+        explode(',', env('CORS_ALLOWED_ORIGINS', env('APP_URL', '')))
+    ))),
 
     'allowed_origins_patterns' => [],
 
