@@ -40,13 +40,17 @@ class DeviceTokenController extends Controller
 
         $user = Auth::user();
 
-        // Update or create device
+        // device_token is globally unique (one FCM token belongs to whichever
+        // user most recently registered it, e.g. a shared device or re-login
+        // with a different account) - match on it alone, not user_id, or the
+        // insert violates the unique constraint when the token already
+        // belongs to a different user.
         $device = UserDevice::updateOrCreate(
             [
-                'user_id' => $user->id,
                 'device_token' => $request->device_token,
             ],
             [
+                'user_id' => $user->id,
                 'device_type' => $request->device_type,
                 'device_model' => $request->device_model,
                 'os_version' => $request->os_version,
