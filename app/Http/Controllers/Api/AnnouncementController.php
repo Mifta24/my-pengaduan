@@ -104,7 +104,7 @@ class AnnouncementController extends Controller
             $announcement->increment('views_count');
 
             $data = $announcement->only([
-                'id', 'title', 'content', 'priority', 'is_sticky', 'published_at', 'created_at',
+                'id', 'slug', 'title', 'content', 'priority', 'is_sticky', 'published_at', 'created_at',
                 'cover_image', 'cover_image_url', 'attachments', 'target_audience', 'views_count',
             ]);
 
