@@ -148,6 +148,29 @@ class NotificationController extends Controller
     }
 
     /**
+     * Delete a notification
+     */
+    public function destroy($id)
+    {
+        try {
+            $notification = FcmNotification::where('user_id', Auth::id())
+                ->where('id', $id)
+                ->first();
+
+            if (!$notification) {
+                return $this->notFound('Notification not found');
+            }
+
+            $notification->delete();
+
+            return $this->deleted('Notification deleted successfully');
+
+        } catch (\Exception $e) {
+            return $this->serverError('Failed to delete notification', $e);
+        }
+    }
+
+    /**
      * Get notification settings
      */
     public function getSettings()
