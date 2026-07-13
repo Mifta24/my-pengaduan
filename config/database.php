@@ -95,7 +95,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'require',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
             'options' => extension_loaded('pdo_pgsql') ? [
                 PDO::ATTR_PERSISTENT => env('DB_PERSISTENT', true),
                 PDO::ATTR_TIMEOUT    => 30,
